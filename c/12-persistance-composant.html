@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>12 · Persistance d'un composant</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 12</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Persistance<br/>d'un composant</h1>
+<p class="chapeau">Ce qu'un composant laisse dans le fichier .gh, comment il le relit, et pourquoi certains identifiants ne survivent pas au voyage.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>07</b> anatomie · <b>11</b> cycle de vie</span>
+<span class="pastille">Exemples · <b>Magpie</b> (éditeur d'exercice) et <b>SnapSet</b> (conteneur)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 240" width="100%">
+<defs>
+<marker id="a1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2E7D32"></path></marker>
+<marker id="a2" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#1565C0"></path></marker>
+</defs>
+<!-- composant à gauche -->
+<rect fill="#C9C9C9" height="80" rx="8" stroke="#4E4E4E" stroke-width="2" width="130" x="10" y="60"></rect>
+<text font-size="11" font-weight="700" text-anchor="middle" x="75" y="90">Éditeur</text>
+<text font-size="11" font-weight="700" text-anchor="middle" x="75" y="106">d'exercice</text>
+<text fill="#2B2F33" font-size="9" text-anchor="middle" x="75" y="126">Titre, Mode…</text>
+<!-- flèches -->
+<path d="M144 84 C 180 70, 200 70, 228 70" fill="none" marker-end="url(#a1)" stroke="#2E7D32" stroke-width="1.8"></path>
+<text class="mono" fill="#2E7D32" font-weight="700" style="font-size:10px" text-anchor="middle" x="186" y="60">Write</text>
+<path d="M228 140 C 200 140, 180 130, 144 118" fill="none" marker-end="url(#a2)" stroke="#1565C0" stroke-width="1.8"></path>
+<text class="mono" fill="#1565C0" font-weight="700" style="font-size:10px" text-anchor="middle" x="186" y="156">Read</text>
+<!-- fichier -->
+<path d="M236 14 H 520 L 540 34 V 226 H 236 Z" fill="#fff" stroke="#2B2F33" stroke-width="1.6"></path>
+<text class="mono" font-weight="700" style="font-size:10px" x="250" y="34">Exercice.gh</text>
+<g class="mono">
+<rect fill="#EFE9E1" height="22" rx="3" width="276" x="250" y="44"></rect><text class="mono" style="font-size:9.5px" x="258" y="59">Definition</text>
+<rect fill="#EFE9E1" height="22" rx="3" width="262" x="264" y="70"></rect><text class="mono" style="font-size:9.5px" x="272" y="85">DefinitionObjects</text>
+<rect fill="#fff" height="122" rx="3" stroke="#B5AEA5" width="248" x="278" y="96"></rect>
+<text class="mono" font-weight="700" style="font-size:9.5px" x="286" y="112">Object 0</text>
+</g>
+<g fill="#6B7378">
+<text class="mono" style="font-size:9px" x="292" y="130">GUID   = ComponentGuid de la classe</text>
+<text class="mono" style="font-size:9px" x="292" y="144">InstanceGuid, Name, NickName</text>
+<text class="mono" style="font-size:9px" x="292" y="158">Attributes (Pivot), paramètres…</text>
+</g>
+<rect fill="#E8F3E8" height="44" rx="3" stroke="#2E7D32" width="228" x="288" y="166"></rect>
+<g fill="#2E7D32">
+<text class="mono" font-weight="700" style="font-size:9px" x="296" y="182">Id = "EX-04"   Titre = "…"</text>
+<text class="mono" font-weight="700" style="font-size:9px" x="296" y="198">Mode = "ExactOrderedList"…</text>
+</g>
+<text fill="#2E7D32" font-size="9" font-weight="700" x="552" y="186">ce que</text>
+<text fill="#2E7D32" font-size="9" font-weight="700" x="552" y="198">TU écris</text>
+<text fill="#6B7378" font-size="9" x="552" y="138">ce que</text>
+<text fill="#6B7378" font-size="9" x="552" y="150">la base</text>
+<text fill="#6B7378" font-size="9" x="552" y="162">écrit</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>À l'enregistrement, Grasshopper demande à chaque objet d'écrire son état avec <code>Write</code> ; à l'ouverture, il recrée l'objet par son constructeur, puis lui fait relire cet état avec <code>Read</code>. Tout ce qui n'est pas écrit est perdu.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un déménagement. Les meubles ne voyagent pas montés : on note sur chaque carton ce qu'il contient et où il va. À l'arrivée, on remonte chaque meuble d'après ses notes. Une pièce sans étiquette arrive, mais personne ne sait plus quoi en faire.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>écrire et relire des valeurs, des listes et des énumérations avec <code>GH_IWriter</code> et <code>GH_IReader</code> ;</li>
+<li>rendre un composant capable d'ouvrir des fichiers écrits par ses anciennes versions ;</li>
+<li>distinguer les trois sortes de Guid, et savoir lequel survit au collage, à l'ouverture, au changement de poste.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Ce qui est <b>calculé</b> (les sorties) n'est pas enregistré : Grasshopper le recalcule à l'ouverture. Ce qui est <b>réglé</b> par l'utilisateur dans le composant (un titre, un mode, une liste de membres) doit être écrit, sinon il disparaît.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 12 · Persistance d'un composant</div>
+</section>
+<!-- ============ PAGE 2 · QUAND WRITE ET READ SONT APPELÉS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 12</b></div>
+<p class="rubrique">Schéma 1 · Quand Write et Read sont appelés</p>
+<h2>Pas seulement à l'enregistrement</h2>
+<p style="max-width:165mm">Write et Read sont le seul moyen pour Grasshopper de photographier un objet. Il s'en sert donc partout où il faut une copie fidèle : fichier, presse-papiers, annulation.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 320" width="100%">
+<defs>
+<marker id="b1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2E7D32"></path></marker>
+<marker id="b2" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#1565C0"></path></marker>
+</defs>
+<g>
+<rect fill="#EFE9E1" height="96" width="600" x="0" y="0"></rect>
+<rect fill="#EFE9E1" height="96" width="600" x="0" y="112"></rect>
+<rect fill="#EFE9E1" height="96" width="600" x="0" y="224"></rect>
+</g>
+<g fill="#1F5F7A" font-size="12" font-weight="800"><text x="14" y="24">Enregistrer, ouvrir</text><text x="14" y="136">Copier, coller</text><text x="14" y="248">Annuler</text></g>
+<!-- ligne 1 -->
+<g font-size="10">
+<rect fill="#fff" height="40" rx="5" stroke="#2B2F33" width="110" x="20" y="40"></rect><text font-weight="700" text-anchor="middle" x="75" y="64">composant</text>
+<path d="M130 52 H 206" marker-end="url(#b1)" stroke="#2E7D32" stroke-width="1.6"></path><text class="mono" fill="#2E7D32" style="font-size:9px" text-anchor="middle" x="168" y="46">Write</text>
+<rect fill="#fff" height="40" rx="5" stroke="#2B2F33" width="110" x="210" y="40"></rect><text font-weight="700" text-anchor="middle" x="265" y="58">.gh / .ghx</text><text fill="#6B7378" font-size="8.5" text-anchor="middle" x="265" y="72">binaire / XML</text>
+<path d="M320 68 H 396" marker-end="url(#b2)" stroke="#1565C0" stroke-width="1.6"></path><text class="mono" fill="#1565C0" style="font-size:9px" text-anchor="middle" x="358" y="84">Read</text>
+<rect fill="#fff" height="40" rx="5" stroke="#1565C0" width="180" x="400" y="40"></rect><text font-weight="700" text-anchor="middle" x="490" y="58">nouvelle instance</text><text fill="#6B7378" font-size="8.5" text-anchor="middle" x="490" y="72">constructeur, puis Read</text>
+</g>
+<!-- ligne 2 -->
+<g font-size="10">
+<rect fill="#fff" height="40" rx="5" stroke="#2B2F33" width="110" x="20" y="152"></rect><text font-weight="700" text-anchor="middle" x="75" y="176">sélection</text>
+<path d="M130 164 H 206" marker-end="url(#b1)" stroke="#2E7D32" stroke-width="1.6"></path><text class="mono" fill="#2E7D32" style="font-size:9px" text-anchor="middle" x="168" y="158">Write</text>
+<rect fill="#fff" height="40" rx="5" stroke="#2B2F33" width="110" x="210" y="152"></rect><text font-weight="700" text-anchor="middle" x="265" y="170">presse-papiers</text><text fill="#6B7378" font-size="8.5" text-anchor="middle" x="265" y="184">une archive</text>
+<path d="M320 180 H 396" marker-end="url(#b2)" stroke="#1565C0" stroke-width="1.6"></path><text class="mono" fill="#1565C0" style="font-size:9px" text-anchor="middle" x="358" y="196">Read</text>
+<rect fill="#fff" height="40" rx="5" stroke="#E65100" width="180" x="400" y="152"></rect><text font-weight="700" text-anchor="middle" x="490" y="170">copies, Guid neufs</text><text fill="#E65100" font-size="8.5" text-anchor="middle" x="490" y="184">InstanceGuidsChanged (p. 4)</text>
+</g>
+<!-- ligne 3 -->
+<g font-size="10">
+<rect fill="#fff" height="40" rx="5" stroke="#2B2F33" width="110" x="20" y="264"></rect><text font-weight="700" text-anchor="middle" x="75" y="282">avant le geste</text><text fill="#6B7378" font-size="8.5" text-anchor="middle" x="75" y="296">RecordUndoEvent</text>
+<path d="M130 276 H 206" marker-end="url(#b1)" stroke="#2E7D32" stroke-width="1.6"></path><text class="mono" fill="#2E7D32" style="font-size:9px" text-anchor="middle" x="168" y="270">Write</text>
+<rect fill="#fff" height="40" rx="5" stroke="#2B2F33" width="110" x="210" y="264"></rect><text font-weight="700" text-anchor="middle" x="265" y="282">instantané</text><text fill="#6B7378" font-size="8.5" text-anchor="middle" x="265" y="296">pile d'annulation</text>
+<path d="M320 292 H 396" marker-end="url(#b2)" stroke="#1565C0" stroke-width="1.6"></path><text class="mono" fill="#1565C0" style="font-size:9px" text-anchor="middle" x="358" y="308">Read</text>
+<rect fill="#fff" height="40" rx="5" stroke="#1565C0" width="180" x="400" y="264"></rect><text font-weight="700" text-anchor="middle" x="490" y="282">le MÊME objet</text><text fill="#6B7378" font-size="8.5" text-anchor="middle" x="490" y="296">Ctrl+Z : il relit son passé</text>
+</g>
+</svg>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">La conséquence la plus subtile</span>
+    À l'annulation, <code>Read</code> est appelé sur un objet <b>déjà rempli</b>, pas sur un objet neuf. <code>Read</code> doit donc tout remettre à zéro avant de relire : SnapSet commence par <code>_membres.Clear()</code>, Magpie aussi. Sans cela, une liste relue s'ajouterait à l'ancienne.
+  </div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire que le constructeur suffit à initialiser l'état. À l'ouverture, il s'exécute <b>avant</b> Read : toute valeur qu'il pose est écrasée par celle du fichier, si elle y est. Et à l'annulation, il ne s'exécute pas du tout.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 12 · Persistance d'un composant</div>
+</section>
+<!-- ============ PAGE 3 · ÉCRIRE, RELIRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 12</b></div>
+<p class="rubrique">Schéma 2 · Écrire, relire</p>
+<h2>Des clés, des valeurs, et toujours un plan B</h2>
+<p style="max-width:165mm">L'archive est une table de <b>clés nommées</b>. On y range des types simples ; une liste devient un compteur, plus une clé indexée par élément. À la relecture, une clé peut manquer : un fichier ancien ne la connaissait pas.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 220" width="100%">
+<defs><marker id="c1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+<rect fill="#EFE9E1" height="220" width="600" x="0" y="0"></rect>
+<text fill="#6B7378" font-size="9.5" font-weight="700" letter-spacing="1" x="14" y="22">EN MÉMOIRE</text>
+<text fill="#6B7378" font-size="9.5" font-weight="700" letter-spacing="1" x="230" y="22">DANS L'ARCHIVE · CLÉ → VALEUR</text>
+<g font-size="10">
+<rect fill="#fff" height="26" rx="4" stroke="#2B2F33" width="180" x="14" y="34"></rect><text class="mono" style="font-size:9.5px" x="22" y="51">string Titre = "Moyenne"</text>
+<rect fill="#fff" height="26" rx="4" stroke="#2B2F33" width="180" x="14" y="70"></rect><text class="mono" style="font-size:9.5px" x="22" y="87">ValidationMode Mode</text>
+<rect fill="#fff" height="70" rx="4" stroke="#2B2F33" width="180" x="14" y="106"></rect><text class="mono" style="font-size:9.5px" x="22" y="123">List&lt;Guid&gt; _membres</text>
+<text class="mono" fill="#6B7378" style="font-size:9px" x="34" y="141">[0] 3f2a…</text><text class="mono" fill="#6B7378" style="font-size:9px" x="34" y="155">[1] 91c0…</text><text class="mono" fill="#6B7378" style="font-size:9px" x="34" y="169">[2] 07be…</text>
+</g>
+<g stroke="#2B2F33" stroke-width="1.3"><path d="M194 47 H 222" marker-end="url(#c1)"></path><path d="M194 83 H 222" marker-end="url(#c1)"></path><path d="M194 141 H 222" marker-end="url(#c1)"></path></g>
+<g>
+<rect fill="#fff" height="26" rx="4" stroke="#2E7D32" width="360" x="226" y="34"></rect>
+<text class="mono" style="font-size:9.5px" x="234" y="51"><tspan fill="#2E7D32" font-weight="700">"Titre"</tspan> → "Moyenne"</text>
+<rect fill="#fff" height="26" rx="4" stroke="#2E7D32" width="360" x="226" y="70"></rect>
+<text class="mono" style="font-size:9.5px" x="234" y="87"><tspan fill="#2E7D32" font-weight="700">"Mode"</tspan> → "ExactOrderedList"  <tspan fill="#6B7378">(le nom, pas 0)</tspan></text>
+<rect fill="#fff" height="70" rx="4" stroke="#2E7D32" width="360" x="226" y="106"></rect>
+<text class="mono" style="font-size:9.5px" x="234" y="123"><tspan fill="#2E7D32" font-weight="700">"MembresCount"</tspan> → 3</text>
+<text class="mono" style="font-size:9.5px" x="234" y="141"><tspan fill="#2E7D32" font-weight="700">"Membre"</tspan>, 0 → 3f2a…</text>
+<text class="mono" style="font-size:9.5px" x="234" y="155"><tspan fill="#2E7D32" font-weight="700">"Membre"</tspan>, 1 → 91c0…</text>
+<text class="mono" style="font-size:9.5px" x="234" y="169"><tspan fill="#2E7D32" font-weight="700">"Membre"</tspan>, 2 → 07be…</text>
+</g>
+<text fill="#2B2F33" font-size="9.5" x="14" y="204">Écriture : <tspan class="mono" font-weight="700" style="font-size:9.5px">SetString, SetInt32, SetDouble, SetBoolean, SetGuid</tspan>, avec ou sans index.</text>
+</svg>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.8pt">
+<h3>Relire sans planter</h3>
+<p><code>reader.GetString("Titre")</code> lève une exception si la clé manque. <code>reader.TryGetString("Titre", ref s)</code> renvoie <code>false</code> à la place : on choisit alors une valeur par défaut.</p>
+<p style="margin-top:2mm">C'est ce qui permet d'<b>ajouter</b> un réglage dans une version 2 : les fichiers de la version 1 ne l'ont pas, et s'ouvrent quand même, avec le défaut.</p>
+</div>
+<div style="font-size:8.8pt">
+<h3>Une énumération en texte</h3>
+<p>Magpie écrit <code>Mode.ToString()</code> et relit avec <code>Enum.TryParse</code>. Écrire l'entier serait plus court, mais le jour où une valeur est insérée au milieu de <code>ValidationMode</code>, tous les numéros suivants glissent, et les anciens fichiers changent de mode sans prévenir.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier <code>return base.Write(writer);</code> ou <code>base.Read(reader)</code>. La classe parente y écrit le surnom, les paramètres, leurs données internes et la position sur le canvas : sans cet appel, le composant revient nu, au mauvais endroit.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 12 · Persistance d'un composant</div>
+</section>
+<!-- ============ PAGE 4 · TROIS GUID ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 12</b></div>
+<p class="rubrique">Schéma 3 · Trois sortes de Guid</p>
+<h2>Qui survit au collage, à l'ouverture, au voyage ?</h2>
+<p style="max-width:165mm">Un Guid est un identifiant de 128 bits, unique au monde. Mais « unique » ne dit pas <b>dans quel monde</b> il désigne quelque chose. Trois Guid circulent autour d'un composant.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 200" width="100%">
+<g>
+<rect fill="#fff" height="200" rx="8" stroke="#2E7D32" stroke-width="1.6" width="190" x="0" y="0"></rect>
+<rect fill="#fff" height="200" rx="8" stroke="#1565C0" stroke-width="1.6" width="190" x="205" y="0"></rect>
+<rect fill="#fff" height="200" rx="8" stroke="#C62828" stroke-width="1.6" width="190" x="410" y="0"></rect>
+</g>
+<g font-weight="700"><text fill="#2E7D32" font-size="11.5" x="14" y="24">ComponentGuid</text><text fill="#1565C0" font-size="11.5" x="219" y="24">InstanceGuid</text><text fill="#C62828" font-size="11.5" x="424" y="24">Guid d'objet Rhino</text></g>
+<g fill="#2B2F33" font-size="9.5">
+<text x="14" y="46">un par <tspan font-weight="700">classe</tspan> (cours 07)</text>
+<text x="14" y="62">écrit en dur dans le code</text>
+<text x="219" y="46">un par <tspan font-weight="700">objet posé</tspan></text>
+<text x="219" y="62">sur le canvas</text>
+<text x="424" y="46">un par objet du <tspan font-weight="700">modèle</tspan></text>
+<text x="424" y="62">Rhino (.3dm)</text>
+</g>
+<g font-size="9" font-weight="700">
+<text fill="#6B7378" x="14" y="96">ouverture</text><text fill="#2E7D32" x="110" y="96">identique</text>
+<text fill="#6B7378" x="14" y="116">collage</text><text fill="#2E7D32" x="110" y="116">identique</text>
+<text fill="#6B7378" x="14" y="136">autre poste</text><text fill="#2E7D32" x="110" y="136">identique</text>
+<text fill="#6B7378" x="219" y="96">ouverture</text><text fill="#2E7D32" x="315" y="96">identique</text>
+<text fill="#6B7378" x="219" y="116">collage</text><text fill="#C62828" x="315" y="116">NEUF</text>
+<text fill="#6B7378" x="219" y="136">autre poste</text><text fill="#2E7D32" x="315" y="136">identique</text>
+<text fill="#6B7378" x="424" y="96">ouverture</text><text fill="#E65100" x="520" y="96">si même .3dm</text>
+<text fill="#6B7378" x="424" y="116">collage</text><text fill="#2E7D32" x="520" y="116">identique</text>
+<text fill="#6B7378" x="424" y="136">autre poste</text><text fill="#C62828" x="520" y="136">ne désigne</text>
+<text fill="#C62828" x="520" y="148">rien</text>
+</g>
+<g fill="#6B7378" font-size="9" font-style="italic">
+<text x="14" y="178">le changer casse les .gh</text><text x="14" y="190">qui utilisent la classe</text>
+<text x="219" y="178">le retenir oblige à suivre</text><text x="219" y="190">les collages</text>
+<text x="424" y="178">le retenir rend le composant</text><text x="424" y="190">dépendant d'un fichier Rhino</text>
+</g>
+</svg>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>SnapSet : suivre les collages</h3>
+<p>Un conteneur retient les InstanceGuid de ses membres. Au collage, Grasshopper donne des Guid neufs aux copies : la liste désignerait les originaux. Le conteneur implémente donc <code>IGH_InstanceGuidDependent</code>, et Grasshopper lui passe la correspondance ancien → nouveau.</p>
+<div class="boite apres" style="margin-top:3mm"><span class="etiq">Conteneur.cs · 213–220</span>public void InstanceGuidsChanged(
+    SortedDictionary&lt;Guid, Guid&gt; map)
+{
+    if (map == null) return;
+    for (int i = 0; i &lt; _membres.Count; i++)
+        if (map.TryGetValue(_membres[i], out var nouveau))
+            _membres[i] = nouveau;
+}</div>
+</div>
+<div style="font-size:8.6pt">
+<h3>Magpie : ne pas référencer</h3>
+<p>Un composant qui <b>référence</b> un objet Rhino ne retient que son Guid. Chez l'apprenant, sur un autre poste, ce Guid ne désigne rien : le composant de départ arrive vide.</p>
+<p style="margin-top:2mm">Le README de Magpie donne la parade : <b>internaliser</b> la géométrie et ses attributs dans des paramètres Grasshopper, puis reconstruire l'objet avec <i>Model Object</i>, entrée <i>Object</i> laissée vide. Le .gh porte alors la géométrie elle-même, pas une adresse.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Régénérer le ComponentGuid d'un composant à chaque version, par exemple en laissant un assistant réécrire la classe. Le plugin marche, mais chaque fichier .gh qui utilisait l'ancienne version ouvre un composant manquant. Le référentiel Magpie en fait même une « erreur attendue » de l'exercice IA-07.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 12 · Persistance d'un composant</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 12</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>MagpieExerciseEditor.cs : Write et Read en miroir</h2>
+<p style="max-width:165mm">Les deux méthodes se lisent côte à côte : chaque <code>Set…</code> a son <code>TryGet…</code>, sous la même clé. Les lignes longues sont coupées ici pour tenir sur la page.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">917</span><span class="kw">public override bool</span> Write(<span class="ty">GH_IWriter</span> writer)</div>
+<div class="l"><span class="n">918</span>{</div>
+<div class="l k1"><span class="n">919</span>  writer.SetString(<span class="st">"Id"</span>, Id ?? <span class="kw">string</span>.Empty);<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n">920</span>  writer.SetString(<span class="st">"Titre"</span>, Titre ?? <span class="kw">string</span>.Empty);</div>
+<div class="l k2"><span class="n">922</span>  writer.SetString(<span class="st">"Mode"</span>, Mode.ToString());<span class="rep r2">2</span></div>
+<div class="l"><span class="n">923</span>  writer.SetBoolean(<span class="st">"ToleranceCochee"</span>, ToleranceCochee);</div>
+<div class="l k3"><span class="n">926</span>  writer.SetInt32(<span class="st">"MembresCount"</span>, _membres.Count);<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">927</span> <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; _membres.Count; i++)</div>
+<div class="l k3"><span class="n"> </span>    writer.SetGuid(<span class="st">"Membre"</span>, i, _membres[i]);</div>
+<div class="l k4"><span class="n">928</span> <span class="kw">if</span> (_signatureEnregistree != <span class="kw">null</span>) writer.SetString(…);<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">930</span> <span class="kw">return base</span>.Write(writer);<span class="rep r5">5</span></div>
+<div class="l"><span class="n">931</span>}</div>
+<div class="l"><span class="n"> </span></div>
+<div class="l"><span class="n">933</span><span class="kw">public override bool</span> Read(<span class="ty">GH_IReader</span> reader)</div>
+<div class="l"><span class="n">934</span>{</div>
+<div class="l k6"><span class="n">935</span> <span class="kw">string</span> s = <span class="kw">null</span>;<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">936</span>  Id = reader.TryGetString(<span class="st">"Id"</span>, <span class="kw">ref</span> s) ? s : <span class="kw">string</span>.Empty;</div>
+<div class="l k2"><span class="n">939</span>  Mode = reader.TryGetString(<span class="st">"Mode"</span>, <span class="kw">ref</span> s)</div>
+<div class="l k2"><span class="n"> </span>      &amp;&amp; <span class="ty">Enum</span>.TryParse(s, <span class="kw">out</span> <span class="ty">ValidationMode</span> m)</div>
+<div class="l k2"><span class="n"> </span>      ? m : <span class="ty">ValidationMode</span>.ExactOrderedList;</div>
+<div class="l k6"><span class="n">941</span>  ToleranceCochee =</div>
+<div class="l k6"><span class="n"> </span>      reader.TryGetBoolean(<span class="st">"ToleranceCochee"</span>, <span class="kw">ref</span> b) &amp;&amp; b;</div>
+<div class="l k3"><span class="n">947</span>  _membres.Clear();</div>
+<div class="l k3"><span class="n">949</span> <span class="kw">if</span> (reader.TryGetInt32(<span class="st">"MembresCount"</span>, <span class="kw">ref</span> n))</div>
+<div class="l k3"><span class="n">950</span> <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i++)</div>
+<div class="l k3"><span class="n">951</span> <span class="kw">if</span> (reader.ItemExists(<span class="st">"Membre"</span>, i))</div>
+<div class="l k3"><span class="n"> </span>        _membres.Add(reader.GetGuid(<span class="st">"Membre"</span>, i));</div>
+<div class="l k4"><span class="n">953</span>  _signatureEnregistree = reader.TryGetString(…) ? s : <span class="kw">null</span>;</div>
+<div class="l k7"><span class="n">955</span>  InvaliderEtat();<span class="rep r7">7</span></div>
+<div class="l k7"><span class="n">956</span>  Attrs?.ExpireLayout();</div>
+<div class="l k5"><span class="n">957</span> <span class="kw">return base</span>.Read(reader);</div>
+<div class="l"><span class="n">958</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Jamais null</b><code>?? string.Empty</code> (cours 01) : on n'écrit jamais null, au pire une chaîne vide, que Read sait relire.</li>
+<li><span class="rep r2">2</span><b>L'énumération par son nom</b>Écrite en texte, relue avec <code>Enum.TryParse</code>, avec un mode par défaut.</li>
+<li><span class="rep r3">3</span><b>Une liste</b>Un compteur, puis une clé indexée. À la relecture : vider d'abord, puis vérifier chaque index.</li>
+<li><span class="rep r4">4</span><b>Facultatif</b>Une clé absente veut dire « pas de signature » : null à la relecture.</li>
+<li><span class="rep r5">5</span><b>La part du parent</b>Surnom, paramètres, position : écrits et relus par la base.</li>
+<li><span class="rep r6">6</span><b>TryGet partout</b>Un fichier ancien sans la clé s'ouvre quand même, avec un défaut.</li>
+<li><span class="rep r7">7</span><b>Après la relecture</b>L'état dérivé est oublié et la capsule remise en page (cours 11).</li>
+</ul>
+</div>
+<div class="folio">5</div>
+<div class="pied">Cours 12 · Persistance d'un composant</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 12</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">writer.SetString("clé", v)</td><td>écrit une valeur sous une clé</td><td>MagpieExerciseEditor:919</td></tr>
+<tr><td class="c">writer.SetGuid("clé", i, g)</td><td>écrit l'élément i d'une liste</td><td>MagpieExerciseEditor:927</td></tr>
+<tr><td class="c">reader.TryGetString("clé", ref s)</td><td>relit, ou false si absente</td><td>MagpieExerciseEditor:936</td></tr>
+<tr><td class="c">reader.ItemExists("clé", i)</td><td>l'élément i existe-t-il ?</td><td>Conteneur:202</td></tr>
+<tr><td class="c">Enum.TryParse(s, out m)</td><td>relit une énumération écrite en texte</td><td>MagpieExerciseEditor:939</td></tr>
+<tr><td class="c">return base.Write(writer)</td><td>laisse la base écrire sa part</td><td>MagpieExerciseEditor:930</td></tr>
+<tr><td class="c">InstanceGuidsChanged(map)</td><td>suit les Guid neufs d'un collage</td><td>Conteneur:213</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Archive</dt><dd>La table de clés et de valeurs où chaque objet s'écrit.</dd>
+<dt>Persistance</dt><dd>Ce qui survit à la fermeture du fichier.</dd>
+<dt>InstanceGuid</dt><dd>L'identité d'un objet posé ; neuve à chaque collage.</dd>
+<dt>Compatibilité ascendante</dt><dd>Une nouvelle version sait ouvrir les fichiers des anciennes.</dd>
+<dt>Internaliser</dt><dd>Copier une donnée dans le .gh au lieu d'en garder l'adresse.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 43</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 12 · Persistance d'un composant</div>
+</section>
+</body>
+</html>

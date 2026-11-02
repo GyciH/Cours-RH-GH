@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F6F4F0" media="(prefers-color-scheme: light)">
+<meta name="application-name" content="Cours RH·GH">
+<meta name="theme-color" content="#141619" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone-192.png">
+<link rel="apple-touch-icon" href="icone-180.png">
+<style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head><body>
+<title>Cours Rhino · Grasshopper</title>
+<style>
+:root{
+  --ground:#F6F4F0; --card:#FFFFFF; --line:#E2DED7; --line2:#D5D0C8; --ink:#1E2226; --muted:#5E656B; --track:#ECE9E3;
+  --ok:#2E7D32; --okp:#EEF6EE; --ko:#C62828; --kop:#FBEDED; --warn:#B45309; --warnp:#FBF1E6;
+  --inv:#1E2226; --invfg:#FFFFFF; --mix:#1E2226;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ground:#141619; --card:#1D2024; --line:#2D3135; --line2:#3A3F44; --ink:#ECE9E3; --muted:#9BA1A6; --track:#2A2E32;
+  --ok:#6FBF73; --okp:#1C2A1D; --ko:#EF7A7A; --kop:#2E1C1C; --warn:#E8A15C; --warnp:#2E2316;
+  --inv:#ECE9E3; --invfg:#141619; --mix:#FFFFFF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#141619; --card:#1D2024; --line:#2D3135; --line2:#3A3F44; --ink:#ECE9E3; --muted:#9BA1A6; --track:#2A2E32;
+  --ok:#6FBF73; --okp:#1C2A1D; --ko:#EF7A7A; --kop:#2E1C1C; --warn:#E8A15C; --warnp:#2E2316;
+  --inv:#ECE9E3; --invfg:#141619; --mix:#FFFFFF; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--ground);z-index:10}
+button{font:inherit;color:inherit}
+a{color:inherit}
+.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+/* la couleur de partie, lisible dans les deux thèmes */
+.pc{--pt:var(--pc)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pc{--pt:color-mix(in oklab,var(--pc) 55%,var(--mix))}}
+:root[data-theme="dark"] .pc{--pt:color-mix(in oklab,var(--pc) 55%,var(--mix))}
+
+#app{max-width:680px;margin:0 auto;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.ecran{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 12px;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-size:26px;line-height:1.15;font-weight:700;text-wrap:balance}
+h2{margin:0;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.sous{color:var(--muted);font-size:14px;margin:4px 0 0}
+.carte{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ligne{display:flex;align-items:center;gap:10px;min-width:0}
+.ecarte{justify-content:space-between}
+.btn{height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line2);background:var(--card);font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;white-space:nowrap}
+.btn.plein{background:var(--inv);color:var(--invfg);border-color:var(--inv)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.petit{height:36px;padding:0 12px;font-size:13px}
+.barre{height:8px;background:var(--track);border-radius:4px;overflow:hidden;flex:1;min-width:40px}
+.barre>i{display:block;height:100%;background:var(--pt,var(--ink));border-radius:4px}
+.puce{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;border:1px solid var(--line2);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.puce b{color:var(--ink);font-weight:600;margin-left:4px}
+button.puce{background:var(--card);cursor:pointer}
+.puces{display:flex;flex-wrap:wrap;gap:6px}
+.vide{color:var(--muted);font-size:14px;text-align:center;padding:24px 8px}
+
+/* barre d'onglets */
+nav.onglets{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.onglets div{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.onglets a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:11.5px;font-weight:500;color:var(--muted);text-decoration:none;position:relative}
+nav.onglets a svg{width:22px;height:22px}
+nav.onglets a[aria-current]{color:var(--ink);font-weight:700}
+nav.onglets .badge{position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--warn);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* listes de cours */
+.cours-ligne{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);text-decoration:none;min-width:0}
+.cours-ligne:first-child{border-top:none}
+.cours-ligne .num{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:var(--pt)}
+.cours-ligne .t{font-weight:600;font-size:15px;line-height:1.25}
+.cours-ligne .m{font-size:12.5px;color:var(--muted)}
+.etat{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;color:var(--muted)}
+.etat::before{content:"";width:8px;height:8px;border-radius:50%;border:1.5px solid currentColor}
+.etat.encours{color:var(--warn)} .etat.encours::before{background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
+.etat.fini{color:var(--ok)} .etat.fini::before{background:currentColor}
+.etat.revoir{color:var(--ko)} .etat.revoir::before{background:currentColor;border-radius:2px}
+.groupe{display:flex;flex-direction:column;gap:2px}
+.groupe-tete{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:2px 0 6px;border-bottom:2px solid var(--pt,var(--ink))}
+.groupe-tete span{font-weight:700;font-size:16px}
+.groupe-tete small{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.sousgroupe{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--pt);padding:12px 0 2px}
+
+/* bibliothèque */
+.recherche{display:flex;align-items:center;gap:8px;height:46px;padding:0 12px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.recherche input{flex:1;min-width:0;border:none;outline:none;background:transparent;font:inherit;font-size:16px;color:var(--ink)}
+.segment{display:grid;grid-template-columns:repeat(3,1fr);background:var(--track);border-radius:12px;padding:3px;gap:3px}
+.segment button{height:36px;border:none;border-radius:9px;background:transparent;font-size:13.5px;font-weight:500;cursor:pointer;color:var(--muted)}
+.segment button[aria-pressed="true"]{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 0 0 1px var(--line)}
+.filtres{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:0 max(16px,env(safe-area-inset-left,0px))}
+.filtres button{flex:none;height:34px;padding:0 12px;border-radius:17px;border:1px solid var(--line2);background:var(--card);font-size:13px;cursor:pointer}
+.filtres button[aria-pressed="true"]{background:var(--inv);color:var(--invfg);border-color:var(--inv);font-weight:600}
+
+/* accueil */
+.parties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.partie-tuile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;text-decoration:none;border-top:5px solid var(--pc);min-width:0}
+.partie-tuile .no{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--pt)}
+.partie-tuile .nm{font-weight:600;font-size:14px;line-height:1.25}
+.partie-tuile .ct{font-size:12px;color:var(--muted)}
+.grand{font-size:34px;font-weight:700;line-height:1}
+
+/* page cours */
+.bandeau{background:var(--pc);color:#fff;padding:20px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:8px}
+.bandeau .haut{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.92}
+.bandeau .haut a{color:#fff;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px;min-height:32px}
+.bandeau h1{color:#fff;font-size:27px}
+.bandeau p{margin:0;font-size:15px;line-height:1.45;opacity:.95}
+.idee{font-size:16px;line-height:1.45;font-weight:500;margin:0}
+ol.obj{margin:0;padding:0;list-style:none;counter-reset:o;display:flex;flex-direction:column;gap:8px}
+ol.obj li{counter-increment:o;display:grid;grid-template-columns:24px 1fr;gap:8px}
+ol.obj li::before{content:counter(o);width:22px;height:22px;border-radius:50%;background:var(--pc);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.retenir{border-left:4px solid var(--pc);background:color-mix(in oklab,var(--pc) 10%,var(--card));padding:12px 14px;border-radius:0 12px 12px 0}
+.retenir b{display:block;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--pt);margin-bottom:4px}
+.pages a{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:11px 0;border-top:1px solid var(--line);text-decoration:none}
+.pages a:first-child{border-top:none}
+.pages .pn{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:13px}
+.pages .lu{font-size:12px;color:var(--ok);font-weight:600}
+dl.glo{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:0}
+dl.glo dt{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--pt);font-weight:500}
+dl.glo dd{margin:0 0 4px;font-size:14px}
+details summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+details summary::after{content:"+";color:var(--muted);font-weight:400}
+details[open] summary::after{content:"–"}
+
+/* lecteur */
+.lecteur-barre{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:8px max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:8px}
+.lecteur-barre .titre{flex:1;min-width:0;font-size:13px;line-height:1.25}
+.lecteur-barre .titre b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.lecteur-barre .titre span{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feuille{overflow:auto;padding:12px max(8px,env(safe-area-inset-right,0px)) 12px max(8px,env(safe-area-inset-left,0px));-webkit-overflow-scrolling:touch}
+.feuille-hote{margin:0 auto;box-shadow:0 1px 0 var(--line),0 0 0 1px var(--line);background:#fff}
+.lecteur-pied{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:8px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.points{display:flex;gap:6px;justify-content:center}
+.points i{width:8px;height:8px;border-radius:50%;background:var(--track)}
+.points i.on{background:var(--pt);transform:scale(1.25)}
+.points i.lu{background:color-mix(in oklab,var(--pt) 45%,var(--track))}
+
+/* QCM */
+.q-tete{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.q-enonce{font-size:18px;font-weight:600;line-height:1.35;margin:0}
+.q-tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.05em;color:var(--warn);text-transform:uppercase}
+.options{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;text-align:left;padding:12px;border-radius:12px;border:1.5px solid var(--line2);background:var(--card);cursor:pointer;font-size:15px;line-height:1.35;min-height:48px}
+.opt .l{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--muted)}
+.opt.multi .l{border-radius:6px}
+.opt.choisi{border-color:var(--ink)}
+.opt.choisi .l{background:var(--inv);color:var(--invfg);border-color:var(--inv)}
+.opt.juste{border-color:var(--ok);background:var(--okp)}
+.opt.juste .l{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.faux{border-color:var(--ko);background:var(--kop)}
+.opt.faux .l{background:var(--ko);border-color:var(--ko);color:#fff}
+.opt .verdict{grid-column:2;font-size:12px;font-weight:700}
+.opt.juste .verdict{color:var(--ok)} .opt.faux .verdict{color:var(--ko)}
+.retour{border-radius:12px;padding:12px 14px;font-size:14.5px}
+.retour.bon{background:var(--okp);border:1px solid var(--ok)}
+.retour.mauvais{background:var(--kop);border:1px solid var(--ko)}
+.retour b{display:block;margin-bottom:2px}
+.progression-q{height:4px;background:var(--track);border-radius:2px;overflow:hidden}
+.progression-q i{display:block;height:100%;background:var(--pt,var(--ink))}
+.score{font-size:56px;font-weight:700;line-height:1}
+.score small{font-size:22px;color:var(--muted);font-weight:500}
+.recap-q{display:flex;flex-wrap:wrap;gap:6px}
+.recap-q span{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:"JetBrains Mono",monospace}
+.recap-q .o{background:var(--okp);color:var(--ok);border:1px solid var(--ok)}
+.recap-q .x{background:var(--kop);color:var(--ko);border:1px solid var(--ko)}
+
+/* progrès */
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.kpi b{font-size:26px;line-height:1.1}
+.kpi span{font-size:12.5px;color:var(--muted)}
+.jours{display:grid;grid-template-columns:repeat(7,minmax(0,30px));gap:5px}
+.jours i{aspect-ratio:1;border-radius:5px;background:var(--track);max-width:100%}
+.jours i.n1{background:color-mix(in oklab,var(--ok) 35%,var(--track))}
+.jours i.n2{background:color-mix(in oklab,var(--ok) 65%,var(--track))}
+.jours i.n3{background:var(--ok)}
+.jours i.auj{outline:2px solid var(--ink);outline-offset:1px}
+.comp{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;padding:10px 0;border-top:1px solid var(--line);text-decoration:none}
+.comp:first-of-type{border-top:none}
+.comp .id{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--muted);padding-top:2px}
+.comp .nm{font-size:14px;font-weight:600}
+.niv{grid-column:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.niv div{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.niv .barre{flex:none;height:6px}
+.niv .barre>i{background:var(--ok)}
+.sync{font-size:12px;color:var(--muted);text-align:center}
+.legende{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+@media (min-width:560px){.parties{grid-template-columns:repeat(3,minmax(0,1fr))}.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+<link rel="stylesheet" href="f/polices.css">
+
+<div id="app"><div class="ecran"><p class="vide">Chargement de la bibliothèque…</p></div></div>
+<nav class="onglets" aria-label="Sections"><div>
+  <a href="#accueil" data-o="accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</a>
+  <a href="#biblio" data-o="biblio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h4v16H4zM10 4h4v16h-4zM16.5 4.5l3.8 1-3.9 15-3.8-1z"/></svg>Bibliothèque</a>
+  <a href="#revisions" data-o="revisions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>Révisions<span class="badge" id="badge" hidden></span></a>
+  <a href="#progres" data-o="progres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progrès</a>
+</div></nav>
+
+<script>
+(function(){
+'use strict';
+var INTERVALLES=[1,1,3,7,16,35];   // jours avant de revoir une carte, par boîte (0 = ratée)
+var SEUIL=7/12;                      // part de bonnes réponses : en dessous, le cours est « à revoir »
+var MAITRISE=10/12;
+var CLE='cours-rh-gh-progres';
+var NIV=['','N1 · découvrir','N2 · pratiquer','N3 · maîtriser'];
+var ETATS={afaire:'À faire',encours:'En cours',fini:'Terminé',revoir:'À revoir'};
+var $app=document.getElementById('app');
+var CAT=null, PAR={}, CH={}, CO={}, COMP={}, ORDRE=[];
+var P=vide();
+var ui={groupe:'partie',statut:'tous',q:'',partie:0,zoom:0};
+var sess=null; // séance de QCM ou de révision en cours
+
+function vide(){return {v:2,cours:{},cartes:{},jours:{},dernier:null}}
+// v1 → v2 : les cours passent de 7 à 6 pages (QCM et corrigé retirés) ; l'ancienne page 7 devient la 6
+function migrer(x){x=JSON.parse(JSON.stringify(x||{}));if((x.v|0)>=2)return x;for(var n in (x.cours||{})){var c=x.cours[n],b=c.pg|0;c.pg=(b&31)|(((b>>6)&1)<<5)}if(x.dernier&&x.dernier.pg>6)x.dernier.pg=6;x.v=2;return x}
+function nbPages(n){return CO[n].pg.length}
+function totQ(pr){return pr.tot||12}
+function ratio(pr){return (pr.best||0)/totQ(pr)}
+function nettoyer(){for(var k in P.cartes){var p=k.split('-');if(!CO[+p[0]]||!CO[+p[0]].qk[+p[1]])delete P.cartes[k]}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function norm(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
+function jour(d){d=d||new Date();var m=d.getMonth()+1,j=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(j<10?'0':'')+j}
+function plus(n){var d=new Date();d.setDate(d.getDate()+n);return jour(d)}
+function pc(p){return '--pc:'+PAR[p].c}
+function num(c){return c.num}
+function pagesLues(n){var c=P.cours[n];if(!c||!c.pg)return 0;var k=0,b=c.pg;while(b){k+=b&1;b>>=1}return k}
+
+/* ---------- état d'un cours ---------- */
+function statut(n){var c=P.cours[n];if(!c)return 'afaire';if(c.nb>0)return ratio(c)>=SEUIL-1e-9?'fini':'revoir';if(c.pg)return 'encours';return 'afaire'}
+function etatHtml(n){var s=statut(n);return '<span class="etat '+s+'">'+ETATS[s]+'</span>'}
+function cartesDues(){var t=jour(),r=[];for(var k in P.cartes){if(P.cartes[k].d<=t)r.push(k)}return r}
+function noter(){P.jours[jour()]=(P.jours[jour()]||0)+1}
+
+/* ---------- sauvegarde : appareil + base partagée ---------- */
+var doc=null, enAttente=false, minuteur=null, syncEtat='local';
+function lireLocal(){try{var s=localStorage.getItem(CLE);if(s)return JSON.parse(s)}catch(e){}return null}
+function ecrireLocal(){try{localStorage.setItem(CLE,JSON.stringify(P))}catch(e){}}
+function fusion(a,b){ // réunit deux états sans rien perdre
+  var r=vide(),k;
+  r.cours=JSON.parse(JSON.stringify(a.cours||{}));
+  for(k in (b.cours||{})){var x=r.cours[k],y=b.cours[k];
+    if(!x){r.cours[k]=JSON.parse(JSON.stringify(y));continue}
+    x.pg=(x.pg|0)|(y.pg|0);x.best=Math.max(x.best||0,y.best||0);x.nb=Math.max(x.nb||0,y.nb||0);
+    if((y.at||'')>(x.at||'')){x.at=y.at;x.last=y.last}}
+  r.cartes=JSON.parse(JSON.stringify(a.cartes||{}));
+  for(k in (b.cartes||{})){var c=r.cartes[k],e=b.cartes[k];if(!c||(e.t||0)>(c.t||0))r.cartes[k]=e}
+  r.jours=Object.assign({},a.jours||{});
+  for(k in (b.jours||{}))r.jours[k]=Math.max(r.jours[k]||0,b.jours[k]);
+  r.dernier=(a.dernier&&b.dernier)?((a.dernier.t||0)>=(b.dernier.t||0)?a.dernier:b.dernier):(a.dernier||b.dernier);
+  return r}
+function sauver(){ecrireLocal();majBadge();if(!doc)return;clearTimeout(minuteur);enAttente=true;
+  minuteur=setTimeout(function(){doc.set(JSON.parse(JSON.stringify(P))).then(function(){enAttente=false;syncEtat='ok';majSync()},function(){enAttente=false;syncEtat='local';majSync()})},1200)}
+function majSync(){var el=document.getElementById('sync');if(el)el.textContent=syncTexte()}
+function syncTexte(){return 'Progression enregistrée sur ce téléphone.'}
+function brancherBase(){
+  if(!window.claude||!window.claude.use)return;
+  window.claude.use('db').then(function(db){
+    if(!db)return;
+    doc=db.doc('progres/moi');
+    doc.onSnapshot(function(s){
+      if(enAttente)return;
+      syncEtat='ok';
+      var avant=JSON.stringify(P);
+      var distant=s.exists?migrer(s.data()):null;
+      P=distant?fusion(distant,P):P;if(CAT)nettoyer();
+      ecrireLocal();
+      if(!distant||JSON.stringify(P)!==JSON.stringify(distant))sauver();
+      if(JSON.stringify(P)!==avant&&!sess)rendre();else majSync();
+    },function(){doc=null;syncEtat='local';majSync()});
+  },function(){});
+}
+
+/* ---------- navigation ---------- */
+function aller(h){if(location.hash==='#'+h)rendre();else location.hash=h}
+function route(){var h=(location.hash||'#accueil').slice(1).split('-');return h}
+function rendre(){
+  if(!CAT)return;
+  var r=route(),v=r[0],ong=v;
+  if(v==='cours'||v==='lire'||v==='qcm')ong='biblio';
+  if(v==='revision')ong='revisions';
+  document.querySelectorAll('nav.onglets a').forEach(function(a){if(a.dataset.o===ong)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+  var n=+r[1];
+  if((v==='cours'||v==='lire'||v==='qcm')&&!CO[n])v='biblio';
+  if(v!=='qcm'&&v!=='revision')sess=null;
+  if(v==='biblio')vueBiblio(r[1]);
+  else if(v==='cours')vueCours(n);
+  else if(v==='lire')vueLire(n,+(r[2]||1));
+  else if(v==='qcm')vueQcm(n);
+  else if(v==='revisions')vueRevisions();
+  else if(v==='revision')vueSeance();
+  else if(v==='progres')vueProgres();
+  else vueAccueil();
+  majBadge();
+}
+var derniereVue='';
+window.addEventListener('hashchange',function(){var h=location.hash;rendre();if(h.indexOf('#lire')!==0||derniereVue.indexOf('#lire')!==0)window.scrollTo(0,0);derniereVue=h});
+function majBadge(){var b=document.getElementById('badge');if(!b||!CAT)return;var n=cartesDues().length;b.hidden=!n;b.textContent=n>99?'99+':n}
+
+/* ---------- fragments ---------- */
+function ligneCours(c,sansNum){var p=PAR[c.p];
+  return '<a class="cours-ligne pc" style="'+pc(c.p)+'" href="#cours-'+c.n+'"><span class="num">'+esc(c.num)+'</span><span style="min-width:0"><span class="t">'+esc(c.t)+'</span><br><span class="m">'+c.ch+' · N'+c.niv+' · '+esc(c.dur)+(statut(c.n)==='encours'?' · page '+pagesLues(c.n)+'/'+nbPages(c.n):'')+(P.cours[c.n]&&P.cours[c.n].nb?' · '+P.cours[c.n].best+'/'+totQ(P.cours[c.n]):'')+'</span></span>'+etatHtml(c.n)+'</a>'}
+function suivantDansParcours(apres){var i=apres?ORDRE.indexOf(apres)+1:0;for(;i<ORDRE.length;i++){var s=statut(ORDRE[i]);if(s!=='fini')return ORDRE[i]}return null}
+function compte(liste){var f=0;liste.forEach(function(n){if(statut(n)==='fini')f++});return f}
+
+/* ---------- Accueil ---------- */
+function vueAccueil(){
+  var d=new Date(),date=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  var dues=cartesDues().length, h='<div class="ecran">';
+  h+='<div><h1>Aujourd’hui</h1><p class="sous">'+esc(date.charAt(0).toUpperCase()+date.slice(1))+' · '+compte(ORDRE)+' cours terminés sur '+ORDRE.length+'</p></div>';
+  // Reprendre
+  var der=P.dernier&&CO[P.dernier.n]?CO[P.dernier.n]:null;
+  if(der&&statut(der.n)!=='fini'){
+    var lu=pagesLues(der.n),np=nbPages(der.n),pg=Math.min(np,(P.dernier.pg||1));
+    var cible=lu>=np-1?'#qcm-'+der.n:'#lire-'+der.n+'-'+pg;
+    h+='<div class="carte pc" style="'+pc(der.p)+';border-left:5px solid var(--pc)"><h2>Reprendre</h2>'+
+      '<a href="#cours-'+der.n+'" style="text-decoration:none"><span class="mono" style="color:var(--pt);font-size:13px">Cours '+esc(der.num)+' · '+der.ch+'</span><br><span style="font-size:19px;font-weight:700;line-height:1.25">'+esc(der.t)+'</span></a>'+
+      '<div class="ligne"><div class="barre"><i style="width:'+Math.round(lu/np*100)+'%"></i></div><span style="font-size:13px;color:var(--muted)">'+lu+' / '+np+' pages</span></div>'+
+      '<div class="ligne"><a class="btn plein" href="'+cible+'" style="flex:1">'+(lu>=np-1?'Faire le QCM':'Lire la page '+pg)+'</a><a class="btn" href="#cours-'+der.n+'">Fiche</a></div></div>';
+  } else {
+    var s=suivantDansParcours(der?der.n:null)||suivantDansParcours(null);
+    if(s){var c=CO[s];h+='<div class="carte pc" style="'+pc(c.p)+';border-left:5px solid var(--pc)"><h2>'+(der?'Cours suivant':'Pour commencer')+'</h2>'+
+      '<a href="#cours-'+c.n+'" style="text-decoration:none"><span class="mono" style="color:var(--pt);font-size:13px">Cours '+esc(c.num)+' · '+c.ch+'</span><br><span style="font-size:19px;font-weight:700;line-height:1.25">'+esc(c.t)+'</span></a>'+
+      '<p style="margin:0;color:var(--muted);font-size:14px">'+esc(c.idee)+'</p><a class="btn plein" href="#lire-'+c.n+'-1">Commencer la lecture</a></div>'}
+  }
+  // Révisions
+  h+='<div class="carte"><div class="ligne ecarte"><div><h2>Révisions du jour</h2><span style="font-size:15px">'+(dues?'<b class="grand">'+dues+'</b> question'+(dues>1?'s':'')+' à revoir':(Object.keys(P.cartes).length?'Rien à revoir aujourd’hui.':'Les questions des QCM réussis ou ratés reviendront ici au bon moment.'))+'</span></div>'+
+    (dues?'<a class="btn plein" href="#revision">Réviser</a>':'')+'</div></div>';
+  // Ensuite
+  var ens=[],cur=der?der.n:null,x=cur,tete=(der&&statut(der.n)!=='fini')?der.n:(suivantDansParcours(cur)||suivantDansParcours(null));
+  while(ens.length<3){x=suivantDansParcours(x);if(!x)break;if(x!==cur&&x!==tete)ens.push(x)}
+  if(ens.length){h+='<div class="carte"><h2>Ensuite dans le parcours</h2><div>'+ens.map(function(n){return ligneCours(CO[n])}).join('')+'</div></div>'}
+  // Parties
+  h+='<h2 style="margin-top:4px">Les '+CAT.parties.length+' parties</h2><div class="parties">';
+  CAT.parties.forEach(function(p){var l=[];p.chs.forEach(function(c){l=l.concat(c.cours)});var f=compte(l);
+    h+='<a class="partie-tuile pc" style="'+pc(p.p)+'" href="#biblio-p'+p.p+'"><span class="no">Partie '+p.p+'</span><span class="nm">'+esc(p.nom)+'</span><div class="barre"><i style="width:'+Math.round(f/l.length*100)+'%"></i></div><span class="ct">'+f+' / '+l.length+' terminés</span></a>'});
+  h+='</div><p class="sync" id="sync">'+syncTexte()+'</p></div>';
+  $app.innerHTML=h;
+}
+
+/* ---------- Bibliothèque ---------- */
+function vueBiblio(arg){
+  if(arg&&arg.charAt(0)==='p'){ui.partie=+arg.slice(1)||0;ui.groupe='partie'}
+  var h='<div class="ecran"><div><h1>'+(ui.partie?esc(PAR[ui.partie].nom):ORDRE.length+' cours')+'</h1><p class="sous">'+(ui.partie?'Partie '+ui.partie+' · <a href="#biblio" id="toutes">voir toutes les parties</a>':'Cherche par mot, ou range par partie, compétence ou niveau.')+'</p></div>';
+  h+='<label class="recherche"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="color:var(--muted)"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="Titre, notion, mot du glossaire…" aria-label="Chercher un cours" value="'+esc(ui.q)+'"></label>';
+  h+='<div class="segment" role="group" aria-label="Ranger par">'+[['partie','Partie'],['comp','Compétence'],['niv','Niveau']].map(function(g){return '<button data-g="'+g[0]+'" aria-pressed="'+(ui.groupe===g[0])+'">'+g[1]+'</button>'}).join('')+'</div>';
+  h+='<div class="filtres" role="group" aria-label="Filtrer par état">'+[['tous','Tous'],['afaire','À faire'],['encours','En cours'],['fini','Terminés'],['revoir','À revoir']].map(function(s){return '<button data-s="'+s[0]+'" aria-pressed="'+(ui.statut===s[0])+'">'+s[1]+'</button>'}).join('')+'</div>';
+  h+='<div id="res"></div></div>';
+  $app.innerHTML=h;
+  var q=document.getElementById('q');
+  q.addEventListener('input',function(){ui.q=q.value;listeBiblio()});
+  $app.querySelectorAll('[data-g]').forEach(function(b){b.onclick=function(){ui.groupe=b.dataset.g;if(ui.groupe!=='partie')ui.partie=0;vueBiblio()}});
+  $app.querySelectorAll('[data-s]').forEach(function(b){b.onclick=function(){ui.statut=b.dataset.s;$app.querySelectorAll('[data-s]').forEach(function(x){x.setAttribute('aria-pressed',x===b)});listeBiblio()}});
+  var t=document.getElementById('toutes');if(t)t.onclick=function(){ui.partie=0};
+  listeBiblio();
+}
+function correspond(c,mots){if(!mots.length)return true;var hay=c._h||(c._h=norm([c.num,c.t,c.chap,c.idee,c.ret,c.ch,(c.ex||[]).join(' '),c.glo.map(function(g){return g[0]}).join(' '),c.pg.join(' '),COMP[c.comp]].join(' ')));
+  return mots.every(function(m){return hay.indexOf(m)>=0})}
+function listeBiblio(){
+  var mots=norm(ui.q).split(/\s+/).filter(Boolean),res=document.getElementById('res');
+  var garde=function(n){var c=CO[n];return (ui.statut==='tous'||statut(n)===ui.statut)&&correspond(c,mots)&&(!ui.partie||c.p===ui.partie)};
+  var h='',total=0;
+  if(ui.groupe==='partie'){
+    CAT.parties.forEach(function(p){if(ui.partie&&p.p!==ui.partie)return;var bloc='',nb=0;
+      p.chs.forEach(function(ch){var l=ch.cours.filter(garde);if(!l.length)return;nb+=l.length;bloc+='<div class="sousgroupe">'+ch.id+' · '+esc(ch.nom)+'</div>'+l.map(function(n){return ligneCours(CO[n])}).join('')});
+      if(nb){total+=nb;h+='<section class="groupe pc" style="'+pc(p.p)+'"><div class="groupe-tete"><span>'+p.p+' · '+esc(p.nom)+'</span><small>'+nb+' cours</small></div>'+bloc+'</section>'}});
+  } else if(ui.groupe==='comp'){
+    CAT.comps.forEach(function(k){var l=ORDRE.filter(function(n){return CO[n].comp===k.id&&garde(n)});if(!l.length)return;total+=l.length;
+      l.sort(function(a,b){return CO[a].niv-CO[b].niv});
+      var bloc='',nv=0;l.forEach(function(n){if(CO[n].niv!==nv){nv=CO[n].niv;bloc+='<div class="sousgroupe" style="color:var(--muted)">'+NIV[nv]+'</div>'}bloc+=ligneCours(CO[n])});
+      h+='<section class="groupe"><div class="groupe-tete"><span><span class="mono" style="color:var(--muted);font-size:13px">'+k.id+'</span> '+esc(k.nom)+'</span><small>'+l.length+' cours</small></div>'+bloc+'</section>'});
+  } else {
+    [1,2,3].forEach(function(v){var l=ORDRE.filter(function(n){return CO[n].niv===v&&garde(n)});if(!l.length)return;total+=l.length;
+      h+='<section class="groupe"><div class="groupe-tete"><span>'+NIV[v]+'</span><small>'+l.length+' cours</small></div>'+l.map(function(n){return ligneCours(CO[n])}).join('')+'</section>'});
+  }
+  res.innerHTML=total?'<p class="sous" style="margin:0 0 8px">'+total+' résultat'+(total>1?'s':'')+'</p><div style="display:flex;flex-direction:column;gap:22px">'+h+'</div>':'<p class="vide">Aucun cours ne correspond.</p>';
+}
+
+/* ---------- Fiche d'un cours ---------- */
+function vueCours(n){
+  var c=CO[n],p=PAR[c.p],pr=P.cours[n]||{},lu=pagesLues(n),s=statut(n);
+  var i=ORDRE.indexOf(n),av=ORDRE[i-1],ap=ORDRE[i+1];
+  var h='<div class="pc" style="'+pc(c.p)+'"><div class="bandeau"><div class="haut"><a href="#biblio" onclick="history.length>1&&(event.preventDefault(),history.back())">‹ Retour</a><span>Partie '+c.p+' · '+c.ch+' · '+esc(CH[c.ch].nom)+'</span></div>'+
+    '<span class="mono" style="font-size:14px;opacity:.9">'+(c.num==='HS'?'Hors-série':'Cours '+esc(c.num))+'</span><h1>'+esc(c.t)+'</h1><p>'+esc(c.chap)+'</p></div>';
+  h+='<div class="ecran">';
+  h+='<div class="puces"><span class="puce">'+ETATS[s]+(pr.nb?' <b>'+pr.best+'/'+totQ(pr)+'</b>':'')+'</span><span class="puce">Durée<b>'+esc(c.dur)+'</b></span><span class="puce">Niveau<b>N'+c.niv+'</b></span><span class="puce">'+c.comp+'<b>'+esc(COMP[c.comp])+'</b></span></div>';
+  h+='<div class="ligne"><a class="btn plein" style="flex:1" href="#lire-'+n+'-'+premiereNonLue(n)+'">'+(lu?(lu>=c.pg.length?'Relire':'Continuer · page '+premiereNonLue(n)):'Lire le cours')+'</a><a class="btn" style="flex:1" href="#qcm-'+n+'">'+(pr.nb?'Refaire le QCM':'Faire le QCM')+'</a></div>';
+  h+='<div class="carte"><h2>L’idée</h2><p class="idee">'+esc(c.idee)+'</p></div>';
+  if(c.obj&&c.obj.length)h+='<div class="carte"><h2>Tu sauras</h2><ol class="obj">'+c.obj.map(function(o){return '<li><span>'+esc(o.replace(/[;.]\s*$/,''))+'</span></li>'}).join('')+'</ol></div>';
+  h+='<div class="retenir"><b>À retenir</b>'+esc(c.ret)+'</div>';
+  h+='<div class="carte"><div class="ligne ecarte"><h2>Les '+c.pg.length+' pages</h2><span style="font-size:13px;color:var(--muted)">'+lu+' lue'+(lu>1?'s':'')+'</span></div><div class="pages">'+c.pg.map(function(t,k){var l=pr.pg&(1<<k);return '<a href="#lire-'+n+'-'+(k+1)+'"><span class="pn">'+(k+1)+'</span><span>'+esc(t)+'</span>'+(l?'<span class="lu">✓ lue</span>':'<span></span>')+'</a>'}).join('')+'</div></div>';
+  if((c.pre&&c.pre.length)||(c.ex&&c.ex.length)){
+    h+='<div class="carte">';
+    if(c.pre&&c.pre.length)h+='<h2>Prérequis</h2><div class="puces">'+c.pre.filter(function(x){return CO[x]}).map(function(x){return '<a class="puce" style="text-decoration:none" href="#cours-'+x+'">'+esc(CO[x].num)+' · '+esc(CO[x].t)+' · '+ETATS[statut(x)].toLowerCase()+'</a>'}).join('')+'</div>';
+    if(c.ex&&c.ex.length)h+='<h2>Exemples tirés de</h2><div class="puces">'+c.ex.map(function(x){return '<span class="puce">'+esc(x)+'</span>'}).join('')+'</div>';
+    h+='</div>'}
+  if(c.glo&&c.glo.length)h+='<details class="carte"><summary>Glossaire · '+c.glo.length+' termes</summary><dl class="glo">'+c.glo.map(function(g){return '<dt>'+esc(g[0])+'</dt><dd>'+esc(g[1])+'</dd>'}).join('')+'</dl></details>';
+  h+='<div class="ligne" style="justify-content:space-between">'+(av?'<a class="btn petit" href="#cours-'+av+'">‹ '+esc(CO[av].num)+'</a>':'<span></span>')+'<span style="font-size:12px;color:var(--muted)">ordre de lecture</span>'+(ap?'<a class="btn petit" href="#cours-'+ap+'">'+esc(CO[ap].num)+' ›</a>':'<span></span>')+'</div>';
+  h+='</div></div>';
+  $app.innerHTML=h;
+}
+function premiereNonLue(n){var b=(P.cours[n]||{}).pg|0;for(var k=0;k<nbPages(n);k++)if(!(b&(1<<k)))return k+1;return 1}
+
+/* ---------- Lecteur ---------- */
+var cacheCours={}, feuilleCss=null;
+function chargerCours(c){
+  if(cacheCours[c.n])return Promise.resolve(cacheCours[c.n]);
+  return fetch('c/'+encodeURIComponent(c.s)+'.html').then(function(r){if(!r.ok)throw new Error(r.status);return r.text()}).then(function(t){
+    var d=new DOMParser().parseFromString(t,'text/html');
+    var st=[].map.call(d.querySelectorAll('head style, body style'),function(s){return s.textContent.replace(/(^|[\s,}])body(?=[\s.{,])/g,'$1.doc')}).join('\n');
+    var pages=[].map.call(d.querySelectorAll('section.page'),function(s){return s.outerHTML});
+    return cacheCours[c.n]={css:st,cls:d.body.className,pages:pages}});
+}
+function vueLire(n,k){
+  var c=CO[n],np=c.pg.length;k=Math.max(1,Math.min(np,k||1));
+  var h='<div class="pc" style="'+pc(c.p)+'"><div class="lecteur-barre"><a class="btn petit" href="#cours-'+n+'" aria-label="Retour à la fiche">‹</a><div class="titre"><b>'+esc(c.t)+'</b><span>Page '+k+' / '+np+' · '+esc(c.pg[k-1])+'</span></div><button class="btn petit" id="zoom" aria-label="Changer le zoom">'+['Ajusté','Agrandi','100 %'][ui.zoom]+'</button></div>'+
+    '<div class="feuille" id="feuille"><div class="feuille-hote" id="hote"><p class="vide">Chargement de la page…</p></div></div>'+
+    '<div class="lecteur-pied">'+(k>1?'<a class="btn" href="#lire-'+n+'-'+(k-1)+'">‹ Page '+(k-1)+'</a>':'<span></span>')+
+    '<div class="points">'+c.pg.map(function(_,i){var l=(P.cours[n]||{}).pg&(1<<i);return '<i class="'+(i+1===k?'on':(l?'lu':''))+'"></i>'}).join('')+'</div>'+
+    (k<np?'<a class="btn plein" href="#lire-'+n+'-'+(k+1)+'" style="justify-self:end">Page '+(k+1)+' ›</a>':'<a class="btn plein" href="#qcm-'+n+'" style="justify-self:end">QCM ›</a>')+'</div></div>';
+  $app.innerHTML=h;
+  document.getElementById('zoom').onclick=function(){ui.zoom=(ui.zoom+1)%3;this.textContent=['Ajusté','Agrandi','100 %'][ui.zoom];poserZoom()};
+  // la page compte comme lue, et devient le point de reprise
+  var pr=P.cours[n]||(P.cours[n]={pg:0,best:0,last:0,nb:0,at:''});
+  if(!(pr.pg&(1<<(k-1)))){pr.pg|=1<<(k-1);noter()}
+  P.dernier={n:n,pg:k,t:Date.now()};sauver();
+  chargerCours(c).then(function(d){
+    var hote=document.getElementById('hote');if(!hote||route()[0]!=='lire'||+route()[1]!==n)return;
+    hote.innerHTML='';var sr=hote.shadowRoot||hote.attachShadow({mode:'open'});
+    sr.innerHTML='<link rel="stylesheet" href="c/trame-app.css"><style>'+d.css+'</style><div class="doc '+esc(d.cls)+'" id="doc">'+(d.pages[k-1]||'')+'</div>';
+    poserZoom();
+  },function(){var hote=document.getElementById('hote');if(hote)hote.innerHTML='<p class="vide">La page n’a pas pu être chargée. Vérifie la connexion puis réessaie.</p>'});
+}
+function poserZoom(){
+  var hote=document.getElementById('hote'),f=document.getElementById('feuille');if(!hote||!hote.shadowRoot)return;
+  var d=hote.shadowRoot.getElementById('doc');if(!d)return;
+  var largeur=f.clientWidth-16,base=794,z=[largeur/base,Math.min(1,largeur/base*1.6),1][ui.zoom];
+  d.style.zoom=z;hote.style.width=Math.ceil(base*z)+'px';
+}
+window.addEventListener('resize',function(){if(route()[0]==='lire')poserZoom()});
+
+/* ---------- QCM et révisions ---------- */
+function vueQcm(n){
+  if(!sess||sess.type!=='qcm'||sess.n!==n){
+    sess={type:'qcm',n:n,items:CO[n].q.map(function(q){return {n:n,i:q.k}}),k:0,choix:[],valide:false,res:[]};
+  }
+  dessinerQuestion();
+}
+function vueRevisions(){
+  var dues=cartesDues(),total=Object.keys(P.cartes).length;
+  var boites=[0,0,0,0,0,0];for(var k in P.cartes)boites[P.cartes[k].b]++;
+  var demain=0,t=plus(1);for(k in P.cartes)if(P.cartes[k].d===t)demain++;
+  var h='<div class="ecran"><div><h1>Révisions</h1><p class="sous">Chaque question revient juste avant que tu l’oublies : le lendemain si tu l’as ratée, puis après 3, 7, 16 et 35 jours.</p></div>';
+  h+='<div class="carte"><div class="ligne ecarte"><div><span class="grand">'+dues.length+'</span><br><span style="color:var(--muted);font-size:14px">question'+(dues.length>1?'s':'')+' à revoir aujourd’hui</span></div>'+(dues.length?'<a class="btn plein" href="#revision">Commencer</a>':'')+'</div>'+
+    (dues.length>15?'<p style="margin:0;font-size:13px;color:var(--muted)">Une séance en prend 15, les plus anciennes d’abord.</p>':'')+
+    (!dues.length?'<p style="margin:0;font-size:14px;color:var(--muted)">'+(total?'Demain : '+demain+' question'+(demain>1?'s':'')+'.':'Fais le QCM d’un cours : ses questions entrent ici.')+'</p>':'')+'</div>';
+  if(total){
+    h+='<div class="carte"><h2>Tes '+total+' questions en mémoire</h2><div style="display:flex;flex-direction:column;gap:8px">'+
+      ['Ratées, demain','Boîte 1 · 1 jour','Boîte 2 · 3 jours','Boîte 3 · 7 jours','Boîte 4 · 16 jours','Boîte 5 · 35 jours'].map(function(l,b){return '<div class="ligne"><span style="width:130px;font-size:13px;flex:none">'+l+'</span><div class="barre"><i style="width:'+Math.round(boites[b]/total*100)+'%;background:'+(b===0?'var(--ko)':'var(--ok)')+'"></i></div><span class="mono" style="font-size:12px;width:34px;text-align:right">'+boites[b]+'</span></div>'}).join('')+'</div></div>';
+  }
+  // par cours, ce qui est dû
+  var parCours={};dues.forEach(function(k){var n=+k.split('-')[0];parCours[n]=(parCours[n]||0)+1});
+  var ks=Object.keys(parCours);
+  if(ks.length){h+='<div class="carte"><h2>D’où viennent les questions du jour</h2><div>'+ks.map(function(n){return ligneCours(CO[n])}).join('')+'</div></div>'}
+  h+='</div>';$app.innerHTML=h;
+}
+function vueSeance(){
+  if(!sess||sess.type!=='rev'){
+    var dues=cartesDues().sort(function(a,b){return P.cartes[a].d<P.cartes[b].d?-1:P.cartes[a].d>P.cartes[b].d?1:Math.random()-.5}).slice(0,15);
+    for(var i=dues.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=dues[i];dues[i]=dues[j];dues[j]=t}
+    if(!dues.length){aller('revisions');return}
+    sess={type:'rev',items:dues.map(function(k){var p=k.split('-');return {n:+p[0],i:+p[1]}}),k:0,choix:[],valide:false,res:[]};
+  }
+  dessinerQuestion();
+}
+function dessinerQuestion(){
+  var s=sess;if(s.k>=s.items.length)return finSeance();
+  var it=s.items[s.k],c=CO[it.n],q=c.qk[it.i],multi=q.m;
+  // ordre des réponses tiré au hasard une fois par question : la bonne réponse n'est plus toujours au même endroit
+  if(!it.perm){it.perm=q.o.map(function(_,i){return i});for(var z=it.perm.length-1;z>0;z--){var y=Math.floor(Math.random()*(z+1)),w=it.perm[z];it.perm[z]=it.perm[y];it.perm[y]=w}}
+  var lettre=function(i){return 'ABCD'[it.perm.indexOf(i)]};
+  var h='<div class="pc" style="'+pc(c.p)+'"><div class="ecran">';
+  h+='<div class="q-tete"><a class="btn petit" href="'+(s.type==='qcm'?'#cours-'+c.n:'#revisions')+'">‹ Quitter</a><span>'+(s.type==='qcm'?'QCM · cours '+esc(c.num):'Révision')+' · <b style="color:var(--ink)">'+(s.k+1)+' / '+s.items.length+'</b></span></div>';
+  h+='<div class="progression-q"><i style="width:'+Math.round(s.k/s.items.length*100)+'%"></i></div>';
+  if(s.type==='rev')h+='<a href="#cours-'+c.n+'" class="mono" style="font-size:12.5px;color:var(--pt);text-decoration:none">Cours '+esc(c.num)+' · '+esc(c.t)+'</a>';
+  h+='<div>'+(multi?'<span class="q-tag">Plusieurs réponses</span>':'')+'<p class="q-enonce">'+esc(q.e)+'</p></div>';
+  h+='<div class="options" role="group">'+it.perm.map(function(i){var o=q.o[i];
+    var cls='opt'+(multi?' multi':''),verdict='';
+    var ch=s.choix.indexOf(i)>=0,bon=q.r.indexOf(i)>=0;
+    if(s.valide){if(bon){cls+=' juste';verdict=ch?'Bonne réponse':'Il fallait la cocher'}else if(ch){cls+=' faux';verdict='Fausse'}}
+    else if(ch)cls+=' choisi';
+    return '<button class="'+cls+'" data-i="'+i+'" aria-pressed="'+ch+'"'+(s.valide?' disabled':'')+'><span class="l">'+lettre(i)+'</span><span>'+esc(o)+'</span>'+(verdict?'<span class="verdict">'+verdict+'</span>':'')+'</button>'}).join('')+'</div>';
+  if(s.valide){var ok=s.res[s.k];
+    h+='<div class="retour '+(ok?'bon':'mauvais')+'"><b>'+(ok?'Juste.':'Pas tout à fait. Réponse : '+q.r.map(lettre).sort().join(' et ')+'.')+'</b>'+esc(q.x)+'</div>';
+    h+='<button class="btn plein" id="suite">'+(s.k+1<s.items.length?'Question suivante':'Voir le résultat')+'</button>';
+  } else h+='<button class="btn plein" id="valider"'+(s.choix.length?'':' disabled')+'>Valider</button>';
+  h+='</div></div>';
+  $app.innerHTML=h;
+  $app.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){var i=+b.dataset.i;
+    if(multi){var p=s.choix.indexOf(i);if(p>=0)s.choix.splice(p,1);else s.choix.push(i)}else s.choix=[i];dessinerQuestion()}});
+  var v=document.getElementById('valider');if(v)v.onclick=function(){
+    var ok=s.choix.length===q.r.length&&q.r.every(function(i){return s.choix.indexOf(i)>=0});
+    s.res[s.k]=ok;s.valide=true;carte(it.n,it.i,ok);noter();sauver();dessinerQuestion()};
+  var u=document.getElementById('suite');if(u){u.onclick=function(){s.k++;s.choix=[];s.valide=false;dessinerQuestion();window.scrollTo(0,0)};u.focus({preventScroll:true})}
+}
+function carte(n,i,ok){var k=n+'-'+i,c=P.cartes[k]||{b:0},b=ok?Math.min(5,(P.cartes[k]?c.b:0)+1):0;
+  P.cartes[k]={b:b,d:plus(INTERVALLES[b]),t:Date.now()}}
+function finSeance(){
+  var s=sess,ok=s.res.filter(Boolean).length,tot=s.items.length,h='<div class="ecran">';
+  if(s.type==='qcm'){
+    var c=CO[s.n],pr=P.cours[s.n]||(P.cours[s.n]={pg:0,best:0,last:0,nb:0,at:''});
+    if(!s.enregistre){if(pr.nb&&totQ(pr)!==tot)pr.best=Math.min(tot,Math.round(pr.best*tot/totQ(pr)));pr.tot=tot;pr.last=ok;pr.best=Math.max(pr.best||0,ok);pr.nb=(pr.nb||0)+1;pr.at=jour();P.dernier={n:s.n,pg:nbPages(s.n),t:Date.now()};s.enregistre=true;sauver()}
+    var mm=Math.ceil(tot*MAITRISE-1e-9),ma=Math.ceil(tot*SEUIL-1e-9);
+    var msg=ok>=mm?'Maîtrisé. Les questions reviendront espacées pour le rester.':ok>=ma?'Acquis. Les questions ratées reviennent demain en révision.':'À revoir. Relis les pages concernées, puis refais le QCM.';
+    h+='<div class="pc" style="'+pc(c.p)+'"><a class="mono" href="#cours-'+c.n+'" style="font-size:13px;color:var(--pt);text-decoration:none">Cours '+esc(c.num)+' · '+esc(c.t)+'</a></div>';
+    h+='<div class="carte" style="align-items:flex-start"><div class="score">'+ok+'<small> / '+tot+'</small></div><p style="margin:0;font-size:16px;font-weight:600">'+msg+'</p><p style="margin:0;font-size:13px;color:var(--muted)">Barème : '+mm+' à '+tot+' maîtrisé · '+ma+' à '+(mm-1)+' acquis · moins de '+ma+' à revoir. Meilleur score : '+pr.best+' / '+tot+'.</p>'+
+      '<div class="recap-q">'+s.res.map(function(r,i){return '<span class="'+(r?'o':'x')+'" title="Question '+(i+1)+'">'+(i+1)+'</span>'}).join('')+'</div></div>';
+    var nx=suivantDansParcours(s.n);
+    h+='<div class="ligne">'+(ok<ma?'<a class="btn plein" style="flex:1" href="#lire-'+c.n+'-1">Relire le cours</a>':(nx?'<a class="btn plein" style="flex:1" href="#cours-'+nx+'">Cours suivant · '+esc(CO[nx].num)+'</a>':''))+'<a class="btn" style="flex:1" href="#cours-'+c.n+'">Retour à la fiche</a></div>';
+  } else {
+    h+='<div><h1>Séance terminée</h1><p class="sous">'+ok+' juste'+(ok>1?'s':'')+' sur '+tot+'. Les réponses justes montent d’une boîte, les ratées reviennent demain.</p></div>';
+    h+='<div class="carte"><div class="recap-q">'+s.res.map(function(r,i){return '<span class="'+(r?'o':'x')+'">'+(i+1)+'</span>'}).join('')+'</div></div>';
+    var reste=cartesDues().length;
+    h+='<div class="ligne">'+(reste?'<button class="btn plein" style="flex:1" id="encore">Encore '+Math.min(15,reste)+'</button>':'')+'<a class="btn" style="flex:1" href="#accueil">Accueil</a></div>';
+  }
+  h+='</div>';$app.innerHTML=h;
+  var e=document.getElementById('encore');if(e)e.onclick=function(){sess=null;vueSeance()};
+}
+
+/* ---------- Progrès ---------- */
+function vueProgres(){
+  var fini=compte(ORDRE),questions=0,serie=0,memo=0,k;
+  for(k in P.cartes){if(P.cartes[k].b>=3)memo++}
+  var d=new Date();if(!P.jours[jour(d)])d.setDate(d.getDate()-1);
+  while(P.jours[jour(d)]){serie++;d.setDate(d.getDate()-1)}
+  var repondues=Object.keys(P.cartes).length;
+  var h='<div class="ecran"><div><h1>Progrès</h1><p class="sous">Où tu en es, compétence par compétence.</p></div>';
+  h+='<div class="kpis"><div class="kpi"><b>'+fini+'<small style="font-size:14px;color:var(--muted);font-weight:500"> / '+ORDRE.length+'</small></b><span>cours terminés</span></div>'+
+    '<div class="kpi"><b>'+serie+'</b><span>jour'+(serie>1?'s':'')+' de suite</span></div>'+
+    '<div class="kpi"><b>'+repondues+'</b><span>questions vues sur '+ORDRE.reduce(function(a,n){return a+CO[n].q.length},0)+'</span></div>'+
+    '<div class="kpi"><b>'+memo+'</b><span>bien ancrées (7 j et plus)</span></div></div>';
+  // activité 28 jours, lundi en tête
+  var cases=[],auj=new Date(),deb=new Date();deb.setDate(auj.getDate()-27);
+  var dec=(deb.getDay()+6)%7;deb.setDate(deb.getDate()-dec);
+  var x=new Date(deb);while(x<=auj){var j=jour(x),v=P.jours[j]||0;cases.push('<i class="'+(v>=20?'n3':v>=8?'n2':v>0?'n1':'')+(j===jour(auj)?' auj':'')+'" title="'+j+' · '+v+'"></i>');x.setDate(x.getDate()+1)}
+  h+='<div class="carte"><h2>Activité · 4 dernières semaines</h2><div class="jours" style="font-size:11px;color:var(--muted);text-align:center">'+['L','M','M','J','V','S','D'].map(function(l){return '<span>'+l+'</span>'}).join('')+'</div><div class="jours">'+cases.join('')+'</div><div class="legende"><span>Une case par jour, plus foncée quand tu as lu ou répondu davantage.</span></div></div>';
+  // compétences
+  h+='<div class="carte"><h2>Compétences · part des cours terminés par niveau</h2><div>';
+  CAT.comps.forEach(function(k){var parN=[[],[],[],[]];ORDRE.forEach(function(n){if(CO[n].comp===k.id)parN[CO[n].niv].push(n)});
+    h+='<a class="comp" href="#biblio" data-comp="'+k.id+'"><span class="id">'+k.id+'</span><span class="nm">'+esc(k.nom)+'</span><div class="niv">'+[1,2,3].map(function(v){var l=parN[v];if(!l.length)return '<div><span>N'+v+' · aucun cours</span><div class="barre"></div></div>';var f=compte(l);return '<div><span>N'+v+' · '+f+'/'+l.length+'</span><div class="barre"><i style="width:'+Math.round(f/l.length*100)+'%"></i></div></div>'}).join('')+'</div></a>'});
+  h+='</div></div>';
+  var rev=ORDRE.filter(function(n){return statut(n)==='revoir'});
+  h+='<div class="carte"><h2>À revoir · moins de 7 bonnes réponses sur 12</h2>'+(rev.length?'<div>'+rev.map(function(n){return ligneCours(CO[n])}).join('')+'</div>':'<p style="margin:0;color:var(--muted);font-size:14px">Aucun cours sous le seuil.</p>')+'</div>';
+  h+='<div class="carte"><h2>Sauvegarde</h2><p style="margin:0;font-size:14px;color:var(--muted)">Ta progression vit sur ce téléphone. Exporte-la de temps en temps : le fichier permet de la retrouver après un changement de téléphone.</p><div class="ligne"><button class="btn" style="flex:1" id="exporter">Exporter</button><label class="btn" style="flex:1">Importer<input type="file" id="importer" accept=".json,application/json" hidden></label></div><p id="msg-sauve" style="margin:0;font-size:13px" hidden></p></div>';
+  h+='<p class="sync" id="sync">'+syncTexte()+'</p></div>';
+  $app.innerHTML=h;
+  document.getElementById('exporter').onclick=function(){var b=new Blob([JSON.stringify(P)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='progression-cours-rh-gh-'+jour()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000)};
+  document.getElementById('importer').onchange=function(){var f=this.files[0],m=document.getElementById('msg-sauve');if(!f)return;f.text().then(function(t){var d=JSON.parse(t);if(!d||!d.cours||!d.cartes)throw 0;P=fusion(P,d);sauver();vueProgres();var m2=document.getElementById('msg-sauve');m2.hidden=false;m2.textContent='Progression importée et fusionnée.'}).catch(function(){m.hidden=false;m.style.color='var(--ko)';m.textContent='Ce fichier n’est pas une sauvegarde de progression.'})};
+  $app.querySelectorAll('[data-comp]').forEach(function(a){a.onclick=function(){ui.groupe='comp';ui.partie=0;ui.statut='tous';ui.q=''}});
+}
+
+/* ---------- démarrage ---------- */
+var local=lireLocal();if(local&&local.cours)P=fusion(vide(),migrer(local));
+fetch('catalogue.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){
+  CAT=d;
+  d.parties.forEach(function(p){PAR[p.p]=p;p.chs.forEach(function(ch){CH[ch.id]=ch;ORDRE=ORDRE.concat(ch.cours)})});
+  d.cours.forEach(function(c){CO[c.n]=c;c.qk={};c.q.forEach(function(q){c.qk[q.k]=q})});
+  ORDRE=ORDRE.filter(function(n){return CO[n]});
+  d.comps.forEach(function(k){COMP[k.id]=k.nom});
+  nettoyer();ecrireLocal();
+  derniereVue=location.hash;rendre();
+},function(){$app.innerHTML='<div class="ecran"><p class="vide">Le catalogue n’a pas pu être chargé. Recharge la page.</p></div>'});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
+})();
+</script>
+
+</body></html>

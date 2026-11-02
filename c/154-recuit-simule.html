@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>154 · Le recuit simulé</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-5">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 154</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Le recuit simulé</h1>
+<p class="chapeau">Un métal refroidi lentement range ses atomes mieux qu'un métal trempé. Le recuit simulé copie ce geste : il accepte au début des changements qui empirent la solution, puis de moins en moins. C'est l'un des deux solveurs de Galapagos, et l'un des plus simples à écrire soi-même.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>145</b>, <b>151</b>, <b>153</b></span>
+<span class="pastille">Exemples · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 222" width="100%">
+<polyline fill="none" points="20.0,39.9 21.6,40.4 23.2,41.0 24.8,41.6 26.4,42.4 27.9,43.4 29.5,44.4 31.1,45.5 32.7,46.8 34.3,48.2 35.9,49.6 37.5,51.2 39.1,52.8 40.7,54.6 42.3,56.4 43.8,58.3 45.4,60.2 47.0,62.2 48.6,64.3 50.2,66.4 51.8,68.6 53.4,70.8 55.0,73.0 56.6,75.3 58.2,77.5 59.7,79.8 61.3,82.1 62.9,84.3 64.5,86.5 66.1,88.7 67.7,90.9 69.3,93.0 70.9,95.1 72.5,97.1 74.1,99.0 75.6,100.9 77.2,102.7 78.8,104.4 80.4,106.0 82.0,107.5 83.6,109.0 85.2,110.3 86.8,111.5 88.4,112.6 89.9,113.6 91.5,114.5 93.1,115.2 94.7,115.8 96.3,116.3 97.9,116.7 99.5,117.0 101.1,117.1 102.7,117.1 104.3,116.9 105.8,116.7 107.4,116.3 109.0,115.8 110.6,115.2 112.2,114.5 113.8,113.6 115.4,112.7 117.0,111.7 118.6,110.5 120.2,109.3 121.7,108.0 123.3,106.6 124.9,105.1 126.5,103.6 128.1,102.0 129.7,100.4 131.3,98.7 132.9,97.0 134.5,95.2 136.1,93.4 137.6,91.7 139.2,89.9 140.8,88.1 142.4,86.3 144.0,84.5 145.6,82.8 147.2,81.1 148.8,79.4 150.4,77.8 151.9,76.2 153.5,74.7 155.1,73.3 156.7,71.9 158.3,70.6 159.9,69.4 161.5,68.3 163.1,67.3 164.7,66.4 166.3,65.6 167.8,64.9 169.4,64.3 171.0,63.8 172.6,63.5 174.2,63.2 175.8,63.1 177.4,63.1 179.0,63.2 180.6,63.4 182.2,63.8 183.7,64.3 185.3,64.9 186.9,65.6 188.5,66.4 190.1,67.3 191.7,68.4 193.3,69.5 194.9,70.7 196.5,72.1 198.1,73.5 199.6,75.0 201.2,76.5 202.8,78.2 204.4,79.9 206.0,81.6 207.6,83.5 209.2,85.3 210.8,87.2 212.4,89.1 213.9,91.1 215.5,93.0 217.1,95.0 218.7,96.9 220.3,98.9 221.9,100.8 223.5,102.7 225.1,104.6 226.7,106.4 228.3,108.2 229.8,109.9 231.4,111.5 233.0,113.1 234.6,114.6 236.2,116.1 237.8,117.4 239.4,118.6 241.0,119.8 242.6,120.8 244.2,121.8 245.7,122.6 247.3,123.3 248.9,123.9 250.5,124.4 252.1,124.7 253.7,124.9 255.3,125.0 256.9,125.0 258.5,124.8 260.1,124.5 261.6,124.1 263.2,123.6 264.8,123.0 266.4,122.2 268.0,121.3 269.6,120.3 271.2,119.2 272.8,117.9 274.4,116.6 275.9,115.2 277.5,113.7 279.1,112.1 280.7,110.4 282.3,108.7 283.9,106.8 285.5,105.0 287.1,103.0 288.7,101.0 290.3,99.0 291.8,97.0 293.4,94.9 295.0,92.8 296.6,90.7 298.2,88.6 299.8,86.5 301.4,84.5 303.0,82.4 304.6,80.4 306.2,78.4 307.7,76.5 309.3,74.6 310.9,72.8 312.5,71.0 314.1,69.3 315.7,67.7 317.3,66.2 318.9,64.8 320.5,63.5 322.1,62.2 323.6,61.1 325.2,60.1 326.8,59.1 328.4,58.3 330.0,57.6" stroke="#AD1457" stroke-width="1.6"></polyline>
+<circle cx="98.7" cy="111.9" fill="#E65100" r="5"></circle>
+<path d="M98.7,104.9 Q177.4,46.9 256.1,113.0" fill="none" stroke="#E65100" stroke-dasharray="4 3" stroke-width="1.2"></path>
+<circle cx="256.1" cy="120.0" fill="#2E7D32" opacity=".85" r="5"></circle>
+<text fill="#E65100" font-size="7.4" font-weight="700" text-anchor="middle" x="98.6923076923077" y="134.8583931709714">creux local</text>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="middle" x="256.0769230769231" y="143.0205387132873">meilleur creux</text>
+<text fill="#AD1457" font-size="8" font-weight="700" text-anchor="start" x="20" y="14">accepter de monter un peu pour passer la crête</text>
+<text fill="#AD1457" font-size="8" font-weight="700" text-anchor="start" x="360" y="22">chance d'accepter un coup pire de Δ = 1</text>
+<rect fill="#fff" height="22" rx="4" stroke="#AD1457" stroke-width="1.2" width="90" x="360" y="34"></rect>
+<text fill="#AD1457" font-size="7.8" font-weight="700" text-anchor="middle" x="405.0" y="47.6">T = 10</text>
+<text fill="#2E7D32" font-size="9" font-weight="700" text-anchor="start" x="470" y="49">90 %</text>
+<rect fill="#fff" height="22" rx="4" stroke="#AD1457" stroke-width="1.2" width="90" x="360" y="64"></rect>
+<text fill="#AD1457" font-size="7.8" font-weight="700" text-anchor="middle" x="405.0" y="77.6">T = 1</text>
+<text fill="#E65100" font-size="9" font-weight="700" text-anchor="start" x="470" y="79">37 %</text>
+<rect fill="#fff" height="22" rx="4" stroke="#AD1457" stroke-width="1.2" width="90" x="360" y="94"></rect>
+<text fill="#AD1457" font-size="7.8" font-weight="700" text-anchor="middle" x="405.0" y="107.6">T = 0,1</text>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="start" x="470" y="109">0,005 %</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="360" y="140">e^(−Δ / T), la règle de Metropolis</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="10" y="192">Chaud, on accepte presque tout et l'on explore ; froid, on n'accepte plus que les progrès et l'on affine.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="10" y="208">Courbe inventée, dessinée en Python ; probabilités calculées (déduit).</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>On tente un petit changement ; s'il améliore, on le garde ; s'il empire de Δ, on le garde quand même avec la chance e^(−Δ/T), et T baisse au fil du temps.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Secouer un bocal de billes de moins en moins fort : les grandes secousses défont les mauvais tassements, les petites finissent le rangement.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>écrire la règle d'acceptation ;</li>
+<li>choisir un voisinage ;</li>
+<li>régler température et refroidissement ;</li>
+<li>l'appliquer à des choix discrets.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Le recuit n'a besoin que de trois choses : un objectif, un petit changement au hasard, et une température qui baisse. Il marche aussi bien sur des choix oui ou non que sur des curseurs.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 154 · Le recuit simulé</div>
+</section>
+<!-- ============ PAGE 2 · VOYAGEUR ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 154</b></div>
+<p class="rubrique">Schéma 1 · Le voyageur de commerce</p>
+<h2>Accepter pire pour finir mieux</h2>
+<p style="max-width:165mm">Ordonner des perçages, des passages de fraise ou des points à visiter : c'est le problème du voyageur de commerce, sans pente et aux combinaisons innombrables. Un terrain classique pour le recuit.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 222" width="100%">
+<rect fill="#EFE9E1" height="222" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Tournée la plus courte par 100 villes au hasard dans un carré unité, 10 essais (.NET 8, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">méthode</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="300" y="40">longueur (médiane)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="420" y="40">étendue</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="510" y="40">durée</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">ordre au hasard</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="61">50,56</text>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="420" y="61"></text>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="510" y="61"></text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">plus proche voisin, sans retour</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="79">9,78</text>
+<text fill="#C62828" font-size="7.4" text-anchor="start" x="420" y="79"></text>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="510" y="79"></text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">descente 2-opt, 2 millions d'essais</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="97">8,64</text>
+<text fill="#E65100" font-size="7.4" text-anchor="start" x="420" y="97">8,33 à 8,93</text>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="510" y="97">78 ms</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">recuit 2-opt, même budget, T de 1 à 0,001</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="115">7,80</text>
+<text fill="#2E7D32" font-size="7.4" text-anchor="start" x="420" y="115">7,70 à 7,93</text>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="510" y="115">153 ms</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="120"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="133">recuit refroidi 100 fois trop vite</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="133">9,19</text>
+<text fill="#C62828" font-size="7.4" text-anchor="start" x="420" y="133">8,73 à 10,01</text>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="510" y="133">1 ms</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="158">Un coup 2-opt retourne un morceau de la tournée. La descente s'arrête dès qu'aucun retournement n'aide ;</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="174">le recuit accepte d'abord des tournées plus longues, et trouve 10 % plus court à budget égal.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="196">Meilleure tournée vue, tous essais confondus : 7,697. C'est un repère, pas une preuve d'optimum.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, la règle de Metropolis</span>double T = T0 * Math.Pow(T1 / T0, (double)k / budget);        // refroidissement géométrique
+double delta = Essayer(r);                                    // allongement si l'on retournait ce morceau
+if (delta &lt;= 0 || r.NextDouble() &lt; Math.Exp(-delta / T)) Appliquer(); </div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Garder le meilleur vu</h3>
+<p>Comme le recuit accepte des reculs, la solution courante n'est pas toujours la meilleure rencontrée. On garde une copie de la meilleure, à rendre à la fin.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Calculer seulement Δ</h3>
+<p>Retourner un morceau de tournée ne change que deux liaisons : Δ se calcule avec quatre distances, sans remesurer toute la tournée. C'est ce qui rend deux millions d'essais possibles.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Refroidir trop vite. En 20 000 essais au lieu de 2 millions, le recuit a fini à 9,19, plus long qu'une simple descente (8,64) : il n'a pas eu le temps de se poser (mesuré).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 154 · Le recuit simulé</div>
+</section>
+<!-- ============ PAGE 3 · VOISINAGE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 154</b></div>
+<p class="rubrique">Schéma 2 · Le voisinage</p>
+<h2>Le petit changement compte autant que la température</h2>
+<p style="max-width:165mm">Un recuit essaie des voisins de la solution courante. Ce qu'on appelle « voisin » fixe ce qu'il peut atteindre en un pas : trop petit, il reste coincé ; trop grand, il saute au hasard.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Rastrigin en 10 variables, 100 000 évaluations, 20 essais (0 au minimum global, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">méthode</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="330" y="40">médiane</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="450" y="40">pire</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">recherche au hasard</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="61">57,9</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="61">69,1</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">descentes multiples à petits pas</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="79">25,9</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="79">38,8</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">recuit, T de 10 à 0,01, sauts gaussiens de 0,5</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="97">0,02</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="97">0,04</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">mêmes sauts, T fixé à 0,01 (presque une descente)</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="115">0,01</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="115">0,01</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="120"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="133">recuit trop chaud, T de 100 à 10</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="133">32,5</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="133">41,0</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="158">Ici, ce sont les sauts larges, pas la température, qui franchissent les crêtes : un saut de 0,5 atteint</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="174">le creux voisin d'un seul coup. Trop chaud, en revanche, le recuit ne se pose jamais.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="194">Rastrigin se découpe variable par variable : un cas favorable aux sauts. Ne pas généraliser (déduit).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, un voisin pour des curseurs</span>int i = r.Next(x.Length); double ancien = x[i];
+x[i] = Math.Clamp(ancien + sigma * Gauss(r), min[i], max[i]);   // un seul curseur bouge, saut gaussien
+if (!Accepter(Objectif(x) - f, T)) x[i] = ancien;                  // refusé : on remet l'ancienne valeur</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Des voisins naturels</h3>
+<p>Tournée : retourner un morceau. Curseurs : bouger l'un d'eux. Pavage : retourner une case. Le bon voisin change peu la solution, et se calcule vite.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Adapter la taille</h3>
+<p>On peut réduire σ avec la température : de grands sauts au début pour explorer, de petits à la fin pour affiner, comme on baisse T.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Partir trop chaud. De T = 100 à 10, le recuit a fini à 32,5 de moyenne, moins bien que des descentes répétées (25,9) : il accepte encore presque tout à la fin (mesuré).
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 154 · Le recuit simulé</div>
+</section>
+<!-- ============ PAGE 4 · TEMPÉRATURE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 154</b></div>
+<p class="rubrique">Schéma 3 · Le temps de refroidir</p>
+<h2>Régler T sur les écarts réels</h2>
+<p style="max-width:165mm">Une température n'a de sens que comparée aux écarts Δ du problème. On la règle en mesurant la part des coups pires acceptés, au début et à la fin, puis on donne au refroidissement le temps qu'il demande.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Même tournée de 100 villes, recuit de T = 0,1 à 0,0001 : longueur selon le budget (mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">essais</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="160" y="40">médiane</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="290" y="40">étendue</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="420" y="40">durée</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">20 000</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="61">8,69</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="290" y="61">8,12 à 8,98</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="61">3 ms</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">200 000</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="79">8,15</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="290" y="79">7,70 à 8,38</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="79">20 ms</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">2 millions</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="97">7,76</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="290" y="97">7,71 à 7,93</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="97">168 ms</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">20 millions</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="115">7,71</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="290" y="115">7,697 à 7,710</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="115">1,7 s</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="136">Coups plus longs acceptés, depuis une tournée au hasard (allongement moyen 0,39) :</text>
+<rect fill="#fff" height="22" rx="4" stroke="#AD1457" stroke-width="1.2" width="136" x="16" y="146"></rect>
+<text fill="#AD1457" font-size="7.4" font-weight="700" text-anchor="middle" x="84.0" y="159.46666666666667">T = 1 : 71 %</text>
+<rect fill="#fff" height="22" rx="4" stroke="#AD1457" stroke-width="1.2" width="136" x="160" y="146"></rect>
+<text fill="#AD1457" font-size="7.4" font-weight="700" text-anchor="middle" x="228.0" y="159.46666666666667">0,1 : 20 %</text>
+<rect fill="#fff" height="22" rx="4" stroke="#AD1457" stroke-width="1.2" width="136" x="304" y="146"></rect>
+<text fill="#AD1457" font-size="7.4" font-weight="700" text-anchor="middle" x="372.0" y="159.46666666666667">0,01 : 3,3 %</text>
+<rect fill="#fff" height="22" rx="4" stroke="#AD1457" stroke-width="1.2" width="136" x="448" y="146"></rect>
+<text fill="#AD1457" font-size="7.4" font-weight="700" text-anchor="middle" x="516.0" y="159.46666666666667">0,001 : 0,4 %</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="192">Départ : la moitié environ des coups pires acceptés. Fin : presque aucun. Entre les deux, le temps fait la qualité.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, régler T0 sur les écarts mesurés</span>double dMoyen = Enumerable.Range(0, 1000).Select(_ =&gt; Essayer(r)).Where(d =&gt; d &gt; 0).Average();
+double T0 = -dMoyen / Math.Log(0.5);     // la moitié des coups pires acceptés au départ
+double T1 = -dMoyen / Math.Log(0.001);   // un sur mille à la fin</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Une marge confortable</h3>
+<p>Commencer à 1 ou à 0,1 a donné presque la même tournée (7,80 et 7,76). Le recuit tolère une erreur d'un facteur dix sur T0 ; pas un facteur cent vers le haut (page 3).</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Rejouer</h3>
+<p>Avec une graine (cours 145), un bon résultat se retrouve ; plusieurs graines donnent l'étendue, qui dit si le budget suffit.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Juger un réglage sur un seul essai. À 200 000 essais, les tournées allaient de 7,70 à 8,38 selon la graine (mesuré) : seule l'étendue dit si le budget suffit.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 154 · Le recuit simulé</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 154</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Truchet tire 400 choix oui ou non</h2>
+<p style="max-width:165mm">Truchet pose dans chaque case deux quarts de cercle, dans un sens ou dans l'autre selon un tirage. Les arcs se raccordent en courbes plus ou moins longues : chaque case est une variable binaire, exactement ce qu'un recuit sait retourner.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Truchet.cs</span></div>
+<div class="l k1"><span class="n">55</span>Random rand = new Random(seed);<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">70</span>bool flip = rand.Next(2) == 1;<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">82</span>tiles.Add(QuarterArc(m0, c10, m1));<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">87</span>tiles.Add(QuarterArc(m3, c00, m0));<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">93</span>curves.AddRange(Curve.JoinCurves(tiles, …));<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Graine</b>Reproductible.</li>
+<li><span class="rep r2">2</span><b>Choix</b>Un bit par case.</li>
+<li><span class="rep r3">3</span><b>Sens 1</b>Coins c10 et c01.</li>
+<li><span class="rep r4">4</span><b>Sens 2</b>Coins c00 et c11.</li>
+<li><span class="rep r5">5</span><b>Raccord</b>Le nombre de courbes.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · le nombre de courbes dépend du tirage</span>
+    Sur une grille de 20 × 20, la recopie du raccord (chaque arc relie deux milieux d'arêtes) donnait 55 à 90 courbes selon la graine, 72 en médiane sur 1 000 graines ; 40 si toutes les cases vont dans le même sens, 220 en damier (mesuré sur recopie). Pour une découpe ou un traceur, chaque courbe est une levée d'outil. Mais une descente qui retourne une case à la fois retombait sur 40 dans tous les essais, c'est-à-dire sur le motif uniforme : minimiser les courbes seules efface le hasard qu'on cherchait (mesuré sur recopie). L'objectif doit aussi dire ce qu'on veut garder. Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 154 · Le recuit simulé</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 154</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">Math.Exp(-delta / T)</td><td>la chance d'accepter un recul</td><td>page 2</td></tr>
+<tr><td class="c">T0 * Math.Pow(T1 / T0, k / budget)</td><td>refroidir de T0 à T1</td><td>page 2</td></tr>
+<tr><td class="c">Array.Reverse(t, i, j - i + 1)</td><td>un coup 2-opt : retourner un morceau</td><td>page 2</td></tr>
+<tr><td class="c">ancien + sigma * Gauss(r)</td><td>un voisin pour un curseur</td><td>page 3</td></tr>
+<tr><td class="c">-dMoyen / Math.Log(0.5)</td><td>T0 qui accepte la moitié des reculs</td><td>page 4</td></tr>
+<tr><td class="c">rand.Next(2) == 1</td><td>un choix binaire par case</td><td>Truchet.cs:70</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Recuit simulé</dt><dd>Une recherche qui accepte des reculs, de moins en moins souvent.</dd>
+<dt>Température</dt><dd>Le réglage qui fixe la facilité d'accepter un recul.</dd>
+<dt>Refroidissement</dt><dd>La façon dont la température baisse au fil des essais.</dd>
+<dt>Voisinage</dt><dd>L'ensemble des solutions atteignables par un petit changement.</dd>
+<dt>2-opt</dt><dd>Retourner un morceau de tournée pour défaire un croisement.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 155</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 154 · Le recuit simulé</div>
+</section>
+</body>
+</html>

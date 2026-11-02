@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>09 · La géométrie RhinoCommon</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 09</b></div>
+<p class="rubrique">Le concept</p>
+<h1>La géométrie<br/>RhinoCommon</h1>
+<p class="chapeau">Les types avec lesquels Cuttlefish calcule : des valeurs légères qu'on manipule comme des nombres, et des objets complets que Rhino sait afficher et enregistrer.</p>
+<div class="meta">
+<span class="pastille"><b>55 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>01</b> valeur et référence · <b>03</b> lambdas · <b>08</b> données</span>
+<span class="pastille">Exemples · <b>Flow</b>, <b>Truchet</b>, <b>Bubble</b>, Magpie</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 240" width="100%">
+<!-- Famille 1 : struct -->
+<rect fill="#fff" height="196" rx="10" stroke="#1565C0" stroke-width="1.8" width="270" x="10" y="10"></rect>
+<text fill="#1565C0" font-size="12" font-weight="700" x="26" y="34">LES VALEURS · struct</text>
+<text fill="#6B7378" font-size="9.5" x="26" y="50">copiées à l'affectation, calculées comme des nombres</text>
+<g fill="#E5EEF9" stroke="#1565C0">
+<rect height="26" rx="4" width="112" x="26" y="64"></rect><rect height="26" rx="4" width="112" x="152" y="64"></rect>
+<rect height="26" rx="4" width="112" x="26" y="98"></rect><rect height="26" rx="4" width="112" x="152" y="98"></rect>
+<rect height="26" rx="4" width="112" x="26" y="132"></rect><rect height="26" rx="4" width="112" x="152" y="132"></rect>
+</g>
+<g fill="#1565C0" font-weight="700" text-anchor="middle">
+<text class="mono" style="font-size:10.5px" x="82" y="81">Point3d</text><text class="mono" style="font-size:10.5px" x="208" y="81">Vector3d</text>
+<text class="mono" style="font-size:10.5px" x="82" y="115">Plane</text><text class="mono" style="font-size:10.5px" x="208" y="115">Line</text>
+<text class="mono" style="font-size:10.5px" x="82" y="149">Circle</text><text class="mono" style="font-size:10.5px" x="208" y="149">Rectangle3d</text>
+</g>
+<text fill="#2B2F33" font-size="9.5" x="26" y="186">Polyline est à part : une liste de Point3d.</text>
+<!-- Famille 2 : GeometryBase -->
+<rect fill="#fff" height="196" rx="10" stroke="#E65100" stroke-width="1.8" width="270" x="320" y="10"></rect>
+<text fill="#E65100" font-size="12" font-weight="700" x="336" y="34">LES OBJETS · GeometryBase</text>
+<text fill="#6B7378" font-size="9.5" x="336" y="50">classes : affichables, enregistrables dans un .3dm</text>
+<g fill="#FFF3E8" stroke="#E65100">
+<rect height="26" rx="4" width="238" x="336" y="64"></rect>
+<rect height="26" rx="4" width="112" x="336" y="98"></rect><rect height="26" rx="4" width="112" x="462" y="98"></rect>
+</g>
+<g fill="#E65100" font-weight="700" text-anchor="middle">
+<text class="mono" style="font-size:10.5px" x="455" y="81">Curve</text>
+<text class="mono" style="font-size:10.5px" x="392" y="115">Brep</text><text class="mono" style="font-size:10.5px" x="518" y="115">Mesh</text>
+</g>
+<g class="mono" fill="#2B2F33">
+<text class="mono" style="font-size:9px" x="336" y="146">NurbsCurve, PolylineCurve,</text>
+<text class="mono" style="font-size:9px" x="336" y="160">LineCurve, ArcCurve…</text>
+</g>
+<text fill="#2B2F33" font-size="9.5" x="336" y="186">Toutes héritent de Curve (cours 02).</text>
+<!-- Pont -->
+<text fill="#2B2F33" font-size="11" text-anchor="middle" x="300" y="230">On <tspan font-weight="700">calcule</tspan> avec les valeurs, on <tspan font-weight="700">livre</tspan> des objets : <tspan class="mono" style="font-size:10.5px">new PolylineCurve(points)</tspan>.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>RhinoCommon range la géométrie en deux familles : des <b>struct</b> légères (point, vecteur, plan, cercle) pour calculer, et des classes héritières de <code>GeometryBase</code> (courbe, Brep, maillage) pour ce qui sort du calcul.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Les cotes et les pièces. Sur la table de l'atelier, on additionne des cotes au crayon (les valeurs) ; à la fin, on découpe une pièce réelle (l'objet), que l'on peut ranger, peindre et livrer.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>distinguer un point d'un vecteur et prévoir le type de <code>p2 - p1</code> ou <code>p + v</code> ;</li>
+<li>parcourir une courbe par son paramètre t, et savoir pourquoi t n'est pas une longueur ;</li>
+<li>dire ce qu'est un Brep, un Mesh, et à quoi sert la tolérance du document.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Une <b>struct</b> se copie : <code>Point3d q = p;</code> crée un second point, indépendant. Une <b>classe</b> se partage : <code>Curve c2 = c;</code> désigne la même courbe. C'est la différence valeur / référence du cours 01, appliquée à la géométrie.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 09 · La géométrie RhinoCommon</div>
+</section>
+<!-- ============ PAGE 2 · POINTS, VECTEURS, PLANS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 09</b></div>
+<p class="rubrique">Schéma 1 · Points, vecteurs, plans</p>
+<h2>Un point est une position, un vecteur un déplacement</h2>
+<p style="max-width:165mm">Les deux ont trois nombres X, Y, Z, mais pas le même sens. Les opérateurs de RhinoCommon respectent cette différence : le type du résultat te dit toujours ce que tu as calculé.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 270" width="100%">
+<defs>
+<marker id="v1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#E65100"></path></marker>
+<marker id="v2" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#7B1FA2"></path></marker>
+<marker id="v3" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#B5AEA5"></path></marker>
+</defs>
+<rect fill="#EFE9E1" height="270" width="300" x="0" y="0"></rect>
+<!-- grille -->
+<g stroke="#DDD5CA" stroke-width="1">
+<line x1="40" x2="280" y1="60" y2="60"></line><line x1="40" x2="280" y1="110" y2="110"></line><line x1="40" x2="280" y1="160" y2="160"></line><line x1="40" x2="280" y1="210" y2="210"></line>
+<line x1="90" x2="90" y1="30" y2="240"></line><line x1="140" x2="140" y1="30" y2="240"></line><line x1="190" x2="190" y1="30" y2="240"></line><line x1="240" x2="240" y1="30" y2="240"></line>
+</g>
+<path d="M40 240 H 285" marker-end="url(#v3)" stroke="#B5AEA5" stroke-width="1.4"></path><path d="M40 240 V 25" marker-end="url(#v3)" stroke="#B5AEA5" stroke-width="1.4"></path>
+<text fill="#6B7378" font-size="9" x="276" y="256">X</text><text fill="#6B7378" font-size="9" x="28" y="32">Y</text>
+<!-- points -->
+<circle cx="90" cy="210" fill="#1565C0" r="5"></circle><text class="mono" fill="#1565C0" font-weight="700" style="font-size:10px" x="70" y="228">a</text>
+<circle cx="240" cy="110" fill="#1565C0" r="5"></circle><text class="mono" fill="#1565C0" font-weight="700" style="font-size:10px" x="250" y="106">b</text>
+<!-- vecteur b - a -->
+<path d="M95 207 L 233 115" marker-end="url(#v1)" stroke="#E65100" stroke-width="2"></path>
+<text class="mono" fill="#E65100" font-weight="700" style="font-size:10px" transform="rotate(-33 156 142)" x="156" y="142">v = b - a</text>
+<!-- vecteur déplacé -->
+<path d="M90 110 L 228 18" marker-end="url(#v1)" opacity=".7" stroke="#E65100" stroke-dasharray="4 3" stroke-width="1.4"></path>
+<text fill="#6B7378" font-size="9" font-style="italic" x="96" y="96">le même v, ailleurs</text>
+<!-- unitaire -->
+<path d="M90 210 L 132 182" marker-end="url(#v2)" stroke="#7B1FA2" stroke-width="2.4"></path>
+<text class="mono" fill="#7B1FA2" font-weight="700" style="font-size:9.5px" x="104" y="232">v unitaire</text>
+<!-- tableau des opérations -->
+<g fill="#6B7378" font-size="9.5" font-weight="700" letter-spacing="1"><text x="322" y="16">CALCUL</text><text x="470" y="16">RÉSULTAT</text></g>
+<g>
+<line stroke="#1F5F7A" stroke-width="1" x1="320" x2="600" y1="24" y2="24"></line>
+<g class="mono" fill="#2B2F33">
+<text class="mono" style="font-size:10.5px" x="322" y="46">point - point</text>
+<text class="mono" style="font-size:10.5px" x="322" y="78">point + vecteur</text>
+<text class="mono" style="font-size:10.5px" x="322" y="110">vecteur * nombre</text>
+<text class="mono" style="font-size:10.5px" x="322" y="142">vecteur + vecteur</text>
+<text class="mono" style="font-size:10.5px" x="322" y="174">vecteur * vecteur</text>
+<text class="mono" style="font-size:10.5px" x="322" y="206">a.DistanceTo(b)</text>
+</g>
+<g font-weight="700">
+<text class="mono" fill="#E65100" style="font-size:10.5px" x="470" y="46">Vector3d</text>
+<text class="mono" fill="#1565C0" style="font-size:10.5px" x="470" y="78">Point3d</text>
+<text class="mono" fill="#E65100" style="font-size:10.5px" x="470" y="110">Vector3d</text>
+<text class="mono" fill="#E65100" style="font-size:10.5px" x="470" y="142">Vector3d</text>
+<text class="mono" fill="#C62828" style="font-size:10.5px" x="470" y="174">double</text>
+<text class="mono" fill="#C62828" style="font-size:10.5px" x="470" y="206">double</text>
+</g>
+<g fill="#6B7378" font-size="8.5">
+<text x="322" y="58">le déplacement de a vers b</text>
+<text x="322" y="90">on se déplace</text>
+<text x="322" y="122">même direction, autre longueur</text>
+<text x="322" y="154">on enchaîne deux déplacements</text>
+<text x="322" y="186">produit scalaire, pas un vecteur !</text>
+<text x="322" y="218">la longueur de b - a</text>
+</g>
+<g stroke="#E2DCD3"><line x1="320" x2="600" y1="64" y2="64"></line><line x1="320" x2="600" y1="96" y2="96"></line><line x1="320" x2="600" y1="128" y2="128"></line><line x1="320" x2="600" y1="160" y2="160"></line><line x1="320" x2="600" y1="192" y2="192"></line><line x1="320" x2="600" y1="224" y2="224"></line></g>
+<text fill="#2B2F33" font-size="9.5" x="322" y="248">Flow, ligne 99 : <tspan class="mono" font-weight="700" style="font-size:9.5px">p += v2 * step;</tspan></text>
+<text fill="#6B7378" font-size="9.5" x="322" y="262">un point avance d'un vecteur mis à l'échelle.</text>
+</g>
+</svg>
+<h3 style="margin-top:5mm">Le plan : une origine et trois axes</h3>
+<div class="deuxcol" style="margin-top:2mm; align-items:center">
+<svg viewbox="0 0 280 150" width="100%">
+<defs>
+<marker id="pX" markerheight="6" markerwidth="6" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#C62828"></path></marker>
+<marker id="pY" markerheight="6" markerwidth="6" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2E7D32"></path></marker>
+<marker id="pZ" markerheight="6" markerwidth="6" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#1565C0"></path></marker>
+</defs>
+<path d="M30 120 L 170 120 L 250 70 L 110 70 Z" fill="#E5EEF9" stroke="#1565C0" stroke-width="1"></path>
+<ellipse cx="140" cy="95" fill="none" rx="70" ry="20" stroke="#2B2F33" stroke-width="1.6"></ellipse>
+<circle cx="140" cy="95" fill="#2B2F33" r="3.5"></circle>
+<path d="M140 95 H 205" marker-end="url(#pX)" stroke="#C62828" stroke-width="1.8"></path>
+<path d="M140 95 L 176 72" marker-end="url(#pY)" stroke="#2E7D32" stroke-width="1.8"></path>
+<path d="M140 95 V 22" marker-end="url(#pZ)" stroke="#1565C0" stroke-width="1.8"></path>
+<text fill="#C62828" font-size="9" font-weight="700" x="208" y="99">X</text><text fill="#2E7D32" font-size="9" font-weight="700" x="178" y="68">Y</text><text fill="#1565C0" font-size="9" font-weight="700" x="146" y="28">Z = normale</text>
+<text fill="#2B2F33" font-size="9" x="120" y="112">c</text>
+<text fill="#6B7378" font-size="9" x="16" y="144">Le cercle vit dans le plan : centre c, rayon r.</text>
+</svg>
+<div style="font-size:8.8pt">
+<p>Un <code>Plane</code> donne un repère local : une origine, et trois axes perpendiculaires. Beaucoup de types en ont besoin pour exister : un cercle, un arc, un rectangle sont <b>posés</b> dans un plan.</p>
+<p style="margin-top:2mm">Bubble, ligne 84 : <code>new Circle(new Plane(c, Vector3d.ZAxis), r)</code>. Un plan d'origine c, de normale Z : le cercle est horizontal, centré sur le point.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+<code>v.Unitize()</code> ne renvoie pas un vecteur : il <b>modifie</b> v sur place et renvoie un <code>bool</code> (false si v est nul). Flow, ligne 84, s'en sert ainsi : <code>return sum.Unitize() ? sum : Vector3d.Zero;</code>
+</div>
+<div class="folio">2</div>
+<div class="pied">Cours 09 · La géométrie RhinoCommon</div>
+</section>
+<!-- ============ PAGE 3 · LES COURBES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 09</b></div>
+<p class="rubrique">Schéma 2 · Les courbes</p>
+<h2>Une courbe se parcourt avec un paramètre t</h2>
+<p style="max-width:165mm">Toute <code>Curve</code> est une fonction : à chaque nombre t de son <b>domaine</b>, elle associe un point. Presque toutes ses méthodes parlent en t, pas en longueur.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 230" width="100%">
+<defs>
+<marker id="t1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#7B1FA2"></path></marker>
+</defs>
+<!-- Domaine -->
+<text fill="#6B7378" font-size="9.5" font-weight="700" letter-spacing="1" x="20" y="20">LE DOMAINE · c.Domain</text>
+<line stroke="#2B2F33" stroke-width="1.6" x1="20" x2="300" y1="44" y2="44"></line>
+<g fill="#2B2F33"><circle cx="20" cy="44" r="3"></circle><circle cx="300" cy="44" r="3"></circle></g>
+<circle cx="160" cy="44" fill="#2E7D32" r="5"></circle>
+<g font-size="9" text-anchor="middle"><text class="mono" style="font-size:9px" x="20" y="62">T0</text><text class="mono" style="font-size:9px" x="300" y="62">T1</text><text class="mono" fill="#2E7D32" font-weight="700" style="font-size:9px" x="160" y="62">t</text></g>
+<path d="M160 70 C 160 120, 230 140, 238 172" fill="none" stroke="#2E7D32" stroke-dasharray="3 3" stroke-width="1.3"></path>
+<text fill="#2E7D32" font-size="9.5" font-weight="700" x="80" y="106">PointAt(t)</text>
+<!-- La courbe -->
+<path d="M40 200 C 120 120, 200 230, 300 150 S 470 90, 560 170" fill="none" stroke="#2B2F33" stroke-width="2.4"></path>
+<circle cx="40" cy="200" fill="#2B2F33" r="4"></circle><circle cx="560" cy="170" fill="#2B2F33" r="4"></circle>
+<text class="mono" fill="#6B7378" style="font-size:9px" x="30" y="222">PointAtStart</text><text class="mono" fill="#6B7378" style="font-size:9px" x="512" y="194">PointAtEnd</text>
+<circle cx="240" cy="181" fill="#2E7D32" r="5"></circle>
+<!-- tangente -->
+<path d="M240 181 L 296 163" marker-end="url(#t1)" stroke="#7B1FA2" stroke-width="2"></path>
+<text class="mono" fill="#7B1FA2" font-weight="700" style="font-size:9.5px" x="262" y="196">TangentAt(t)</text>
+<!-- closest point -->
+<circle cx="420" cy="60" fill="#1565C0" r="5"></circle><text class="mono" fill="#1565C0" font-weight="700" style="font-size:10px" x="430" y="56">p</text>
+<line stroke="#1565C0" stroke-dasharray="4 3" stroke-width="1.3" x1="420" x2="414" y1="60" y2="114"></line>
+<circle cx="414" cy="116" fill="#fff" r="4" stroke="#1565C0" stroke-width="1.6"></circle>
+<text fill="#1565C0" font-size="9.5" font-weight="700" x="434" y="84">ClosestPoint(p, out t)</text>
+<text fill="#2B2F33" font-size="9" x="434" y="98">rend le t du point le plus proche</text>
+</svg>
+<div class="deuxcol" style="margin-top:3mm">
+<div>
+<h3>Une famille, plusieurs représentations</h3>
+<p style="font-size:8.8pt"><code>Curve</code> est abstraite (cours 02). Une ligne se stocke en <code>LineCurve</code>, un arc en <code>ArcCurve</code>, une suite de segments en <code>PolylineCurve</code>, une forme libre en <code>NurbsCurve</code>. Toutes répondent à <code>PointAt</code>, <code>TangentAt</code>, <code>ClosestPoint</code>.</p>
+<p style="font-size:8.8pt; margin-top:2mm">La <b>NURBS</b> est la plus générale : un <b>degré</b>, des <b>points de contrôle</b> qui attirent la courbe, et un <b>poids</b> par point. Avec des poids, elle trace même un arc de cercle exact.</p>
+</div>
+<div>
+<h3>Truchet : un quart de cercle en NURBS</h3>
+<div class="boite apres" style="margin-top:3mm"><span class="etiq">Truchet.cs · 106–108</span>Point3d control = start + (end - corner);
+NurbsCurve arc = NurbsCurve.Create(
+    false, 2, new[] { start, control, end });
+arc.Points.SetPoint(1, control, Math.Sqrt(0.5));</div>
+<p style="font-size:8.4pt; margin-top:2mm">Degré 2, trois points. Le poids √0,5 du point du milieu (cos 45°) transforme la parabole en quart de cercle exact. Remarque <code>start + (end - corner)</code> : point + vecteur.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire que t est une longueur. Le milieu du domaine n'est pas le milieu de la courbe : les t se serrent là où la courbe est dense en points de contrôle. Pour des points régulièrement espacés, Magpie utilise <code>DivideByCount</code>, qui découpe à longueur d'arc égale.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 09 · La géométrie RhinoCommon</div>
+</section>
+<!-- ============ PAGE 4 · BREP, MESH, TOLÉRANCE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 09</b></div>
+<p class="rubrique">Schéma 3 · Surfaces, maillages, tolérance</p>
+<h2>Deux façons de décrire une forme, une seule précision</h2>
+<p style="max-width:165mm">Cuttlefish reste dans le plan, avec des courbes. Magpie, lui, compare toutes sortes de géométries ; son <code>GeometrySampler</code> montre bien la différence entre un Brep et un Mesh.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 220" width="100%">
+<rect fill="#EFE9E1" height="220" width="292" x="0" y="0"></rect><rect fill="#EFE9E1" height="220" width="292" x="308" y="0"></rect>
+<text fill="#1F5F7A" font-size="14" font-weight="800" x="14" y="24">Brep</text>
+<text fill="#6B7378" font-size="9.5" x="60" y="24">boundary representation</text>
+<text fill="#1F5F7A" font-size="14" font-weight="800" x="322" y="24">Mesh</text>
+<text fill="#6B7378" font-size="9.5" x="370" y="24">maillage</text>
+<!-- Brep : boîte lisse -->
+<path d="M60 70 L 150 50 L 230 80 L 140 100 Z" fill="#FFF3E8" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M60 70 L 60 150 L 140 180 L 140 100 Z" fill="#FCE9DA" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M140 100 L 140 180 L 230 160 L 230 80 Z" fill="#F9DEC9" stroke="#E65100" stroke-width="1.4"></path>
+<g fill="#2B2F33"><circle cx="60" cy="70" r="3.5"></circle><circle cx="140" cy="100" r="3.5"></circle><circle cx="230" cy="80" r="3.5"></circle><circle cx="140" cy="180" r="3.5"></circle><circle cx="60" cy="150" r="3.5"></circle><circle cx="230" cy="160" r="3.5"></circle><circle cx="150" cy="50" r="3.5"></circle></g>
+<path d="M140 100 L 140 180" stroke="#7B1FA2" stroke-width="2.6"></path>
+<text fill="#2B2F33" font-size="9" x="96" y="206"><tspan fill="#E65100" font-weight="700">Faces</tspan> · <tspan fill="#7B1FA2" font-weight="700">Edges</tspan> · <tspan font-weight="700">Vertices</tspan></text>
+<text fill="#2B2F33" font-size="9" x="244" y="120">surfaces</text><text fill="#2B2F33" font-size="9" x="244" y="132">NURBS</text><text fill="#2B2F33" font-size="9" x="244" y="144">exactes</text>
+<!-- Mesh : triangles -->
+<g fill="#E5EEF9" stroke="#1565C0" stroke-width="1">
+<path d="M370 70 L 430 56 L 410 96 Z"></path><path d="M430 56 L 480 64 L 410 96 Z"></path><path d="M480 64 L 540 80 L 470 104 Z"></path><path d="M480 64 L 470 104 L 410 96 Z"></path>
+<path d="M370 70 L 410 96 L 372 130 Z"></path><path d="M410 96 L 470 104 L 430 146 Z"></path><path d="M410 96 L 430 146 L 372 130 Z"></path><path d="M470 104 L 540 80 L 538 140 Z"></path><path d="M470 104 L 538 140 L 430 146 Z"></path>
+<path d="M372 130 L 430 146 L 380 176 Z"></path><path d="M430 146 L 538 140 L 500 180 Z"></path><path d="M430 146 L 500 180 L 380 176 Z"></path>
+</g>
+<g fill="#1565C0"><circle cx="410" cy="96" r="2.6"></circle><circle cx="470" cy="104" r="2.6"></circle><circle cx="430" cy="146" r="2.6"></circle></g>
+<text fill="#2B2F33" font-size="9" x="370" y="206"><tspan fill="#1565C0" font-weight="700">Vertices</tspan> · <tspan fill="#1565C0" font-weight="700">Faces</tspan> (A, B, C, D)</text>
+<text fill="#2B2F33" font-size="8.5" x="546" y="104">facettes</text><text fill="#2B2F33" font-size="8.5" x="546" y="116">planes,</text><text fill="#2B2F33" font-size="8.5" x="546" y="128">approchées</text>
+</svg>
+<div class="deuxcol" style="margin-top:3mm">
+<div style="font-size:8.8pt">
+<p>Un <b>Brep</b> décrit une forme <b>exacte</b> : des faces (surfaces NURBS découpées), bordées d'arêtes, qui se rejoignent en sommets. Boîte, extrusion, surface, solide : tout cela est un Brep.</p>
+<p style="margin-top:2mm">Un <b>Mesh</b> en donne une <b>approximation</b> : une liste de sommets et une liste de faces triangulaires ou quadrangulaires. C'est ce que Rhino affiche à l'écran.</p>
+</div>
+<div style="font-size:8.8pt">
+<p>Magpie veut des points répartis sur n'importe quelle surface. Il maille donc le Brep : <code>Mesh.CreateFromBrep(brep, MeshingParameters.Default)</code>, puis échantillonne les triangles.</p>
+<p style="margin-top:2mm">Si Rhino ne sait pas mailler un Brep dégénéré, Magpie se rabat sur son squelette : <code>brep.Edges</code> et <code>brep.Vertices</code>.</p>
+</div>
+</div>
+<h3 style="margin-top:5mm">La tolérance : en dessous, c'est pareil</h3>
+<svg viewbox="0 0 600 70" width="100%">
+<line stroke="#B5AEA5" x1="20" x2="580" y1="35" y2="35"></line>
+<circle cx="150" cy="35" fill="#E8F3E8" r="26" stroke="#2E7D32" stroke-dasharray="3 3"></circle>
+<circle cx="150" cy="35" fill="#2B2F33" r="3.5"></circle><circle cx="162" cy="31" fill="#2B2F33" r="3.5"></circle>
+<text fill="#2E7D32" font-size="9.5" font-weight="700" x="186" y="30">écart ≤ tolérance</text><text fill="#2B2F33" font-size="9" x="186" y="44">un seul point, pour Rhino</text>
+<circle cx="410" cy="35" fill="#2B2F33" r="3.5"></circle><circle cx="470" cy="35" fill="#2B2F33" r="3.5"></circle>
+<text fill="#C62828" font-size="9.5" font-weight="700" x="490" y="30">écart &gt; tolérance</text><text fill="#2B2F33" font-size="9" x="490" y="44">deux points distincts</text>
+</svg>
+<p style="font-size:8.8pt">Chaque document Rhino fixe une tolérance absolue (par exemple 0,001 unité) et une tolérance d'angle. Dans un composant, <code>DocumentTolerance()</code> la lit. Bubble, ligne 83 : <code>if (d &lt;= tolerance) continue;</code> deux points confondus ne donnent pas de bulle.</p>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Comparer deux réels avec <code>==</code>. Le calcul en virgule flottante laisse des miettes : 0,1 + 0,2 ne vaut pas exactement 0,3. En géométrie, on compare toujours un écart à la tolérance.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 09 · La géométrie RhinoCommon</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 09</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Flow.cs : un champ de directions en 13 lignes</h2>
+<p style="max-width:165mm">Flow trace des lignes qui suivent des courbes guides. Le cœur est une fonction qui, pour un point, rend une direction : on y croise presque tous les types de ce cours. L'intégration pas à pas qui l'utilise est le sujet du cours 15.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">71</span><span class="cm">// Direction du champ : moyenne des tangentes des guides</span></div>
+<div class="l"><span class="n">72</span><span class="cm">// au point le plus proche, pondérée par 1 / distance².</span></div>
+<div class="l k1"><span class="n">73</span><span class="ty">Func</span>&lt;<span class="ty">Point3d</span>, <span class="ty">Vector3d</span>&gt; field = p =&gt;<span class="rep r1">1</span></div>
+<div class="l"><span class="n">74</span>{</div>
+<div class="l k2"><span class="n">75</span> <span class="ty">Vector3d</span> sum = <span class="ty">Vector3d</span>.Zero;<span class="rep r2">2</span></div>
+<div class="l"><span class="n">76</span> <span class="kw">foreach</span> (<span class="ty">Curve</span> g <span class="kw">in</span> guides)</div>
+<div class="l"><span class="n">77</span>  {</div>
+<div class="l k3"><span class="n">78</span> <span class="kw">if</span> (!g.ClosestPoint(p, <span class="kw">out double</span> t)) <span class="kw">continue</span>;<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">79</span> <span class="kw">double</span> d = p.DistanceTo(g.PointAt(t));<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">80</span> <span class="ty">Vector3d</span> tan = g.TangentAt(t);<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">81</span> <span class="kw">if</span> (d &lt; 1e-9) <span class="kw">return</span> tan;</div>
+<div class="l k6"><span class="n">82</span>    sum += tan / (d * d);<span class="rep r6">6</span></div>
+<div class="l"><span class="n">83</span>  }</div>
+<div class="l k7"><span class="n">84</span> <span class="kw">return</span> sum.Unitize() ? sum : <span class="ty">Vector3d</span>.Zero;<span class="rep r7">7</span></div>
+<div class="l"><span class="n">85</span>};</div>
+<div class="l"><span class="n"> </span><span class="cm">// …</span></div>
+<div class="l"><span class="n">99</span>p += v2 * step;</div>
+<div class="l"><span class="n"> </span><span class="cm">// …</span></div>
+<div class="l"><span class="n">104</span>curves.Add(<span class="kw">new</span> <span class="ty">PolylineCurve</span>(line));</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Une fonction rangée dans une variable</b>Elle prend un <code>Point3d</code> et rend un <code>Vector3d</code> : c'est la définition d'un champ de vecteurs (lambda, cours 03).</li>
+<li><span class="rep r2">2</span><b>Partir de rien</b><code>Vector3d.Zero</code> : le déplacement nul, prêt à accumuler.</li>
+<li><span class="rep r3">3</span><b>Le t le plus proche</b><code>ClosestPoint</code> renvoie un bool, et le paramètre par <code>out</code>.</li>
+<li><span class="rep r4">4</span><b>Revenir à un point</b><code>PointAt(t)</code> transforme ce t en Point3d ; <code>DistanceTo</code> rend un double.</li>
+<li><span class="rep r5">5</span><b>La direction locale</b><code>TangentAt</code> rend un vecteur unitaire. Si p est sur la courbe, on suit simplement la tangente.</li>
+<li><span class="rep r6">6</span><b>Pondérer</b>Vecteur divisé par un nombre : un guide deux fois plus loin pèse quatre fois moins.</li>
+<li><span class="rep r7">7</span><b>Normaliser</b><code>Unitize</code> ramène la somme à longueur 1, sur place, et dit si c'était possible.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Les deux familles, au travail</span>
+    Tout le calcul se fait en valeurs : <code>Point3d</code>, <code>Vector3d</code>, <code>double</code>. Une seule ligne crée un objet, la 104 : la liste de points devient une <code>PolylineCurve</code>, une <code>Curve</code> que Grasshopper pourra emballer en <code>GH_Curve</code> (cours 08) et afficher.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 09 · La géométrie RhinoCommon</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 09</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">b - a · p + v · v * k</td><td>vecteur · point déplacé · vecteur mis à l'échelle</td><td>Flow:99, Truchet:106</td></tr>
+<tr><td class="c">a.DistanceTo(b)</td><td>distance entre deux points</td><td>Flow:79</td></tr>
+<tr><td class="c">v.Unitize()</td><td>longueur 1, sur place ; false si nul</td><td>Flow:84</td></tr>
+<tr><td class="c">new Plane(c, Vector3d.ZAxis)</td><td>repère d'origine c, normale Z</td><td>Bubble:84</td></tr>
+<tr><td class="c">c.PointAt(t) · c.TangentAt(t)</td><td>point et direction au paramètre t</td><td>Flow:79–80</td></tr>
+<tr><td class="c">c.ClosestPoint(p, out t)</td><td>t du point de c le plus proche de p</td><td>Flow:78</td></tr>
+<tr><td class="c">c.DivideByCount(n, true)</td><td>t régulièrement espacés en longueur</td><td>GeometrySampler</td></tr>
+<tr><td class="c">DocumentTolerance()</td><td>tolérance absolue du document</td><td>Bubble:68</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>GeometryBase</dt><dd>La classe mère des objets géométriques : Curve, Brep, Mesh…</dd>
+<dt>Domaine</dt><dd>L'intervalle [T0, T1] des valeurs de t d'une courbe.</dd>
+<dt>NURBS</dt><dd>Courbe définie par un degré, des points de contrôle et des poids.</dd>
+<dt>Brep</dt><dd>Forme exacte faite de faces, d'arêtes et de sommets.</dd>
+<dt>Tolérance</dt><dd>L'écart en dessous duquel deux géométries sont confondues.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 10</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 09 · La géométrie RhinoCommon</div>
+</section>
+</body>
+</html>

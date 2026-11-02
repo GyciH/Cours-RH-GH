@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>36 · Pavages et tissages</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-5">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 36</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Pavages et tissages</h1>
+<p class="chapeau">Truchet, Weave, Spiral, Wander et Dune dessinent des motifs qui paraissent continus et organiques. Aucun ne regarde pourtant le motif en entier : chacun applique une <b>règle locale</b>, case par case, croisement par croisement ou point par point, et la continuité naît de ce que les morceaux voisins partagent.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>09</b>, <b>10</b>, <b>13</b> et <b>18</b></span>
+<span class="pastille">Exemples · <b>Truchet.cs</b>, <b>Weave.cs</b>, <b>Spiral.cs</b>, <b>Wander.cs</b>, <b>Dune.cs</b> (Cuttlefish)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 176" width="100%">
+<rect fill="#fff" height="130" rx="5" stroke="#AD1457" stroke-width="1.2" width="130" x="10" y="6"></rect>
+<text fill="#AD1457" font-size="10" font-weight="700" text-anchor="middle" x="75" y="154">Truchet</text>
+<text fill="#6B7378" font-size="8.4" text-anchor="middle" x="75" y="168">une case, deux sens</text>
+<rect fill="#fff" height="130" rx="5" stroke="#AD1457" stroke-width="1.2" width="130" x="160" y="6"></rect>
+<text fill="#AD1457" font-size="10" font-weight="700" text-anchor="middle" x="225" y="154">Weave</text>
+<text fill="#6B7378" font-size="8.4" text-anchor="middle" x="225" y="168">dessus, dessous</text>
+<rect fill="#fff" height="130" rx="5" stroke="#AD1457" stroke-width="1.2" width="130" x="310" y="6"></rect>
+<text fill="#AD1457" font-size="10" font-weight="700" text-anchor="middle" x="375" y="154">Spiral</text>
+<text fill="#6B7378" font-size="8.4" text-anchor="middle" x="375" y="168">d'anneau en anneau</text>
+<rect fill="#fff" height="130" rx="5" stroke="#AD1457" stroke-width="1.2" width="130" x="460" y="6"></rect>
+<text fill="#AD1457" font-size="10" font-weight="700" text-anchor="middle" x="525" y="154">Wander</text>
+<text fill="#6B7378" font-size="8.4" text-anchor="middle" x="525" y="168">de rangée en rangée</text>
+<path d="M33.0 43.0 A14.0 14.0 0 0 1 47.0 29.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M33.0 15.0 A14.0 14.0 0 0 1 19.0 29.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M61.0 43.0 A14.0 14.0 0 0 1 75.0 29.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M61.0 15.0 A14.0 14.0 0 0 1 47.0 29.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M75.0 29.0 A14.0 14.0 0 0 1 89.0 43.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M103.0 29.0 A14.0 14.0 0 0 1 89.0 15.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M117.0 43.0 A14.0 14.0 0 0 1 131.0 29.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M117.0 15.0 A14.0 14.0 0 0 1 103.0 29.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M19.0 57.0 A14.0 14.0 0 0 1 33.0 71.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M47.0 57.0 A14.0 14.0 0 0 1 33.0 43.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M61.0 71.0 A14.0 14.0 0 0 1 75.0 57.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M61.0 43.0 A14.0 14.0 0 0 1 47.0 57.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M89.0 71.0 A14.0 14.0 0 0 1 103.0 57.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M89.0 43.0 A14.0 14.0 0 0 1 75.0 57.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M103.0 57.0 A14.0 14.0 0 0 1 117.0 71.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M131.0 57.0 A14.0 14.0 0 0 1 117.0 43.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M33.0 99.0 A14.0 14.0 0 0 1 47.0 85.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M33.0 71.0 A14.0 14.0 0 0 1 19.0 85.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M61.0 99.0 A14.0 14.0 0 0 1 75.0 85.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M61.0 71.0 A14.0 14.0 0 0 1 47.0 85.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M89.0 99.0 A14.0 14.0 0 0 1 103.0 85.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M89.0 71.0 A14.0 14.0 0 0 1 75.0 85.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M117.0 99.0 A14.0 14.0 0 0 1 131.0 85.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M117.0 71.0 A14.0 14.0 0 0 1 103.0 85.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M33.0 127.0 A14.0 14.0 0 0 1 47.0 113.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M33.0 99.0 A14.0 14.0 0 0 1 19.0 113.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M47.0 113.0 A14.0 14.0 0 0 1 61.0 127.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M75.0 113.0 A14.0 14.0 0 0 1 61.0 99.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M89.0 127.0 A14.0 14.0 0 0 1 103.0 113.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M89.0 99.0 A14.0 14.0 0 0 1 75.0 113.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<path d="M117.0 127.0 A14.0 14.0 0 0 1 131.0 113.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path><path d="M117.0 99.0 A14.0 14.0 0 0 1 103.0 113.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="1.8"></path>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="169" x2="206.5" y1="29.0" y2="29.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="215.5" x2="262.5" y1="29.0" y2="29.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="271.5" x2="281" y1="29.0" y2="29.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="169" x2="178.5" y1="57.0" y2="57.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="187.5" x2="234.5" y1="57.0" y2="57.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="243.5" x2="281" y1="57.0" y2="57.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="169" x2="206.5" y1="85.0" y2="85.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="215.5" x2="262.5" y1="85.0" y2="85.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="271.5" x2="281" y1="85.0" y2="85.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="169" x2="178.5" y1="113.0" y2="113.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="187.5" x2="234.5" y1="113.0" y2="113.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="2.6" x1="243.5" x2="281" y1="113.0" y2="113.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="183.0" x2="183.0" y1="15" y2="24.5"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="183.0" x2="183.0" y1="33.5" y2="80.5"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="183.0" x2="183.0" y1="89.5" y2="127"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="211.0" x2="211.0" y1="15" y2="52.5"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="211.0" x2="211.0" y1="61.5" y2="108.5"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="211.0" x2="211.0" y1="117.5" y2="127"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="239.0" x2="239.0" y1="15" y2="24.5"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="239.0" x2="239.0" y1="33.5" y2="80.5"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="239.0" x2="239.0" y1="89.5" y2="127"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="267.0" x2="267.0" y1="15" y2="52.5"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="267.0" x2="267.0" y1="61.5" y2="108.5"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="2.6" x1="267.0" x2="267.0" y1="117.5" y2="127"></line>
+<path d="M375.0 71.0 C375.2 70.6 377.0 69.3 376.5 68.4 C376.0 67.5 373.8 65.4 372.0 65.8 C370.2 66.2 366.5 68.4 366.0 71.0 C365.5 73.6 366.2 79.2 369.0 81.4 C371.8 83.6 378.5 85.7 382.5 84.0 C386.5 82.3 391.4 74.8 393.0 71.0 C394.6 67.2 393.1 64.3 391.9 61.2 C390.6 58.2 388.3 54.9 385.5 52.8 C382.7 50.7 378.8 48.9 375.0 48.5 C371.2 48.1 366.7 48.6 363.0 50.2 C359.3 51.8 355.4 54.8 352.9 58.2 C350.4 61.7 348.4 66.5 348.0 71.0 C347.6 75.5 348.3 80.9 350.3 85.2 C352.3 89.6 355.9 94.1 360.0 97.0 C364.1 99.9 369.8 102.1 375.0 102.5 C380.2 102.9 386.5 102.0 391.5 99.6 C396.5 97.2 401.6 93.0 404.9 88.3 C408.1 83.5 410.2 76.0 411.0 71.0 C411.8 66.0 410.9 62.4 409.8 58.3 C408.6 54.3 406.7 50.1 404.1 46.6 C401.6 43.1 398.2 39.7 394.5 37.2 C390.8 34.7 386.4 32.7 381.9 31.6 C377.5 30.5 372.5 30.1 367.9 30.6 C363.2 31.1 358.3 32.5 354.0 34.6 C349.7 36.7 345.5 39.8 342.1 43.4 C338.7 46.9 335.7 51.3 333.7 56.0 C331.6 60.6 330.3 65.9 330.0 71.0 C329.7 76.1 330.3 81.7 331.8 86.7 C333.3 91.8 335.8 96.9 339.0 101.2 C342.2 105.5 346.4 109.6 351.0 112.6 C355.6 115.6 361.0 118.0 366.5 119.3 C371.9 120.5 378.0 120.9 383.7 120.2 C389.4 119.6 395.3 117.8 400.5 115.2 C405.7 112.5 410.8 108.8 414.8 104.4 C418.9 100.1 422.4 94.7 424.8 89.1 C427.2 83.6 428.3 74.0 429.0 71.0" fill="none" stroke="#7B1FA2" stroke-linecap="round" stroke-width="1.6"></path>
+<circle cx="478" cy="124" fill="#6B7378" r="1.4"></circle>
+<circle cx="478" cy="106" fill="#6B7378" r="1.4"></circle>
+<circle cx="478" cy="88" fill="#6B7378" r="1.4"></circle>
+<circle cx="478" cy="70" fill="#6B7378" r="1.4"></circle>
+<circle cx="478" cy="52" fill="#6B7378" r="1.4"></circle>
+<circle cx="478" cy="34" fill="#6B7378" r="1.4"></circle>
+<circle cx="478" cy="16" fill="#6B7378" r="1.4"></circle>
+<circle cx="497" cy="124" fill="#6B7378" r="1.4"></circle>
+<circle cx="497" cy="106" fill="#6B7378" r="1.4"></circle>
+<circle cx="497" cy="88" fill="#6B7378" r="1.4"></circle>
+<circle cx="497" cy="70" fill="#6B7378" r="1.4"></circle>
+<circle cx="497" cy="52" fill="#6B7378" r="1.4"></circle>
+<circle cx="497" cy="34" fill="#6B7378" r="1.4"></circle>
+<circle cx="497" cy="16" fill="#6B7378" r="1.4"></circle>
+<circle cx="516" cy="124" fill="#6B7378" r="1.4"></circle>
+<circle cx="516" cy="106" fill="#6B7378" r="1.4"></circle>
+<circle cx="516" cy="88" fill="#6B7378" r="1.4"></circle>
+<circle cx="516" cy="70" fill="#6B7378" r="1.4"></circle>
+<circle cx="516" cy="52" fill="#6B7378" r="1.4"></circle>
+<circle cx="516" cy="34" fill="#6B7378" r="1.4"></circle>
+<circle cx="516" cy="16" fill="#6B7378" r="1.4"></circle>
+<circle cx="535" cy="124" fill="#6B7378" r="1.4"></circle>
+<circle cx="535" cy="106" fill="#6B7378" r="1.4"></circle>
+<circle cx="535" cy="88" fill="#6B7378" r="1.4"></circle>
+<circle cx="535" cy="70" fill="#6B7378" r="1.4"></circle>
+<circle cx="535" cy="52" fill="#6B7378" r="1.4"></circle>
+<circle cx="535" cy="34" fill="#6B7378" r="1.4"></circle>
+<circle cx="535" cy="16" fill="#6B7378" r="1.4"></circle>
+<circle cx="554" cy="124" fill="#6B7378" r="1.4"></circle>
+<circle cx="554" cy="106" fill="#6B7378" r="1.4"></circle>
+<circle cx="554" cy="88" fill="#6B7378" r="1.4"></circle>
+<circle cx="554" cy="70" fill="#6B7378" r="1.4"></circle>
+<circle cx="554" cy="52" fill="#6B7378" r="1.4"></circle>
+<circle cx="554" cy="34" fill="#6B7378" r="1.4"></circle>
+<circle cx="554" cy="16" fill="#6B7378" r="1.4"></circle>
+<circle cx="573" cy="124" fill="#6B7378" r="1.4"></circle>
+<circle cx="573" cy="106" fill="#6B7378" r="1.4"></circle>
+<circle cx="573" cy="88" fill="#6B7378" r="1.4"></circle>
+<circle cx="573" cy="70" fill="#6B7378" r="1.4"></circle>
+<circle cx="573" cy="52" fill="#6B7378" r="1.4"></circle>
+<circle cx="573" cy="34" fill="#6B7378" r="1.4"></circle>
+<circle cx="573" cy="16" fill="#6B7378" r="1.4"></circle>
+<polyline fill="none" points="516,124 516,106 516,88 497,70 497,52 516,34 497,16" stroke="#2E7D32" stroke-linejoin="round" stroke-width="1.8"></polyline>
+<polyline fill="none" points="535,124 573,106 554,88 554,70 535,52 535,34 573,16" stroke="#6D4C41" stroke-linejoin="round" stroke-width="1.8"></polyline>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Une règle simple appliquée à chaque case, avec des points de raccord communs entre voisines, suffit à produire un motif continu ; le hasard ne choisit qu'entre quelques variantes qui se raccordent toutes.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un carrelage de carreaux identiques, posés chacun dans un sens tiré à pile ou face. Le carreleur ne voit jamais le dessin d'ensemble, mais comme chaque motif touche les bords au même endroit, les lignes passent d'un carreau à l'autre.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>dire pourquoi les arcs de Truchet forment des chemins continus ;</li>
+<li>expliquer l'alternance dessus-dessous de Weave ;</li>
+<li>suivre le rayon qui glisse d'un anneau à l'autre dans Spiral ;</li>
+<li>lire ce que Wander corrige par rapport à Dune.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Les quatre motifs suivent l'ordre de l'arbre : une branche par rangée de points (ou par anneau pour Spiral). C'est la structure posée par CreateGrid et CircularGrid, et c'est elle qui dit qui est voisin de qui. Un arbre aplati, et il n'y a plus de voisins.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 36 · Pavages et tissages</div>
+</section>
+<!-- ============ PAGE 2 · TRUCHET ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 36</b></div>
+<p class="rubrique">Schéma 1 · Truchet, une case et deux sens</p>
+<h2>Des arcs qui se donnent la main</h2>
+<p style="max-width:165mm">Truchet parcourt chaque case de la grille, entre deux rangées voisines. Dans chaque case, il pose deux quarts de cercle centrés sur deux coins opposés. Un seul tirage décide lesquels.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="12" font-weight="700" text-anchor="start" x="16" y="22">Le tirage choisit la paire de coins</text>
+<rect fill="#fff" height="110" stroke="#6B7378" stroke-dasharray="3 3" width="110" x="22" y="52"></rect>
+<path d="M22.0 107.0 A55.0 55.0 0 0 1 77.0 162.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2.4"></path><path d="M132.0 107.0 A55.0 55.0 0 0 1 77.0 52.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2.4"></path>
+<circle cx="22" cy="162" fill="#2B2F33" r="2.6"></circle><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="end" x="18" y="174">c00</text>
+<circle cx="132" cy="162" fill="#2B2F33" r="2.6"></circle><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="start" x="136" y="174">c10</text>
+<circle cx="132" cy="52" fill="#2B2F33" r="2.6"></circle><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="start" x="136" y="48">c11</text>
+<circle cx="22" cy="52" fill="#2B2F33" r="2.6"></circle><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="end" x="18" y="48">c01</text>
+<circle cx="77.0" cy="162" fill="#E65100" r="2.6"></circle><text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="77.0" y="175">m0</text>
+<circle cx="132" cy="107.0" fill="#E65100" r="2.6"></circle><text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="148" y="110.0">m1</text>
+<circle cx="77.0" cy="52" fill="#E65100" r="2.6"></circle><text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="77.0" y="47">m2</text>
+<circle cx="22" cy="107.0" fill="#E65100" r="2.6"></circle><text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="6" y="110.0">m3</text>
+<text class="mono" fill="#AD1457" font-size="8.8" font-weight="700" style="font-size:8.8px" text-anchor="middle" x="77.0" y="194">flip = false</text>
+<rect fill="#fff" height="110" stroke="#6B7378" stroke-dasharray="3 3" width="110" x="200" y="52"></rect>
+<path d="M255.0 162.0 A55.0 55.0 0 0 1 310.0 107.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2.4"></path><path d="M255.0 52.0 A55.0 55.0 0 0 1 200.0 107.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2.4"></path>
+<circle cx="200" cy="162" fill="#2B2F33" r="2.6"></circle><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="end" x="196" y="174">c00</text>
+<circle cx="310" cy="162" fill="#2B2F33" r="2.6"></circle><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="start" x="314" y="174">c10</text>
+<circle cx="310" cy="52" fill="#2B2F33" r="2.6"></circle><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="start" x="314" y="48">c11</text>
+<circle cx="200" cy="52" fill="#2B2F33" r="2.6"></circle><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="end" x="196" y="48">c01</text>
+<circle cx="255.0" cy="162" fill="#E65100" r="2.6"></circle><text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="255.0" y="175">m0</text>
+<circle cx="310" cy="107.0" fill="#E65100" r="2.6"></circle><text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="326" y="110.0">m1</text>
+<circle cx="255.0" cy="52" fill="#E65100" r="2.6"></circle><text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="255.0" y="47">m2</text>
+<circle cx="200" cy="107.0" fill="#E65100" r="2.6"></circle><text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="184" y="110.0">m3</text>
+<text class="mono" fill="#AD1457" font-size="8.8" font-weight="700" style="font-size:8.8px" text-anchor="middle" x="255.0" y="194">flip = true</text>
+<text fill="#6B7378" font-size="8.4" font-style="italic" text-anchor="middle" x="470" y="42">le même tirage, case après case</text>
+<path d="M356.0 71.0 A19.0 19.0 0 0 1 375.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M394.0 71.0 A19.0 19.0 0 0 1 375.0 52.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M394.0 71.0 A19.0 19.0 0 0 1 413.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M432.0 71.0 A19.0 19.0 0 0 1 413.0 52.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M432.0 71.0 A19.0 19.0 0 0 1 451.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M470.0 71.0 A19.0 19.0 0 0 1 451.0 52.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M470.0 71.0 A19.0 19.0 0 0 1 489.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M508.0 71.0 A19.0 19.0 0 0 1 489.0 52.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M508.0 71.0 A19.0 19.0 0 0 1 527.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M546.0 71.0 A19.0 19.0 0 0 1 527.0 52.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M546.0 71.0 A19.0 19.0 0 0 1 565.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M584.0 71.0 A19.0 19.0 0 0 1 565.0 52.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M375.0 128.0 A19.0 19.0 0 0 1 394.0 109.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M375.0 90.0 A19.0 19.0 0 0 1 356.0 109.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M413.0 128.0 A19.0 19.0 0 0 1 432.0 109.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M413.0 90.0 A19.0 19.0 0 0 1 394.0 109.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M432.0 109.0 A19.0 19.0 0 0 1 451.0 128.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M470.0 109.0 A19.0 19.0 0 0 1 451.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M470.0 109.0 A19.0 19.0 0 0 1 489.0 128.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M508.0 109.0 A19.0 19.0 0 0 1 489.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M508.0 109.0 A19.0 19.0 0 0 1 527.0 128.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M546.0 109.0 A19.0 19.0 0 0 1 527.0 90.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M565.0 128.0 A19.0 19.0 0 0 1 584.0 109.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M565.0 90.0 A19.0 19.0 0 0 1 546.0 109.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M375.0 166.0 A19.0 19.0 0 0 1 394.0 147.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M375.0 128.0 A19.0 19.0 0 0 1 356.0 147.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M413.0 166.0 A19.0 19.0 0 0 1 432.0 147.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M413.0 128.0 A19.0 19.0 0 0 1 394.0 147.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M432.0 147.0 A19.0 19.0 0 0 1 451.0 166.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M470.0 147.0 A19.0 19.0 0 0 1 451.0 128.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M470.0 147.0 A19.0 19.0 0 0 1 489.0 166.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M508.0 147.0 A19.0 19.0 0 0 1 489.0 128.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M527.0 166.0 A19.0 19.0 0 0 1 546.0 147.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M527.0 128.0 A19.0 19.0 0 0 1 508.0 147.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M565.0 166.0 A19.0 19.0 0 0 1 584.0 147.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M565.0 128.0 A19.0 19.0 0 0 1 546.0 147.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M375.0 204.0 A19.0 19.0 0 0 1 394.0 185.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M375.0 166.0 A19.0 19.0 0 0 1 356.0 185.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M394.0 185.0 A19.0 19.0 0 0 1 413.0 204.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M432.0 185.0 A19.0 19.0 0 0 1 413.0 166.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M432.0 185.0 A19.0 19.0 0 0 1 451.0 204.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M470.0 185.0 A19.0 19.0 0 0 1 451.0 166.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M489.0 204.0 A19.0 19.0 0 0 1 508.0 185.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M489.0 166.0 A19.0 19.0 0 0 1 470.0 185.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M508.0 185.0 A19.0 19.0 0 0 1 527.0 204.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M546.0 185.0 A19.0 19.0 0 0 1 527.0 166.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<path d="M565.0 204.0 A19.0 19.0 0 0 1 584.0 185.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path><path d="M565.0 166.0 A19.0 19.0 0 0 1 546.0 185.0" fill="none" stroke="#AD1457" stroke-linecap="round" stroke-width="2"></path>
+<rect fill="none" height="152" stroke="#6B7378" stroke-dasharray="3 3" width="228" x="356" y="52"></rect>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Truchet.cs · 78–89</span>Point3d m0 = Outils.Milieu(c00, c10), m1 = Outils.Milieu(c10, c11);
+Point3d m2 = Outils.Milieu(c11, c01), m3 = Outils.Milieu(c01, c00);
+if (flip)
+{
+    tiles.Add(QuarterArc(m0, c10, m1));
+    tiles.Add(QuarterArc(m2, c01, m3));
+}
+else
+{
+    tiles.Add(QuarterArc(m3, c00, m0));
+    tiles.Add(QuarterArc(m1, c11, m2));
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le raccord, c'est le milieu</h3>
+<p>Tout arc commence et finit au milieu d'un côté. Or deux cases voisines partagent ce côté, donc ce milieu. Quel que soit le tirage, les arcs se touchent ; <code>Curve.JoinCurves</code> (ligne 93) n'a plus qu'à les souder en chemins. Le quart de cercle lui-même est une NURBS de degré 2 de poids √0,5 (ligne 108, cours 09).</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Un tirage, deux usages</h3>
+<p>Le pile ou face est tiré ligne 70, <b>avant</b> le test du type ligne 72. Avec la même graine, passer de <code>Type 0</code> (arcs) à <code>Type 1</code> (diagonales) garde donc les mêmes orientations : la diagonale relie les deux coins qui auraient porté les arcs.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Brancher une grille aplatie (Flatten) sur Truchet. <code>Outils.Groupes</code> n'y voit plus qu'une rangée ; la boucle des cases (ligne 62) va jusqu'à <code>rows.Count - 1</code>, soit 0, et la sortie reste vide, sans message. Garde l'arbre de CreateGrid tel quel.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 36 · Pavages et tissages</div>
+</section>
+<!-- ============ PAGE 3 · WEAVE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 36</b></div>
+<p class="rubrique">Schéma 2 · Weave, le damier des croisements</p>
+<h2>Dessus, dessous, dessus</h2>
+<p style="max-width:165mm">Weave reçoit deux familles de brins, A et B. À chaque croisement, l'un passe dessus et reste entier ; l'autre passe dessous et perd un morceau de longueur <code>Gap</code>, centré sur le croisement.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 210" width="100%">
+<rect fill="#EFE9E1" height="210" width="600" x="0" y="0"></rect>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="50" x2="103.0" y1="54.0" y2="54.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="117.0" x2="183.0" y1="54.0" y2="54.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="197.0" x2="210" y1="54.0" y2="54.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="50" x2="63.0" y1="94.0" y2="94.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="77.0" x2="143.0" y1="94.0" y2="94.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="157.0" x2="210" y1="94.0" y2="94.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="50" x2="103.0" y1="134.0" y2="134.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="117.0" x2="183.0" y1="134.0" y2="134.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="197.0" x2="210" y1="134.0" y2="134.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="50" x2="63.0" y1="174.0" y2="174.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="77.0" x2="143.0" y1="174.0" y2="174.0"></line>
+<line stroke="#1565C0" stroke-linecap="round" stroke-width="3" x1="157.0" x2="210" y1="174.0" y2="174.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="70.0" x2="70.0" y1="34" y2="47.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="70.0" x2="70.0" y1="61.0" y2="127.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="70.0" x2="70.0" y1="141.0" y2="194"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="110.0" x2="110.0" y1="34" y2="87.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="110.0" x2="110.0" y1="101.0" y2="167.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="110.0" x2="110.0" y1="181.0" y2="194"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="150.0" x2="150.0" y1="34" y2="47.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="150.0" x2="150.0" y1="61.0" y2="127.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="150.0" x2="150.0" y1="141.0" y2="194"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="190.0" x2="190.0" y1="34" y2="87.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="190.0" x2="190.0" y1="101.0" y2="167.0"></line>
+<line stroke="#E65100" stroke-linecap="round" stroke-width="3" x1="190.0" x2="190.0" y1="181.0" y2="194"></line>
+<text class="mono" fill="#1565C0" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="end" x="42" y="57.5">A0</text>
+<text class="mono" fill="#E65100" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="70.0" y="26">B0</text>
+<text class="mono" fill="#1565C0" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="end" x="42" y="97.5">A1</text>
+<text class="mono" fill="#E65100" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="110.0" y="26">B1</text>
+<text class="mono" fill="#1565C0" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="end" x="42" y="137.5">A2</text>
+<text class="mono" fill="#E65100" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="150.0" y="26">B2</text>
+<text class="mono" fill="#1565C0" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="end" x="42" y="177.5">A3</text>
+<text class="mono" fill="#E65100" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="190.0" y="26">B3</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="77.0" y="49.0">0</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="117.0" y="49.0">1</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="157.0" y="49.0">2</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="197.0" y="49.0">3</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="77.0" y="89.0">1</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="117.0" y="89.0">2</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="157.0" y="89.0">3</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="197.0" y="89.0">4</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="77.0" y="129.0">2</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="117.0" y="129.0">3</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="157.0" y="129.0">4</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="197.0" y="129.0">5</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="77.0" y="169.0">3</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="117.0" y="169.0">4</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="157.0" y="169.0">5</text>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="197.0" y="169.0">6</text>
+<text fill="#6B7378" font-size="8" font-style="italic" text-anchor="middle" x="130" y="204">petit chiffre : i + j au croisement</text>
+<rect fill="#fff" height="64" rx="5" stroke="#1565C0" stroke-width="1.3" width="336" x="250" y="34"></rect>
+<text fill="#1565C0" font-size="9.4" font-weight="700" text-anchor="start" x="262" y="54">i + j pair</text>
+<text fill="#2B2F33" font-size="8.6" text-anchor="start" x="262" y="72">A passe dessus. B passe dessous : sa distance</text>
+<text fill="#2B2F33" font-size="8.6" text-anchor="start" x="262" y="86">au croisement entre dans underB[j].</text>
+<rect fill="#fff" height="64" rx="5" stroke="#E65100" stroke-width="1.3" width="336" x="250" y="106"></rect>
+<text fill="#E65100" font-size="9.4" font-weight="700" text-anchor="start" x="262" y="126">i + j impair</text>
+<text fill="#2B2F33" font-size="8.6" text-anchor="start" x="262" y="144">B passe dessus. A passe dessous : sa distance</text>
+<text fill="#2B2F33" font-size="8.6" text-anchor="start" x="262" y="158">au croisement entre dans underA[i].</text>
+<text fill="#6B7378" font-size="8.6" font-style="italic" text-anchor="start" x="250" y="192">Ensuite, Cut retire Gap / 2 de part et d'autre de chaque distance.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Weave.cs · 73–82</span>var events = Intersection.CurveCurve(a[i], b[j], tolerance, tolerance);
+if (events == null) continue;
+foreach (var e in events.Where(e =&gt; e.IsPoint))
+{
+    // Damier : A passe dessus quand i + j est pair, dessous sinon.
+    if ((i + j) % 2 == 0)
+        underB[j].Add(b[j].GetLength(new Interval(b[j].Domain.Min, e.ParameterB)));
+    else
+        underA[i].Add(a[i].GetLength(new Interval(a[i].Domain.Min, e.ParameterA)));
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Une parité, pas un graphe</h3>
+<p>Le brin A d'indice <code>i</code> et le brin B d'indice <code>j</code> se croisent ; si <code>i + j</code> est pair, A passe dessus. Le long d'un même brin, <code>j</code> avance de 1 à chaque croisement, la parité bascule, et dessus et dessous alternent : c'est le damier du cours 18.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Compter en longueur</h3>
+<p>Le croisement arrive en paramètre de courbe, qui n'est pas proportionnel à la longueur. Weave le convertit en distance depuis le début du brin (<code>GetLength</code>), puis coupe en longueurs (<code>Cut</code>, page 5). La sortie range A en <code>{0; i}</code> et B en <code>{1; j}</code>.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Donner des brins dans le désordre. La parité vient de la <b>position dans la liste</b>, pas de la position dans l'espace : si les brins B ne sont pas triés de gauche à droite, deux croisements voisins peuvent avoir la même parité, et le brin passe deux fois dessus. Trie les listes avant Weave.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 36 · Pavages et tissages</div>
+</section>
+<!-- ============ PAGE 4 · SPIRAL ET WANDER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 36</b></div>
+<p class="rubrique">Schéma 3 · Glisser d'un anneau, d'une rangée à l'autre</p>
+<h2>Spiral, Wander et Dune</h2>
+<p style="max-width:165mm">Ces trois composants relient des points qui appartiennent à des branches différentes. Spiral passe d'un anneau au suivant en douceur ; Wander et Dune sautent au hasard vers une rangée voisine.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<circle cx="116" cy="100" fill="none" r="28" stroke="#6B7378" stroke-dasharray="3 3" stroke-width=".8"></circle>
+<circle cx="116" cy="100" fill="none" r="56" stroke="#6B7378" stroke-dasharray="3 3" stroke-width=".8"></circle>
+<circle cx="116" cy="100" fill="none" r="84" stroke="#6B7378" stroke-dasharray="3 3" stroke-width=".8"></circle>
+<circle cx="144.0" cy="100.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="130.0" cy="75.8" fill="#6B7378" r="1.6"></circle>
+<circle cx="102.0" cy="75.8" fill="#6B7378" r="1.6"></circle>
+<circle cx="88.0" cy="100.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="102.0" cy="124.2" fill="#6B7378" r="1.6"></circle>
+<circle cx="130.0" cy="124.2" fill="#6B7378" r="1.6"></circle>
+<circle cx="172.0" cy="100.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="164.5" cy="72.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="144.0" cy="51.5" fill="#6B7378" r="1.6"></circle>
+<circle cx="116.0" cy="44.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="88.0" cy="51.5" fill="#6B7378" r="1.6"></circle>
+<circle cx="67.5" cy="72.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="60.0" cy="100.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="67.5" cy="128.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="88.0" cy="148.5" fill="#6B7378" r="1.6"></circle>
+<circle cx="116.0" cy="156.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="144.0" cy="148.5" fill="#6B7378" r="1.6"></circle>
+<circle cx="164.5" cy="128.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="200.0" cy="100.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="194.9" cy="71.3" fill="#6B7378" r="1.6"></circle>
+<circle cx="180.3" cy="46.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="158.0" cy="27.3" fill="#6B7378" r="1.6"></circle>
+<circle cx="130.6" cy="17.3" fill="#6B7378" r="1.6"></circle>
+<circle cx="101.4" cy="17.3" fill="#6B7378" r="1.6"></circle>
+<circle cx="74.0" cy="27.3" fill="#6B7378" r="1.6"></circle>
+<circle cx="51.7" cy="46.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="37.1" cy="71.3" fill="#6B7378" r="1.6"></circle>
+<circle cx="32.0" cy="100.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="37.1" cy="128.7" fill="#6B7378" r="1.6"></circle>
+<circle cx="51.7" cy="154.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="74.0" cy="172.7" fill="#6B7378" r="1.6"></circle>
+<circle cx="101.4" cy="182.7" fill="#6B7378" r="1.6"></circle>
+<circle cx="130.6" cy="182.7" fill="#6B7378" r="1.6"></circle>
+<circle cx="158.0" cy="172.7" fill="#6B7378" r="1.6"></circle>
+<circle cx="180.3" cy="154.0" fill="#6B7378" r="1.6"></circle>
+<circle cx="194.9" cy="128.7" fill="#6B7378" r="1.6"></circle>
+<path d="M116.0 100.0 C116.4 99.3 119.1 97.3 118.3 96.0 C117.6 94.6 114.1 91.2 111.3 91.9 C108.6 92.6 102.8 96.0 102.0 100.0 C101.2 104.0 102.4 112.8 106.7 116.2 C110.9 119.5 121.4 122.9 127.7 120.2 C133.9 117.5 141.6 105.9 144.0 100.0 C146.4 94.1 144.2 89.5 142.3 84.8 C140.3 80.1 136.7 75.0 132.3 71.7 C128.0 68.4 121.8 65.7 116.0 65.0 C110.2 64.3 103.1 65.1 97.3 67.7 C91.6 70.2 85.5 74.8 81.6 80.2 C77.8 85.6 74.7 93.0 74.0 100.0 C73.3 107.0 74.5 115.4 77.6 122.2 C80.7 128.9 86.3 135.9 92.7 140.4 C99.1 144.9 107.8 148.3 116.0 149.0 C124.2 149.7 133.9 148.2 141.7 144.5 C149.4 140.8 157.4 134.2 162.5 126.8 C167.5 119.4 170.7 107.8 172.0 100.0 C173.3 92.2 171.9 86.6 170.1 80.3 C168.3 74.0 165.2 67.5 161.3 62.0 C157.3 56.5 152.1 51.3 146.3 47.5 C140.6 43.6 133.7 40.4 126.8 38.7 C119.9 37.0 112.2 36.4 104.9 37.2 C97.7 38.0 90.0 40.1 83.3 43.4 C76.6 46.7 70.0 51.5 64.8 57.0 C59.5 62.5 54.8 69.4 51.7 76.6 C48.6 83.8 46.5 92.0 46.0 100.0 C45.5 108.0 46.4 116.6 48.8 124.5 C51.1 132.3 55.0 140.3 60.0 147.0 C65.0 153.7 71.5 160.0 78.7 164.7 C85.8 169.3 94.3 173.1 102.8 175.1 C111.2 177.1 120.7 177.7 129.5 176.6 C138.3 175.5 147.6 172.8 155.7 168.7 C163.7 164.6 171.7 158.7 178.0 152.0 C184.3 145.2 189.8 136.9 193.5 128.2 C197.1 119.5 198.9 104.7 200.0 100.0" fill="none" stroke="#7B1FA2" stroke-linecap="round" stroke-width="2"></path>
+<circle cx="116" cy="100" fill="#2B2F33" r="2.6"></circle>
+<text fill="#6B7378" font-size="8.2" font-style="italic" text-anchor="middle" x="116" y="206">anneaux de 6, 12 et 18 points</text>
+<text fill="#AD1457" font-size="9.6" font-weight="700" text-anchor="start" x="246" y="30">Le saut de rangée, tiré dans ids = { -1, 0, 0, 1 }</text>
+<text class="mono" fill="#2B2F33" font-size="10" font-weight="700" style="font-size:10px" text-anchor="end" x="270" y="72">-1</text>
+<rect fill="#2E7D32" height="14" width="70.0" x="280" y="54"></rect>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="start" x="356.0" y="65">1/4</text>
+<rect fill="#C62828" height="14" width="93.3" x="280" y="72"></rect>
+<text fill="#C62828" font-size="8.2" font-weight="700" text-anchor="start" x="379.3333333333333" y="83">1/3</text>
+<text class="mono" fill="#2B2F33" font-size="10" font-weight="700" style="font-size:10px" text-anchor="end" x="270" y="118">0</text>
+<rect fill="#2E7D32" height="14" width="140.0" x="280" y="100"></rect>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="start" x="426.0" y="111">1/2</text>
+<rect fill="#C62828" height="14" width="186.7" x="280" y="118"></rect>
+<text fill="#C62828" font-size="8.2" font-weight="700" text-anchor="start" x="472.66666666666663" y="129">2/3</text>
+<text class="mono" fill="#2B2F33" font-size="10" font-weight="700" style="font-size:10px" text-anchor="end" x="270" y="164">+1</text>
+<rect fill="#2E7D32" height="14" width="70.0" x="280" y="146"></rect>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="start" x="356.0" y="157">1/4</text>
+<rect fill="#C62828" height="14" width="1.0" x="280" y="164"></rect>
+<text fill="#C62828" font-size="8.2" font-weight="700" text-anchor="start" x="286" y="175">jamais</text>
+<rect fill="#2E7D32" height="10" width="10" x="280" y="190"></rect><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="start" x="296" y="199">Wander : rand.Next(0, ids.Count)</text>
+<rect fill="#C62828" height="10" width="10" x="460" y="190"></rect><text class="mono" fill="#2B2F33" font-size="8.2" style="font-size:8.2px" text-anchor="start" x="476" y="199">Dune : … Count - 1</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Spiral.cs · 68–76</span>double radius = ring.Average(p =&gt; p.DistanceTo(center));
+for (int j = 0; j &lt; ring.Count; j++)
+{
+    Vector3d dir = ring[j] - center;
+    if (!dir.Unitize()) continue;
+    double r = previous + (radius - previous) * j / ring.Count;
+    if (r &gt; 0) path.Add(center + dir * r);
+}
+previous = radius;</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Un rayon qui glisse</h3>
+<p>Chaque point d'un anneau garde sa direction depuis le centre, mais son rayon va de celui de l'anneau précédent à celui de l'anneau courant, au prorata de <code>j / ring.Count</code>. Le dernier point referme sur <code>last[0]</code> (ligne 80) et <code>CreateInterpolatedCurve</code> lisse le tout en degré 3.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Wander, Dune réparé</h3>
+<p>Même idée, mais Wander tire dans les quatre cases de <code>ids</code> (ligne 76), part d'une graine, borne la rangée cible (ligne 77), se replie sur sa rangée si la voisine est trop courte (80–84) et prend les tolérances du document (ligne 92).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège réel · Dune</span>
+    Dune lit <code>points.Branches[i + offset][j]</code> (ligne 64) sans vérifier la longueur de la rangée voisine : si la rangée précédente a moins de points, l'indice sort de la liste et le composant passe en erreur. Wander, sur la même grille, prend le point dans sa propre rangée et le signale par une remarque.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 36 · Pavages et tissages</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 36</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Weave.Cut : couper un brin en longueurs</h2>
+<p style="max-width:165mm">Vingt lignes reçoivent un brin et la liste des distances où il passe dessous, et rendent les morceaux à garder. Tout le travail se fait en longueurs ; la conversion en paramètres n'arrive qu'au dernier moment.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">98</span><span class="kw">static</span> <span class="ty">List</span>&lt;<span class="ty">Curve</span>&gt; Cut(<span class="ty">Curve</span> strand,</div>
+<div class="l"><span class="n"> </span> <span class="ty">List</span>&lt;<span class="kw">double</span>&gt; crossings, <span class="kw">double</span> gap)</div>
+<div class="l"><span class="n">100</span> <span class="kw">double</span> total = strand.GetLength();</div>
+<div class="l"><span class="n">101</span> <span class="kw">var</span> keep = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Curve</span>&gt;();</div>
+<div class="l"><span class="n">102</span> <span class="kw">double</span> from = 0;</div>
+<div class="l k1"><span class="n">103</span> <span class="kw">foreach</span> (<span class="kw">double</span> s <span class="kw">in</span> crossings.OrderBy(x =&gt; x))<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">105</span> <span class="kw">double</span> to = <span class="ty">Math</span>.Max(from, s - gap / 2);<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">106</span> <span class="kw">if</span> (to - from &gt; 1e-6)<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n"> </span>      keep.Add(Piece(strand, from, to));</div>
+<div class="l k4"><span class="n">107</span>    from = <span class="ty">Math</span>.Min(total, s + gap / 2);<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">109</span> <span class="kw">if</span> (total - from &gt; 1e-6)<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n"> </span>    keep.Add(Piece(strand, from, total));</div>
+<div class="l k6"><span class="n">110</span> <span class="kw">return</span> keep.Where(c =&gt; c != <span class="kw">null</span>).ToList();<span class="rep r6">6</span></div>
+<div class="l"><span class="n"> </span></div>
+<div class="l"><span class="n">113</span><span class="kw">static</span> <span class="ty">Curve</span> Piece(<span class="ty">Curve</span> strand,</div>
+<div class="l"><span class="n"> </span> <span class="kw">double</span> from, <span class="kw">double</span> to)</div>
+<div class="l k7"><span class="n">115</span> <span class="kw">if</span> (!strand.LengthParameter(from, <span class="kw">out double</span> t0)<span class="rep r7">7</span></div>
+<div class="l k7"><span class="n"> </span>   || !strand.LengthParameter(to, <span class="kw">out double</span> t1))</div>
+<div class="l k7"><span class="n"> </span> <span class="kw">return null</span>;</div>
+<div class="l"><span class="n">116</span> <span class="kw">return</span> strand.Trim(t0, t1);</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Dans l'ordre du brin</b>Les croisements arrivent dans le désordre des brins B ; on les trie.</li>
+<li><span class="rep r2">2</span><b>S'arrêter avant</b>Un demi-gap avant le croisement, jamais avant le début du morceau.</li>
+<li><span class="rep r3">3</span><b>Pas de miettes</b>Deux croisements trop proches ne laissent rien entre eux.</li>
+<li><span class="rep r4">4</span><b>Repartir après</b>Un demi-gap plus loin, sans dépasser le bout.</li>
+<li><span class="rep r5">5</span><b>La queue</b>Le dernier morceau va jusqu'au bout du brin.</li>
+<li><span class="rep r6">6</span><b>Écarter les échecs</b>Un morceau impossible à tailler est rendu null, puis retiré.</li>
+<li><span class="rep r7">7</span><b>Longueur vers paramètre</b>Seule conversion, juste avant <code>Trim</code>.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Le même geste ailleurs</span>
+<code>Math.Max(from, …)</code> et <code>Math.Min(total, …)</code> bornent chaque coupe à ce qui reste du brin. Sans eux, deux croisements à moins d'un <code>Gap</code> l'un de l'autre produiraient un morceau de longueur négative, que <code>LengthParameter</code> ne saurait pas placer.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 36 · Pavages et tissages</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 36</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">bool flip = rand.Next(2) == 1;</td><td>pile ou face par case</td><td>Truchet.cs:70</td></tr>
+<tr><td class="c">arc.Points.SetPoint(1, control, Math.Sqrt(0.5));</td><td>quart de cercle exact</td><td>Truchet.cs:108</td></tr>
+<tr><td class="c">if ((i + j) % 2 == 0)</td><td>damier dessus-dessous</td><td>Weave.cs:78</td></tr>
+<tr><td class="c">strand.LengthParameter(from, out double t0)</td><td>longueur vers paramètre</td><td>Weave.cs:115</td></tr>
+<tr><td class="c">previous + (radius - previous) * j / ring.Count</td><td>rayon qui glisse</td><td>Spiral.cs:73</td></tr>
+<tr><td class="c">ids[rand.Next(0, ids.Count)]</td><td>saut vers une rangée voisine</td><td>Wander.cs:76</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Pavage de Truchet</dt><dd>Des carreaux identiques, chacun orienté au hasard, dont les motifs se raccordent.</dd>
+<dt>Tissage</dt><dd>Deux familles de brins qui passent alternativement dessus et dessous.</dd>
+<dt>Parité</dt><dd>Le fait qu'un entier soit pair ou impair ; ici, la règle du damier.</dd>
+<dt>Paramètre de longueur</dt><dd>Le paramètre de courbe atteint après une distance donnée depuis le début.</dd>
+<dt>Congé</dt><dd>L'arrondi posé à un coin de polyligne (fillet), comme dans Wander et Dune.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 151</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 36 · Pavages et tissages</div>
+</section>
+</body>
+</html>

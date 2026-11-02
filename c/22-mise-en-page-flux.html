@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>22 · Mise en page en flux</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-6">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 22</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Mise en page<br/>en flux</h1>
+<p class="chapeau">Personne ne place un bouton au pixel près. On dit « une colonne, puis une ligne de deux boutons », et le calcul trouve où va chaque chose.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>03</b> collections · <b>20</b> attributs</span>
+<span class="pastille">Exemples · <b>Metrique.cs</b>, <b>MiseEnPage.cs</b> (SnapSet)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 210" width="100%">
+<line stroke="#6B7378" stroke-width="1.1" x1="130" x2="50" y1="39" y2="81"></line>
+<line stroke="#6B7378" stroke-width="1.1" x1="130" x2="135" y1="39" y2="81"></line>
+<line stroke="#6B7378" stroke-width="1.1" x1="130" x2="222" y1="39" y2="81"></line>
+<line stroke="#6B7378" stroke-width="1.1" x1="135" x2="100" y1="103" y2="149"></line>
+<line stroke="#6B7378" stroke-width="1.1" x1="135" x2="175" y1="103" y2="149"></line>
+<rect fill="#fff" height="22" rx="11" stroke="#2F6B3A" stroke-width="1.4" width="76" x="92.0" y="17"></rect><text fill="#2F6B3A" font-size="9.5" font-weight="700" text-anchor="middle" x="130" y="31.5">Colonne</text>
+<rect fill="#fff" height="22" rx="11" stroke="#6B7378" stroke-width="1.4" width="58" x="21.0" y="81"></rect><text fill="#6B7378" font-size="9.5" font-weight="700" text-anchor="middle" x="50" y="95.5">Texte</text>
+<rect fill="#fff" height="22" rx="11" stroke="#2F6B3A" stroke-width="1.4" width="58" x="106.0" y="81"></rect><text fill="#2F6B3A" font-size="9.5" font-weight="700" text-anchor="middle" x="135" y="95.5">Ligne</text>
+<rect fill="#fff" height="22" rx="11" stroke="#6B7378" stroke-width="1.4" width="86" x="179.0" y="81"></rect><text fill="#6B7378" font-size="9.5" font-weight="700" text-anchor="middle" x="222" y="95.5">Interrupteur</text>
+<rect fill="#fff" height="22" rx="11" stroke="#6B7378" stroke-width="1.4" width="58" x="71.0" y="149"></rect><text fill="#6B7378" font-size="9.5" font-weight="700" text-anchor="middle" x="100" y="163.5">Bouton</text>
+<rect fill="#fff" height="22" rx="11" stroke="#6B7378" stroke-width="1.4" width="58" x="146.0" y="149"></rect><text fill="#6B7378" font-size="9.5" font-weight="700" text-anchor="middle" x="175" y="163.5">Bouton</text>
+<line stroke="#1565C0" stroke-width="2" x1="278" x2="278" y1="178" y2="26"></line><polygon fill="#1565C0" points="278,26 280.7,32.4 275.3,32.4"></polygon>
+<line stroke="#E65100" stroke-width="2" x1="296" x2="296" y1="26" y2="178"></line><polygon fill="#E65100" points="296,178 293.3,171.6 298.7,171.6"></polygon>
+<text fill="#1565C0" font-size="9.5" font-weight="700" text-anchor="middle" x="270" y="196">1 · mesurer</text>
+<text fill="#E65100" font-size="9.5" font-weight="700" text-anchor="middle" x="304" y="14">2 · disposer</text>
+<rect fill="#C9C9C9" height="170" rx="6" stroke="#2B2B2B" stroke-width="1.3" width="250" x="330" y="20"></rect>
+<rect fill="#DCDCDC" height="32" stroke="#6B7378" stroke-width=".8" width="234" x="338" y="28"></rect>
+<text fill="#1E1E1E" font-size="10" font-weight="700" text-anchor="start" x="348" y="48">Réglages de la grille</text>
+<rect fill="none" height="62" stroke="#6B7378" stroke-dasharray="4 3" width="234" x="338" y="68"></rect>
+<rect fill="#3A3A3A" height="46" rx="3" width="105" x="346" y="76"></rect><rect fill="#3A3A3A" height="46" rx="3" width="105" x="459" y="76"></rect>
+<text fill="#EEE" font-size="10" font-weight="700" text-anchor="middle" x="398.5" y="103">Valider</text>
+<text fill="#EEE" font-size="10" font-weight="700" text-anchor="middle" x="511.5" y="103">Annuler</text>
+<rect fill="#DCDCDC" height="44" stroke="#6B7378" stroke-width=".8" width="234" x="338" y="138"></rect>
+<text fill="#1E1E1E" font-size="10" text-anchor="start" x="348" y="164">Visible</text>
+<rect fill="#3A3A3A" height="20" rx="2" width="82" x="480" y="150"></rect><text fill="#EEE" font-size="10" font-weight="700" text-anchor="middle" x="521" y="164">True</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un arbre de <b>conteneurs</b> (Colonne, Ligne) et de <b>feuilles</b> se dispose en deux passes : on <b>mesure</b> de bas en haut la taille naturelle de chaque nœud, puis on <b>dispose</b> de haut en bas un rectangle par nœud.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Ranger une étagère. On regarde d'abord l'épaisseur de chaque livre, et l'étagère sait alors quelle longueur il lui faut. Puis on range de gauche à droite : chaque livre commence là où le précédent s'arrête.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>calculer la taille naturelle d'une Colonne ou d'une Ligne ;</li>
+<li>partager une place entre frères selon leurs poids, sans rien rogner ;</li>
+<li>poser un enfant sur l'axe transverse ;</li>
+<li>suivre la mise en page d'un arbre du canvas, depuis le pivot de sa racine.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Un constituant ne connaît que son parent et son rang ; c'est le parent qui calcule où il se trouve. Le moteur est <b>un seul fichier</b>, <code>schema/Metrique.cs</code>, appelé à la fois par le canvas de dessin, par le code généré et par les tests (décisions 1 et 3 de CLAUDE.md).
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 22 · Mise en page en flux</div>
+</section>
+<!-- ============ PAGE 2 · MESURER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 22</b></div>
+<p class="rubrique">Schéma 1 · Mesurer</p>
+<h2>La taille naturelle, de bas en haut</h2>
+<p style="max-width:165mm">Une feuille connaît sa taille (son texte mesuré, cours 19). Un conteneur la déduit de ses enfants. La Colonne empile sur l'axe <b>vertical</b>, la Ligne sur l'axe <b>horizontal</b> : c'est leur <b>axe principal</b>. L'autre est l'<b>axe transverse</b>.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#2F6B3A" font-size="12" font-weight="700" text-anchor="start" x="16" y="22">Une Colonne et trois feuilles, à leur taille naturelle</text>
+<rect fill="#C9C9C9" height="120" stroke="#2B2B2B" stroke-width="1.2" width="196" x="24" y="44"></rect>
+<rect fill="none" height="32" stroke="#7B1FA2" stroke-dasharray="3 2" stroke-width=".9" width="128" x="28" y="48"></rect>
+<rect fill="#F4F4F4" height="24" stroke="#6B7378" stroke-width=".8" width="120" x="32" y="52"></rect>
+<text fill="#2B2F33" font-size="9" text-anchor="middle" x="92.0" y="67.5">Texte 120 × 24</text>
+<rect fill="none" height="48" stroke="#7B1FA2" stroke-dasharray="3 2" stroke-width=".9" width="188" x="28" y="80"></rect>
+<rect fill="#F4F4F4" height="40" stroke="#6B7378" stroke-width=".8" width="180" x="32" y="84"></rect>
+<text fill="#2B2F33" font-size="9" text-anchor="middle" x="122.0" y="107.5">Champ 180 × 40</text>
+<rect fill="none" height="32" stroke="#7B1FA2" stroke-dasharray="3 2" stroke-width=".9" width="98" x="28" y="128"></rect>
+<rect fill="#F4F4F4" height="24" stroke="#6B7378" stroke-width=".8" width="90" x="32" y="132"></rect>
+<text fill="#2B2F33" font-size="9" text-anchor="middle" x="77.0" y="147.5">Bouton 90 × 24</text>
+<line stroke="#1565C0" stroke-width="1.2" x1="236" x2="236" y1="44" y2="164"></line>
+<line stroke="#1565C0" x1="231" x2="241" y1="44" y2="44"></line><line stroke="#1565C0" x1="231" x2="241" y1="164" y2="164"></line>
+<text fill="#1565C0" font-size="10.5" font-weight="700" text-anchor="start" x="246" y="102">120</text>
+<text fill="#1565C0" font-size="8.6" text-anchor="start" x="246" y="116">= 4 + 32 + 48 + 32 + 4</text>
+<line stroke="#E65100" stroke-width="1.2" x1="24" x2="220" y1="180" y2="180"></line>
+<line stroke="#E65100" x1="24" x2="24" y1="175" y2="185"></line><line stroke="#E65100" x1="220" x2="220" y1="175" y2="185"></line>
+<text fill="#E65100" font-size="9.5" font-weight="700" text-anchor="middle" x="122" y="198">196 = 4 + max(128, 188, 98) + 4</text>
+<text fill="#1565C0" font-size="10" font-weight="700" text-anchor="start" x="362" y="56">Axe principal (vertical) : on ADDITIONNE</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="start" x="362" y="72">Σ (boîte + marge) + espaceEntre × (n − 1)</text>
+<text fill="#E65100" font-size="10" font-weight="700" text-anchor="start" x="362" y="104">Axe transverse : on prend le MAX</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="start" x="362" y="120">max (boîte + marge)</text>
+<text fill="#2F6B3A" font-size="10" font-weight="700" text-anchor="start" x="362" y="152">Puis le remplissage des deux côtés</text>
+<text fill="#2B2F33" font-size="9.2" text-anchor="start" x="362" y="168">rebord ≥ 4 px, marge de feuille ≥ 4 px</text>
+<rect fill="none" height="8" stroke="#7B1FA2" stroke-dasharray="3 2" width="10" x="362" y="184"></rect>
+<text fill="#2B2F33" font-size="8.8" text-anchor="start" x="378" y="192">place d'une feuille : sa boîte + 4 px autour</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Metrique.cs · 2995–3029, condensé</span>for (int i = 0; i &lt; nombre; i++)
+{
+    var boite = MesurerBoite(elements[i], gabarit, axe, largeurLibelleAlignee);   // récursif
+    var marge = MargeDeNoeud(elements[i], gabarit);
+    principal += axe == Axe.Vertical ? boite.Height + marge.Vertical : boite.Width + marge.Horizontal;
+    float t = axe == Axe.Vertical ? boite.Width + marge.Horizontal : boite.Height + marge.Vertical;
+    if (t &gt; transverse) transverse = t;
+}
+if (nombre &gt; 1) principal += Positif(noeud.EspaceEntre) * (nombre - 1);
+var pad = RemplissageDeConteneur(noeud, gabarit);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>La récursion fait le « bas en haut »</h3>
+<p><code>MesurerBoite</code> appelle <code>MesurerPile</code> pour un conteneur, qui rappelle <code>MesurerBoite</code> sur chaque enfant. Les feuilles répondent d'abord ; les sommes remontent ensuite jusqu'à la racine.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>La marge appartient au parent</h3>
+<p>La boîte d'un nœud, c'est ce qu'il peint et où on le clique. Sa marge est la place autour, que le parent compte. Une feuille a au moins 4 px de marge, un conteneur au moins 4 px de rebord : deux feuilles voisines sont à 8 px.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Le conteneur vide. Sans <code>if (nombre &gt; 1)</code>, un conteneur sans enfant ajouterait <code>espaceEntre × (0 − 1)</code>, un espacement <b>négatif</b> : sa boîte serait plus petite que son propre remplissage, et le peintre l'accepterait sans broncher (commentaire des lignes 3020–3022).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 22 · Mise en page en flux</div>
+</section>
+<!-- ============ PAGE 3 · PARTAGER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 22</b></div>
+<p class="rubrique">Schéma 2 · Partager l'axe principal</p>
+<h2>Les poids, et la boucle de gel</h2>
+<p style="max-width:165mm">Quand le parent offre plus que la somme des tailles naturelles, qui prend le surplus ? Le <b>poids</b> de chaque enfant. Poids 0 (le défaut) : ta taille naturelle, pas un pixel de plus. Les autres se partagent le reste au prorata.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 236" width="100%">
+<rect fill="#EFE9E1" height="236" width="600" x="0" y="0"></rect>
+<text fill="#2F6B3A" font-size="12" font-weight="700" text-anchor="start" x="16" y="22">Une Ligne de 300 px, trois enfants</text>
+<rect fill="#fff" height="150" opacity=".55" width="390.0" x="140" y="36"></rect>
+<line stroke="#2B2F33" stroke-width="1" x1="140" x2="140" y1="34" y2="190"></line><line stroke="#2B2F33" stroke-width="1" x1="530.0" x2="530.0" y1="34" y2="190"></line>
+<text fill="#2B2F33" font-size="9" text-anchor="middle" x="335.0" y="202">300 px disponibles</text>
+<text fill="#2B2F33" font-size="9.8" font-weight="700" text-anchor="start" x="16" y="64">tailles naturelles</text>
+<rect fill="#2E7D32" height="24" opacity=".85" rx="3" width="76.0" x="140.0" y="48"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="179.0" y="64">A · 60</text>
+<rect fill="#1565C0" height="24" opacity=".85" rx="3" width="50.0" x="218.0" y="48"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="244.0" y="64">B · 40</text>
+<rect fill="#7B1FA2" height="24" opacity=".85" rx="3" width="193.0" x="270.0" y="48"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="367.5" y="64">C · 150</text>
+<text fill="#2B2F33" font-size="9.8" font-weight="700" text-anchor="start" x="16" y="112">partage naïf</text>
+<rect fill="#2E7D32" height="24" opacity=".85" rx="3" width="76.0" x="140.0" y="96"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="179.0" y="112">60</text>
+<rect fill="#1565C0" height="24" opacity=".85" rx="3" width="154.0" x="218.0" y="96"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="296.0" y="112">120</text>
+<rect fill="#7B1FA2" height="24" opacity=".85" rx="3" width="154.0" x="374.0" y="96"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="452.0" y="112">120</text>
+<rect fill="none" height="24" stroke="#C62828" stroke-dasharray="3 2" stroke-width="1.2" width="39.0" x="528.0" y="96"></rect>
+<text fill="#C62828" font-size="8.8" font-weight="700" text-anchor="middle" x="549.5" y="134">C rogné de 30 px</text>
+<text fill="#2B2F33" font-size="9.8" font-weight="700" text-anchor="start" x="16" y="160">partage avec gel</text>
+<rect fill="#2E7D32" height="24" opacity=".85" rx="3" width="76.0" x="140.0" y="144"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="179.0" y="160">60</text>
+<rect fill="#1565C0" height="24" opacity=".85" rx="3" width="115.0" x="218.0" y="144"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="276.5" y="160">90</text>
+<rect fill="#7B1FA2" height="24" opacity=".85" rx="3" width="193.0" x="335.0" y="144"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="432.5" y="160">150</text>
+<text fill="#2B2F33" font-size="8.8" text-anchor="start" x="16" y="222">Poids : A 0, B 1, C 1. A est servi d'abord (poids 0). Sur 240, B et C auraient 120 chacun ; C en veut 150 : il est gelé, et B prend le reste, 90.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Metrique.cs · 3098–3110, commentaires ajoutés</span>for (int i = 0; i &lt; nombre; i++)
+{
+    if (gele[i]) continue;
+    float part = reste * poidsUtiles[i] / sommePoids;
+    if (part &lt; tailles[i])          // sa part est plus petite que sa taille naturelle
+    {
+        gele[i] = true;             // il garde sa taille naturelle…
+        reste = Positif(reste - tailles[i]);
+        aGele = true;
+        break;                      // …et le partage recommence entre les autres
+    }
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi la boucle s'arrête</h3>
+<p>Chaque tour gèle au moins un enfant, ou bien distribue tout et sort. Au pire, il y a autant de tours que d'enfants. Et la somme des poids est testée avant chaque division : aucune division par zéro.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Personne n'a de poids</h3>
+<p>Alors le surplus n'est pris par personne : les enfants gardent leur taille naturelle et le reste de la place reste vide, à la fin de l'axe. C'est la règle du schéma, écrite telle quelle dans le commentaire de <code>Partager</code>.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Partager au prorata d'un seul coup. Deux frères de poids égal et de tailles très différentes recevraient la moitié chacun, et le plus gros serait rogné <b>en silence</b>, comme C sur la ligne du milieu. C'est exactement ce que la boucle de gel interdit.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 22 · Mise en page en flux</div>
+</section>
+<!-- ============ PAGE 4 · TRANSVERSE ET DÉBORDEMENT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 22</b></div>
+<p class="rubrique">Schéma 3 · L'axe transverse et le débordement</p>
+<h2>Aligner, étirer, et ne jamais rogner</h2>
+<p style="max-width:165mm">Sur l'axe transverse, il n'y a rien à partager : chaque enfant a toute la largeur d'une Colonne (ou toute la hauteur d'une Ligne). Son <b>alignement</b> dit ce qu'il en fait.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 226" width="100%">
+<rect fill="#EFE9E1" height="226" width="600" x="0" y="0"></rect>
+<text fill="#2F6B3A" font-size="12" font-weight="700" text-anchor="start" x="16" y="22">L'axe transverse : où poser un enfant plus étroit que la place ?</text>
+<rect fill="none" height="56" stroke="#6B7378" stroke-dasharray="4 3" width="120" x="24" y="36"></rect>
+<rect fill="#1565C0" height="28" opacity=".85" rx="3" width="60" x="24" y="50"></rect>
+<text fill="#2B2F33" font-size="9.8" font-weight="700" text-anchor="middle" x="84" y="108">Debut</text>
+<rect fill="none" height="56" stroke="#6B7378" stroke-dasharray="4 3" width="120" x="168" y="36"></rect>
+<rect fill="#1565C0" height="28" opacity=".85" rx="3" width="60" x="198" y="50"></rect>
+<text fill="#2B2F33" font-size="9.8" font-weight="700" text-anchor="middle" x="228" y="108">Centre</text>
+<rect fill="none" height="56" stroke="#6B7378" stroke-dasharray="4 3" width="120" x="312" y="36"></rect>
+<rect fill="#1565C0" height="28" opacity=".85" rx="3" width="60" x="372" y="50"></rect>
+<text fill="#2B2F33" font-size="9.8" font-weight="700" text-anchor="middle" x="372" y="108">Fin</text>
+<rect fill="none" height="56" stroke="#6B7378" stroke-dasharray="4 3" width="120" x="456" y="36"></rect>
+<rect fill="#1565C0" height="28" opacity=".85" rx="3" width="120" x="456" y="50"></rect>
+<text fill="#2B2F33" font-size="9.8" font-weight="700" text-anchor="middle" x="516" y="108">Etire (défaut)</text>
+<line stroke="#CFC6BA" x1="16" x2="584" y1="120" y2="120"></line>
+<text fill="#2F6B3A" font-size="12" font-weight="700" text-anchor="start" x="16" y="140">Un enfant plus grand que la place : on ne rogne jamais</text>
+<rect fill="#C9C9C9" height="50" stroke="#2B2B2B" width="140" x="40" y="154"></rect>
+<rect fill="#C62828" height="30" opacity=".8" width="132" x="48" y="164"></rect>
+<rect fill="none" height="30" stroke="#C62828" stroke-dasharray="3 2" width="40" x="180" y="164"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="114" y="183">écrêté</text>
+<text fill="#C62828" font-size="9.2" font-weight="700" text-anchor="start" x="232" y="176">refusé : caché</text>
+<text fill="#C62828" font-size="9.2" text-anchor="start" x="232" y="190">et non cliquable</text>
+<rect fill="#C9C9C9" height="50" stroke="#2B2B2B" width="188" x="330" y="154"></rect>
+<rect fill="#2E7D32" height="30" opacity=".85" width="172" x="338" y="164"></rect>
+<text fill="#fff" font-size="9.5" font-weight="700" text-anchor="middle" x="424" y="183">taille naturelle</text>
+<text fill="#2E7D32" font-size="9.2" font-weight="700" text-anchor="start" x="526" y="176">SnapSet : le</text>
+<text fill="#2E7D32" font-size="9.2" text-anchor="start" x="526" y="190">parent grandit</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Metrique.cs · 3256–3292, condensé</span>bool prendToutePlace = noeud.Type == TypeContenu.Separateur
+                    || noeud.Alignement == AlignementTransversal.Etire;
+if (prendToutePlace) { position = debut; taille = Math.Max(placeLibre, Positif(naturel)); return; }
+
+taille = Positif(naturel);
+float reste = Positif(placeLibre - taille);     // 0 si l'enfant est plus grand que la place
+switch (noeud.Alignement)
+{
+    case AlignementTransversal.Fin:    position = debut + reste;      break;
+    case AlignementTransversal.Centre: position = debut + reste / 2f; break;
+    default:                           position = debut;              break;
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Une règle écrite en code</h3>
+<p><code>Metrique.LeDebordementFaitGrandirLeParent = true</code> est une constante, pas un commentaire. Comme le parent se mesure à partir de ses enfants, il est toujours assez grand. Ce qu'on écrêterait serait caché <b>et</b> non cliquable, sans que rien ne le signale.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le séparateur, toujours étiré</h3>
+<p>Un séparateur qui ne prendrait pas toute la place ne séparerait rien. Le schéma ne lui déclare donc pas d'alignement, et le code le force. <code>Math.Max</code> garde aussi la taille naturelle quand la place est trop petite.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Mesurer avec un nombre, disposer avec un autre. Le rebord (<code>RemplissageDeConteneur</code>), la marge (<code>MargeDeNoeud</code>) et la largeur de libellé alignée sont lus par la mesure <b>et</b> par la disposition. Si un seul des deux appliquait un plancher, un enfant déborderait.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 22 · Mise en page en flux</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 22</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Metrique.cs : PlacerEnfants</h2>
+<p style="max-width:165mm">Le cœur du flux tient dans une méthode, la même pour la Colonne et la Ligne : seul l'axe change. Elle reçoit le rectangle de contenu (rebord déjà retiré) et la liste des frères. Extraits, avec des noms de variables raccourcis.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l k1"><span class="n">3184</span><span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; nombre; i++)<span class="rep r1">1</span></div>
+<div class="l"><span class="n">3185</span>{</div>
+<div class="l k1"><span class="n">3187</span>  boites[i] = MesurerBoite(enfants[i], gabarit, axe, …);</div>
+<div class="l k2"><span class="n">3189</span> <span class="kw">var</span> m = MargeDeNoeud(enfants[i], gabarit);<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">3190</span>  naturels[i] = axe == <span class="ty">Axe</span>.Vertical</div>
+<div class="l k2"><span class="n"> </span>    ? boites[i].Height + m.Vertical</div>
+<div class="l k2"><span class="n"> </span>    : boites[i].Width + m.Horizontal;</div>
+<div class="l k3"><span class="n">3194</span>  poids[i] = enfants[i].Poids &gt; 0 ? enfants[i].Poids : 0;<span class="rep r3">3</span></div>
+<div class="l"><span class="n">3195</span>}</div>
+<div class="l k4"><span class="n">3197</span><span class="kw">float</span> disponible = axe == <span class="ty">Axe</span>.Vertical<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n"> </span>  ? contenu.Height : contenu.Width;</div>
+<div class="l k4"><span class="n">3198</span><span class="kw">if</span> (nombre &gt; 1) disponible -= gap * (nombre - 1);</div>
+<div class="l k4"><span class="n">3200</span><span class="kw">var</span> tailles = Partager(disponible, naturels, poids);</div>
+<div class="l"><span class="n">3206</span><span class="kw">float</span> curseur = axe == <span class="ty">Axe</span>.Vertical</div>
+<div class="l"><span class="n"> </span>  ? contenu.Y : contenu.X;</div>
+<div class="l k5"><span class="n">3208</span><span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; nombre; i++)<span class="rep r5">5</span></div>
+<div class="l"><span class="n">3209</span>{</div>
+<div class="l k5"><span class="n">3218</span> <span class="kw">float</span> taillePrincipale = Positif(tailles[i]</div>
+<div class="l k5"><span class="n"> </span>      - margeAvantPrincipal - margeApresPrincipal);</div>
+<div class="l k5"><span class="n">3219</span> <span class="kw">float</span> positionPrincipale = curseur + margeAvantPrincipal;</div>
+<div class="l k6"><span class="n">3226</span>  PlacerSurLAxeTransverse(enfants[i], …,<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n"> </span> <span class="kw">out</span> positionTransverse, <span class="kw">out</span> tailleTransverse);</div>
+<div class="l"><span class="n">3234</span> <span class="kw">var</span> rect = axe == <span class="ty">Axe</span>.Vertical</div>
+<div class="l"><span class="n"> </span>    ? <span class="kw">new</span> <span class="ty">RectangleF</span>(positionTransverse, positionPrincipale, …)</div>
+<div class="l"><span class="n"> </span>    : <span class="kw">new</span> <span class="ty">RectangleF</span>(positionPrincipale, positionTransverse, …);</div>
+<div class="l k7"><span class="n">3238</span>  resultat[i] = Disposer(enfants[i], gabarit, rect, …);<span class="rep r7">7</span></div>
+<div class="l k7"><span class="n">3239</span>  curseur += tailles[i] + gap;</div>
+<div class="l"><span class="n">3240</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Mesurer chaque enfant</b>Sa boîte naturelle, récursivement.</li>
+<li><span class="rep r2">2</span><b>Sa place naturelle</b>Boîte plus marge, sur l'axe principal seulement.</li>
+<li><span class="rep r3">3</span><b>Le poids</b>Un poids négatif compte pour 0.</li>
+<li><span class="rep r4">4</span><b>Partager</b>La place, moins les espaces entre frères, passe à la boucle de gel.</li>
+<li><span class="rep r5">5</span><b>Avancer un curseur</b>Chaque enfant commence où le précédent finit ; sa marge est retirée de sa part.</li>
+<li><span class="rep r6">6</span><b>L'autre axe</b>Début, centre, fin ou étiré (page 4).</li>
+<li><span class="rep r7">7</span><b>Descendre</b><code>Disposer</code> rappelle <code>PlacerEnfants</code> pour un conteneur : le « haut en bas ».</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Côté canvas : MiseEnPage.Calculer (lignes 156–187)</span>
+    Le registre construit un arbre de <code>NoeudContenu</code> depuis l'appartenance, arrondit le pivot de la racine à l'entier inférieur, mesure (<code>MesurerNoeud</code>), pose la boîte au pivot, dispose (<code>DisposerNoeud</code>), puis relit les rectangles <b>par position</b> : <code>Enfants[i]</code> est la place de <code>Elements[i]</code>. Rien n'est stocké d'une passe à l'autre, donc rien ne dérive.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 22 · Mise en page en flux</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 22</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">Metrique.MesurerNoeud(noeud, gabarit)</td><td>la taille naturelle</td><td>Metrique:2180</td></tr>
+<tr><td class="c">Metrique.DisposerNoeud(noeud, gabarit, boite)</td><td>un rectangle par nœud</td><td>Metrique:2208</td></tr>
+<tr><td class="c">Partager(disponible, naturels, poids)</td><td>l'axe principal, avec gel</td><td>Metrique:3056</td></tr>
+<tr><td class="c">PlacerSurLAxeTransverse(…)</td><td>début, centre, fin, étiré</td><td>Metrique:3256</td></tr>
+<tr><td class="c">RemplissageDeConteneur(noeud, gabarit)</td><td>le rebord, 4 px au moins</td><td>Metrique:2949</td></tr>
+<tr><td class="c">MiseEnPage.Calculer(arbre, racine, pivot, …)</td><td>un arbre du canvas</td><td>MiseEnPage:156</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Flux</dt><dd>Une disposition où chaque élément suit le précédent, sans coordonnées écrites.</dd>
+<dt>Taille naturelle</dt><dd>Ce qu'un nœud mesure seul, remplissage compris, marge exclue.</dd>
+<dt>Axe principal</dt><dd>L'axe sur lequel un conteneur empile : vertical pour la Colonne.</dd>
+<dt>Poids</dt><dd>La part du surplus qu'un enfant réclame ; 0 = aucune.</dd>
+<dt>Rebord</dt><dd>Le remplissage minimal d'un conteneur, qui reste toujours cliquable.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 23</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 22 · Mise en page en flux</div>
+</section>
+</body>
+</html>

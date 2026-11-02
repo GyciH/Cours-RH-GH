@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>139 · Orienter trois points</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 139</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Orienter trois points</h1>
+<p class="chapeau">Presque toute la géométrie plane repose sur une seule question : en allant de a vers b, le point c est-il à gauche, à droite, ou dessus ? Deux multiplications et une soustraction y répondent. Elles se trompent pourtant, massivement, dans le seul cas qui compte vraiment : quand les points sont presque alignés.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>49</b>, <b>50</b></span>
+<span class="pastille">Exemples · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 204" width="100%">
+<line stroke="#6B7378" stroke-dasharray="3 3" stroke-width=".6" x1="30" x2="195" y1="120" y2="30.89999999999999"></line>
+<line stroke="#00695C" stroke-width="1.3" x1="30" x2="130" y1="120" y2="66"></line><polygon fill="#00695C" points="130,66 125.6,71.5 123.0,66.7"></polygon>
+<line stroke="#2E7D32" stroke-width="1.3" x1="130" x2="70" y1="66" y2="40"></line><polygon fill="#2E7D32" points="70,40 77.0,40.1 74.8,45.1"></polygon>
+<circle cx="30" cy="120" fill="#00695C" r="3.2"></circle>
+<text fill="#00695C" font-size="8.4" font-weight="700" text-anchor="start" x="26" y="134">a</text>
+<circle cx="130" cy="66" fill="#00695C" r="3.2"></circle>
+<text fill="#00695C" font-size="8.4" font-weight="700" text-anchor="start" x="128" y="58">b</text>
+<circle cx="70" cy="40" fill="#2E7D32" r="3.2"></circle>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="76" y="35">c</text>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="start" x="30" y="150">à gauche : positif</text>
+<line stroke="#6B7378" stroke-dasharray="3 3" stroke-width=".6" x1="225" x2="390" y1="120" y2="30.89999999999999"></line>
+<line stroke="#00695C" stroke-width="1.3" x1="225" x2="325" y1="120" y2="66"></line><polygon fill="#00695C" points="325,66 320.6,71.5 318.0,66.7"></polygon>
+<line stroke="#C62828" stroke-width="1.3" x1="325" x2="345" y1="66" y2="120"></line><polygon fill="#C62828" points="345,120 340.2,114.9 345.3,113.0"></polygon>
+<circle cx="225" cy="120" fill="#00695C" r="3.2"></circle>
+<text fill="#00695C" font-size="8.4" font-weight="700" text-anchor="start" x="221" y="134">a</text>
+<circle cx="325" cy="66" fill="#00695C" r="3.2"></circle>
+<text fill="#00695C" font-size="8.4" font-weight="700" text-anchor="start" x="323" y="58">b</text>
+<circle cx="345" cy="120" fill="#C62828" r="3.2"></circle>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="start" x="351" y="115">c</text>
+<text fill="#C62828" font-size="8.2" font-weight="700" text-anchor="start" x="225" y="150">à droite : négatif</text>
+<line stroke="#6B7378" stroke-dasharray="3 3" stroke-width=".6" x1="420" x2="585" y1="120" y2="30.89999999999999"></line>
+<line stroke="#00695C" stroke-width="1.3" x1="420" x2="520" y1="120" y2="66"></line><polygon fill="#00695C" points="520,66 515.6,71.5 513.0,66.7"></polygon>
+<line stroke="#6B7378" stroke-width="1.3" x1="520" x2="560" y1="66" y2="44.39999999999999"></line><polygon fill="#6B7378" points="560,44.39999999999999 555.6,49.9 553.0,45.1"></polygon>
+<circle cx="420" cy="120" fill="#00695C" r="3.2"></circle>
+<text fill="#00695C" font-size="8.4" font-weight="700" text-anchor="start" x="416" y="134">a</text>
+<circle cx="520" cy="66" fill="#00695C" r="3.2"></circle>
+<text fill="#00695C" font-size="8.4" font-weight="700" text-anchor="start" x="518" y="58">b</text>
+<circle cx="560" cy="44.39999999999999" fill="#6B7378" r="3.2"></circle>
+<text fill="#6B7378" font-size="8.4" font-weight="700" text-anchor="start" x="566" y="39.39999999999999">c</text>
+<text fill="#6B7378" font-size="8.2" font-weight="700" text-anchor="start" x="420" y="150">alignés : zéro</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="10" y="176">orient(a, b, c) = (b.x − a.x)(c.y − a.y) − (b.y − a.y)(c.x − a.x) : la composante Z du produit vectoriel ab × ac.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="10" y="192">Son signe dit de quel côté de la droite ab se trouve c ; sa valeur, deux fois l'aire du triangle. Exemple construit à la main.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Le signe du produit vectoriel de ab et ac range c d'un côté ou de l'autre de la droite ab ; c'est la brique de l'enveloppe convexe, du découpage, de Delaunay.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un cycliste qui file de a vers b : c est-il sur son bras gauche ou son bras droit ? S'il roule pile dessus, il ne sait pas quel bras tendre.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>écrire et lire orient(a, b, c) ;</li>
+<li>dire où le calcul flottant se trompe ;</li>
+<li>relier l'erreur à l'échelle ;</li>
+<li>choisir entre rapide, exact et filtré.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Un signe faux ne donne pas un résultat un peu faux : il donne une décision fausse. Un sommet garde ou jeté, une arête qui croise ou non. Les erreurs s'additionnent en incohérences.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 139 · Orienter trois points</div>
+</section>
+<!-- ============ PAGE 2 · KETTNER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 139</b></div>
+<p class="rubrique">Schéma 1 · Le signe près de la droite</p>
+<h2>Une carte en damier, au lieu d'une diagonale</h2>
+<p style="max-width:165mm">On a promené p sur une grille de 256 × 256 positions, chacune séparée de la suivante par le plus petit pas possible des doubles, et comparé le signe calculé au signe exact. L'expérience reprend celle de Kettner et coll. (2008).</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Le signe de orient(p, q, r) quand p frôle la droite qr (q = (12, 12), r = (24, 24), .NET 8, mesuré)</text>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="100" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="110" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="120" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="130" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="140" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="150" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="160" y="34"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="170" y="34"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="100" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="110" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="120" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="130" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="140" y="44"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="150" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="160" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.35" width="9" x="170" y="44"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="100" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="110" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="120" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="130" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="140" y="54"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="150" y="54"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="160" y="54"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="170" y="54"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="100" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="110" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="120" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="130" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="140" y="64"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="150" y="64"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="160" y="64"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="170" y="64"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="100" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="110" y="74"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="120" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="130" y="74"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="140" y="74"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="74"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="74"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="170" y="74"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="100" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="110" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="120" y="84"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="130" y="84"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="140" y="84"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="84"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="84"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="84"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="100" y="94"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="110" y="94"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="120" y="94"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="130" y="94"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="140" y="94"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="94"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="94"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="94"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="104"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="104"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="104"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="104"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="104"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="104"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="104"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="104"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="100" y="104"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="110" y="104"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="120" y="104"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="130" y="104"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="104"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="104"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="104"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="104"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="114"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="114"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="114"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="114"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="114"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="70" y="114"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="80" y="114"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="90" y="114"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="100" y="114"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="110" y="114"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="120" y="114"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="130" y="114"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="114"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="114"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="114"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="114"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="124"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="124"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="124"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="124"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="124"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="70" y="124"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="80" y="124"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.35" width="9" x="90" y="124"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="100" y="124"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="110" y="124"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="120" y="124"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="130" y="124"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="124"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="124"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="124"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="124"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="134"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="134"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="134"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="134"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="134"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="70" y="134"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="80" y="134"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="90" y="134"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="100" y="134"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="110" y="134"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="120" y="134"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="130" y="134"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="134"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="134"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="134"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="134"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="144"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="144"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="144"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="50" y="144"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="60" y="144"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="70" y="144"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="80" y="144"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="90" y="144"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="100" y="144"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="110" y="144"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="120" y="144"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="130" y="144"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="144"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="144"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="144"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="144"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="154"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="154"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="154"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="50" y="154"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="60" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="70" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="80" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="90" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="100" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="110" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="120" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="130" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="154"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="154"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="164"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="30" y="164"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="40" y="164"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.35" width="9" x="50" y="164"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="60" y="164"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="70" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="80" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="90" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="100" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="110" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="120" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="130" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="164"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="164"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="20" y="174"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="30" y="174"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="40" y="174"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="50" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="60" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="70" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="80" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="90" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="100" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="110" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="120" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="130" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="174"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="174"></rect>
+<rect fill="#2E7D32" height="9" opacity="0.85" width="9" x="20" y="184"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="30" y="184"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="40" y="184"></rect>
+<rect fill="#B0B0B0" height="9" opacity="0.35" width="9" x="50" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="60" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="70" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="80" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="90" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="100" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="110" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="120" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="130" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="140" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="150" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="160" y="184"></rect>
+<rect fill="#C62828" height="9" opacity="0.85" width="9" x="170" y="184"></rect>
+<line stroke="#2B2F33" stroke-dasharray="3 2" stroke-width="1" x1="20" x2="180" y1="194" y2="34"></line>
+<text fill="#6B7378" font-size="7" text-anchor="start" x="20" y="206">p = (0,5 + i·2⁻⁵³, 0,5 + j·2⁻⁵³)</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="205" y="44">256 × 256 positions de p, toutes à moins de 3·10⁻¹⁴ de la droite :</text>
+<rect fill="#fff" height="20" opacity=".55" width="390" x="199" y="54"></rect>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="205" y="68">signe faux (comparé au calcul exact en entiers)</text>
+<text fill="#C62828" font-size="7.4" font-weight="700" text-anchor="start" x="455" y="68">11 972, soit 18,3 %</text>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="205" y="88">p vu exactement sur la droite</text>
+<text fill="#C62828" font-size="7.4" font-weight="700" text-anchor="start" x="455" y="88">11 556, au lieu de 256</text>
+<rect fill="#fff" height="20" opacity=".55" width="390" x="199" y="94"></rect>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="205" y="108">orient(p, q, r) ≠ orient(q, r, p)</text>
+<text fill="#C62828" font-size="7.4" font-weight="700" text-anchor="start" x="455" y="108">13 968, soit 21,3 %</text>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="205" y="128">un million de triplets au hasard</text>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="start" x="455" y="128">0 désaccord</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="205" y="152">Vignette : une position sur 16 dans chaque sens ; pâle = signe faux.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="205" y="166">Pointillé : la vraie droite. Mêmes nombres, autre ordre de calcul :</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="205" y="180">la permutation circulaire devrait donner le même signe.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="205" y="200">L'erreur ne touche que les cas presque alignés, mais là, elle est massive.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, le prédicat d'orientation</span>static double Orient(Point3d a, Point3d b, Point3d c)
+    =&gt; (b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X);   // &gt; 0 : c à gauche de ab</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>D'où vient l'erreur</h3>
+<p>Les deux produits sont presque égaux ; chacun est arrondi, puis on les soustrait. Ce qui reste est de l'ordre de l'arrondi lui-même : le signe tient du hasard.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Pourquoi l'ordre change tout</h3>
+<p>orient(p, q, r) et orient(q, r, p) sont égaux en mathématiques. En flottant, on soustrait d'autres nombres : 21,3 % des positions ont donné deux signes différents (mesuré).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Tester orient &gt; 0 sur des points presque alignés et croire la réponse. Sur la carte, 18,3 % des signes étaient faux, et 11 556 positions vues sur la droite au lieu de 256 (mesuré).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 139 · Orienter trois points</div>
+</section>
+<!-- ============ PAGE 3 · ÉCHELLE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 139</b></div>
+<p class="rubrique">Schéma 2 · L'échelle</p>
+<h2>Loin de l'origine, le doute grandit</h2>
+<p style="max-width:165mm">Un double a toujours 53 bits de précision, quelle que soit sa taille : plus la coordonnée est grande, plus le pas entre deux valeurs voisines est large. On a cherché l'écart minimal encore détecté.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">a, b, c presque alignés : à partir de quel écart c est-il vu sur la droite ? (selon l'origine, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">coordonnées autour de</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="210" y="40">écart sous lequel le signe se perd</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="400" y="40">pas des doubles à cet endroit</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">0</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="210" y="61">5·10⁻¹⁷</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="61">1,1·10⁻¹⁶</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">1</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="210" y="79">1·10⁻¹⁶</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="79">2,2·10⁻¹⁶</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">1 000</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="210" y="97">5·10⁻¹⁴</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="97">1,1·10⁻¹³</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">1 000 000</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="210" y="115">5·10⁻¹¹</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="115">1,2·10⁻¹⁰</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="120"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="133">1 000 000 000</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="210" y="133">5·10⁻⁸</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="133">1,2·10⁻⁷</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="158">Le seuil suit la taille des coordonnées : la moitié du pas entre deux doubles voisins. À un kilomètre exprimé</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="174">en millimètres (10⁶), il reste des millions de fois sous une tolérance Rhino usuelle, 0,001.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="196">Le danger n'est donc pas la précision moyenne : ce sont les configurations exactement dégénérées.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, le pas des doubles autour d'une coordonnée</span>double x = 1_000_000.5;
+double pas = Math.BitIncrement(x) - x;        // 1,2e-10 : en dessous, x ne bouge pas</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Ce que fait déjà la formule</h3>
+<p>orient soustrait a avant de multiplier : elle travaille déjà sur des différences. Ce qui ne se rattrape pas, c'est l'arrondi des coordonnées elles-mêmes, fait dès leur saisie.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le vrai danger</h3>
+<p>Les grilles, les symétries, les milieux exacts : Cuttlefish fabrique volontiers des points rigoureusement alignés. C'est là, et pas dans le bruit, que le signe zéro arrive.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Remplacer « &gt; 0 » par « &gt; tolérance » pour se protéger. On déplace la frontière sans la supprimer, et l'on rend « alignés » des points qui ne le sont pas : la transitivité casse, comme au cours 137.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 139 · Orienter trois points</div>
+</section>
+<!-- ============ PAGE 4 · REMÈDES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 139</b></div>
+<p class="rubrique">Schéma 3 · Rapide, exact, filtré</p>
+<h2>Payer l'exactitude seulement quand il le faut</h2>
+<p style="max-width:165mm">Un calcul exact en entiers coûte des centaines de fois plus cher. Les bibliothèques sérieuses ne le font que lorsque le résultat rapide est trop petit pour qu'on puisse croire son signe.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Ce que coûte la certitude, et où le doute se loge (.NET 8, trois séries, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">calcul</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="280" y="40">un appel</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="440" y="40">signe</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">double, la formule directe</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="61">2,9 à 4,8 ns</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="61">faux près de la droite</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">BigInteger, exact</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="79">655 à 1 488 ns</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="79">toujours juste</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">filtre : double, puis exact si |résultat| est petit</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="97">non mesuré ici</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="97">toujours juste</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="122">Enveloppe convexe d'un million de points au hasard (chaîne monotone) : 463 à 602 ms, 34 à 41 sommets.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="138">200 nuages de 1 000 points presque alignés : 0 enveloppe non convexe (vérifié en exact).</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="162">Le filtre est l'idée des prédicats de Shewchuk : on calcule vite, on borne l'erreur, et on ne refait</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="176">le calcul exact que lorsque le signe est douteux (principe publié, non mesuré ici).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, un filtre simple</span>double d = Orient(a, b, c);
+double borne = 1e-15 * (Math.Abs((b.X - a.X) * (c.Y - a.Y)) + Math.Abs((b.Y - a.Y) * (c.X - a.X)));
+return Math.Abs(d) &gt; borne ? Math.Sign(d) : OrientExact(a, b, c);   // borne : ordre de grandeur</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>L'enveloppe convexe</h3>
+<p>Trier les points, puis les parcourir en ne gardant que les virages à gauche : orient tranche chaque virage. Sur nos nuages presque alignés, elle est restée convexe (mesuré).</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Où s'en tenir au double</h3>
+<p>Pour dessiner, une décision fausse à 10⁻¹⁶ près ne se voit pas. Pour construire une topologie, qui touche qui, qui contient qui, elle peut casser tout le reste.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire qu'une bonne moyenne protège. Sur un million de triplets au hasard, aucun désaccord ; sur des points presque alignés, un sur cinq (mesuré). Les tests aléatoires ne trouvent pas ce défaut.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 139 · Orienter trois points</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 139</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Le Voronoi de Cuttlefish range par signe</h2>
+<p style="max-width:165mm">Voronoi.cs découpe chaque cellule par les médiatrices, et garde un sommet selon le signe d'un produit vectoriel. Hatch et Worm tournent un vecteur d'un quart de tour, l'autre usage du même calcul.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Voronoi.cs</span></div>
+<div class="l k1"><span class="n">144</span>perpVect = new Vector3d(-perpVect.Y, perpVect.X, 0);<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">160</span>return Vector3d.CrossProduct(a, b).Z;<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">108</span>double referenceSide = ProdVectoriel(…);<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">180</span>bool currentInside = current * referenceSide &gt; 0;<span class="rep r4">4</span></div>
+<div class="l"><span class="cm">cuttlefish/Hatch.cs</span></div>
+<div class="l k5"><span class="n">83</span>… = Vector3d.CrossProduct(plane.ZAxis, dir);<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Quart de tour</b>(x, y) → (−y, x).</li>
+<li><span class="rep r2">2</span><b>Orientation</b>Le Z du produit.</li>
+<li><span class="rep r3">3</span><b>Référence</b>Le côté du site.</li>
+<li><span class="rep r4">4</span><b>Même côté</b>Produit positif.</li>
+<li><span class="rep r5">5</span><b>Normale</b>Dans le plan.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · un sommet pile sur la médiatrice compte comme dehors</span>
+    La ligne 180 garde un sommet si le produit est strictement positif ; à zéro, il est jeté, puis remplacé par deux intersections calculées au même endroit. Sur une recopie hors Rhino de l'algorithme, avec une grille de 4 × 4 sites, 63 tests sur 995 valaient exactement zéro, et les cellules portaient 8 arêtes de longueur nulle (mesuré sur recopie, LineLine réécrit). Le dessin n'en souffre pas ; un traitement qui suivrait les arêtes, si. Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 139 · Orienter trois points</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 139</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">(b − a) × (c − a)</td><td>orienter c par rapport à ab</td><td>Voronoi.cs:160</td></tr>
+<tr><td class="c">new Vector3d(-v.Y, v.X, 0)</td><td>tourner d'un quart de tour à gauche</td><td>Voronoi.cs:144</td></tr>
+<tr><td class="c">Vector3d.CrossProduct(z, d)</td><td>une direction perpendiculaire dans le plan</td><td>Hatch.cs:83</td></tr>
+<tr><td class="c">Math.Sign(d)</td><td>−1, 0 ou 1</td><td>page 4</td></tr>
+<tr><td class="c">BigInteger</td><td>calculer exactement, lentement</td><td>page 4</td></tr>
+<tr><td class="c">Math.BitIncrement(x) − x</td><td>le pas des doubles autour de x</td><td>page 3</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Prédicat</dt><dd>Un calcul qui rend une décision, comme gauche, droite ou dessus.</dd>
+<dt>Orientation</dt><dd>Le sens de rotation de trois points : trigonométrique, horaire ou nul.</dd>
+<dt>Configuration dégénérée</dt><dd>Des points exactement alignés, cocycliques ou confondus.</dd>
+<dt>Prédicat filtré</dt><dd>Un calcul rapide doublé d'un calcul exact quand le signe est douteux.</dd>
+<dt>Enveloppe convexe</dt><dd>Le plus petit polygone convexe qui contient tous les points.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 140</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 139 · Orienter trois points</div>
+</section>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>43 · Annuler et écouter le document Grasshopper</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 43</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Annuler et écouter le document Grasshopper</h1>
+<p class="chapeau">Un composant qui modifie le canvas doit se laisser annuler par Ctrl+Z comme un objet natif, et il doit savoir ce qui arrive autour de lui : un objet posé, collé, supprimé. Grasshopper fournit les deux mécanismes, une <b>pile d'annulation</b> et des <b>événements du document</b> ; SnapSet et Magpie s'y branchent au lieu de les réécrire.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>08</b>, <b>11</b>, <b>12</b> et <b>21</b></span>
+<span class="pastille">Exemples · <b>Noyau/Constituant.cs</b>, <b>Appartenance/RegistreDocument.cs</b> (SnapSet), <b>MagpieExerciseEditor.cs</b> (Magpie)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 206" width="100%">
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="10" y="14">La pile d'annulation du document</text>
+<rect fill="#fff" height="28" rx="4" stroke="#6B7378" stroke-width="1.3" width="170" x="20" y="160"></rect>
+<text class="mono" fill="#6B7378" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="30" y="178">GH_UndoRecord</text><text fill="#6B7378" font-size="8.8" font-weight="700" text-anchor="end" x="180" y="178">Add Number</text>
+<rect fill="#fff" height="28" rx="4" stroke="#6B7378" stroke-width="1.3" width="170" x="20" y="126"></rect>
+<text class="mono" fill="#6B7378" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="30" y="144">GH_UndoRecord</text><text fill="#6B7378" font-size="8.8" font-weight="700" text-anchor="end" x="180" y="144">Drag</text>
+<rect fill="#fff" height="28" rx="4" stroke="#1565C0" stroke-width="1.3" width="170" x="20" y="92"></rect>
+<text class="mono" fill="#6B7378" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="30" y="110">GH_UndoRecord</text><text fill="#1565C0" font-size="8.8" font-weight="700" text-anchor="end" x="180" y="110">Toggle</text>
+<rect fill="#fff" height="28" rx="4" stroke="#2E7D32" stroke-width="1.3" width="170" x="20" y="58"></rect>
+<text class="mono" fill="#6B7378" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="30" y="76">GH_UndoRecord</text><text fill="#2E7D32" font-size="8.8" font-weight="700" text-anchor="end" x="180" y="76">Adopter</text>
+<text fill="#2E7D32" font-size="7.6" font-style="italic" text-anchor="start" x="196" y="76">le plus récent</text>
+<line stroke="#C62828" stroke-width="1.4" x1="262" x2="262" y1="80" y2="46"></line><polygon fill="#C62828" points="262,46 264.7,52.4 259.3,52.4"></polygon>
+<text fill="#C62828" font-size="8" font-weight="700" text-anchor="start" x="270" y="66">Ctrl+Z le ressort</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="270" y="78">et relit la photo</text>
+<line stroke="#6B7378" stroke-dasharray="3 3" x1="300" x2="300" y1="10" y2="196"></line>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="320" y="14">Les événements du document</text>
+<rect fill="#3A3A3A" height="140" rx="5" width="110" x="320" y="30"></rect><text fill="#fff" font-size="8.6" font-weight="700" text-anchor="middle" x="375" y="50">GH_Document</text>
+<rect fill="#555" height="22" rx="3" width="90" x="330" y="70"></rect><text class="mono" fill="#fff" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="375" y="85">ObjectsAdded</text>
+<line stroke="#E65100" stroke-width="1.4" x1="420" x2="468" y1="81" y2="81"></line><polygon fill="#E65100" points="468,81 461.6,83.7 461.6,78.3"></polygon>
+<rect fill="#555" height="22" rx="3" width="90" x="330" y="116"></rect><text class="mono" fill="#fff" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="375" y="131">ObjectsDeleted</text>
+<line stroke="#E65100" stroke-width="1.4" x1="420" x2="468" y1="127" y2="127"></line><polygon fill="#E65100" points="468,127 461.6,129.7 461.6,124.3"></polygon>
+<rect fill="#fff" height="80" rx="5" stroke="#E65100" stroke-width="1.4" width="122" x="470" y="60"></rect>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="middle" x="531" y="82">RegistreDocument</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="middle" x="531" y="100">abonné par +=</text>
+<text class="mono" fill="#2B2F33" font-size="7.8" style="font-size:7.8px" text-anchor="middle" x="531" y="114">SurAjout,</text>
+<text class="mono" fill="#2B2F33" font-size="7.8" style="font-size:7.8px" text-anchor="middle" x="531" y="127">SurSuppression</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="320" y="190">Un registre par document (SnapSet).</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Avant de changer quoi que ce soit, on photographie l'objet et on range la photo dans la pile ; Ctrl+Z ressort la photo. Et pour réagir aux gestes des autres, on s'abonne aux événements du document plutôt que de deviner.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un restaurateur de tableaux photographie la toile avant chaque intervention, et classe les photos dans l'ordre. Revenir en arrière, c'est reprendre la dernière photo, pas se souvenir de chaque coup de pinceau.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>poser un enregistrement d'annulation au bon moment ;</li>
+<li>réunir plusieurs actions sous un seul Ctrl+Z ;</li>
+<li>t'abonner aux ajouts et suppressions d'un document ;</li>
+<li>remettre une décision après Grasshopper, et dire pourquoi.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    La photo se prend <b>avant</b> le changement : <code>RecordUndoEvent(libellé)</code>, puis le changement. Dans SnapSet, tout réglage passe par un seul chemin, <code>Constituant.Modifier</code>, qui fait exactement cela (Noyau/Constituant.cs, lignes 311–317 ; contrat C4).
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 43 · Annuler et écouter le document Grasshopper</div>
+</section>
+<!-- ============ PAGE 2 · UN RÉGLAGE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 43</b></div>
+<p class="rubrique">Schéma 1 · Un réglage, un enregistrement</p>
+<h2>Photographier, changer, prévenir</h2>
+<p style="max-width:165mm">Un réglage d'un constituant SnapSet suit toujours la même chaîne. Le libellé passé à <code>RecordUndoEvent</code> est celui qu'affiche le menu Édition de Grasshopper (« Undo Toggle ») : SnapSet reprend les noms des objets natifs.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 176" width="100%">
+<rect fill="#EFE9E1" height="176" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="62" rx="5" stroke="#C62828" stroke-width="1.4" width="106" x="12" y="16"></rect>
+<circle cx="26" cy="30" fill="#C62828" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="26" y="33.5">1</text>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="start" x="40" y="34">Égal ?</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="20" y="52">valeur vue = nouvelle :</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="20" y="63">on s'arrête là</text>
+<line stroke="#2B2F33" stroke-width="1.2" x1="118" x2="130" y1="47.0" y2="47.0"></line><polygon fill="#2B2F33" points="130,47.0 123.6,49.7 123.6,44.3"></polygon>
+<rect fill="#fff" height="62" rx="5" stroke="#1565C0" stroke-width="1.4" width="106" x="130" y="16"></rect>
+<circle cx="144" cy="30" fill="#1565C0" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="144" y="33.5">2</text>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="start" x="158" y="34">Photo</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="138" y="52">RecordUndoEvent</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="138" y="63">(libellé)</text>
+<line stroke="#2B2F33" stroke-width="1.2" x1="236" x2="248" y1="47.0" y2="47.0"></line><polygon fill="#2B2F33" points="248,47.0 241.6,49.7 241.6,44.3"></polygon>
+<rect fill="#fff" height="62" rx="5" stroke="#7B1FA2" stroke-width="1.4" width="106" x="248" y="16"></rect>
+<circle cx="262" cy="30" fill="#7B1FA2" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="262" y="33.5">3</text>
+<text fill="#7B1FA2" font-size="8.4" font-weight="700" text-anchor="start" x="276" y="34">Changer</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="256" y="52">SetValue(clé, v)</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="256" y="63">→ ValuesChanged</text>
+<line stroke="#2B2F33" stroke-width="1.2" x1="354" x2="366" y1="47.0" y2="47.0"></line><polygon fill="#2B2F33" points="366,47.0 359.6,49.7 359.6,44.3"></polygon>
+<rect fill="#fff" height="62" rx="5" stroke="#E65100" stroke-width="1.4" width="106" x="366" y="16"></rect>
+<circle cx="380" cy="30" fill="#E65100" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="380" y="33.5">4</text>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="394" y="34">Prévenir</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="374" y="52">OnObjectChanged</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="374" y="63">(clé, v)</text>
+<line stroke="#2B2F33" stroke-width="1.2" x1="472" x2="484" y1="47.0" y2="47.0"></line><polygon fill="#2B2F33" points="484,47.0 477.6,49.7 477.6,44.3"></polygon>
+<rect fill="#fff" height="62" rx="5" stroke="#2E7D32" stroke-width="1.4" width="106" x="484" y="16"></rect>
+<circle cx="498" cy="30" fill="#2E7D32" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="498" y="33.5">5</text>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="512" y="34">Remettre en page</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="492" y="52">SignalerMesure-</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="492" y="63">Changee()</text>
+<rect fill="#E6EFF2" height="30" rx="4" stroke="#1F5F7A" stroke-dasharray="5 3" width="578" x="12" y="96"></rect>
+<text fill="#1F5F7A" font-size="8.4" font-weight="700" text-anchor="start" x="24" y="115">Étapes 2 à 5 : Constituant.Modifier. Jamais ExpireSolution : le dessin ne déclenche aucun calcul.</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="16" y="148">Annuler : Grasshopper relit l'objet par Read → ValuesChanged → l'arbre du constituant est remis en page.</text>
+<text fill="#6B7378" font-size="8.2" font-style="italic" text-anchor="start" x="16" y="164">Un Ctrl+Z, un réglage : pas un par champ de la table.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Noyau/Constituant.cs · 211–219 et 311–317</span>internal void Regler(string libelle, string cle, string valeur, string valeurCourante)
+{
+    if (string.Equals(valeur, valeurCourante, StringComparison.Ordinal)) return;
+    Modifier(libelle, () =&gt; { SetValue(cle, valeur); OnObjectChanged(cle, valeur); });
+}
+public void Modifier(string libelle, Action changement)
+{
+    RecordUndoEvent(libelle);
+    changement();
+    SignalerMesureChangee();
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Ce que la photo contient</h3>
+<p><code>RecordUndoEvent</code> pose une <code>GH_GenericObjectAction</code> : l'objet entier, écrit comme dans un <code>.gh</code>. Annuler, c'est le relire par <code>Read</code>, ce qui rappelle <code>ValuesChanged</code> ; SnapSet y remet l'arbre en page (lignes 272–280).</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Deux composants, deux suites</h3>
+<p>Magpie, après le changement, relance la solution (<code>ExpireSolution(true)</code>, MagpieExerciseEditor.cs, ligne 168). Un constituant SnapSet ne le fait jamais (ligne 205) : changer une case du dessin ne doit rien recalculer, seulement remettre en page.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège réel</span>
+    L'enregistrement vide. Comparer à la valeur brute de la table rendait <code>null</code> pour une clé jamais écrite : un constituant neuf, au défaut, recevait un Ctrl+Z qui ne changeait rien de visible (défaut E-D1). On compare donc à la valeur que l'utilisateur <b>voit</b> (lignes 206–209).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 43 · Annuler et écouter le document Grasshopper</div>
+</section>
+<!-- ============ PAGE 3 · COMPOSER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 43</b></div>
+<p class="rubrique">Schéma 2 · Plusieurs actions, un Ctrl+Z</p>
+<h2>Composer un enregistrement</h2>
+<p style="max-width:165mm">Un <code>GH_UndoRecord</code> est une liste d'actions, défaites de la dernière à la première. Quand un geste touche plusieurs objets, on fabrique l'enregistrement soi-même, on y range toutes les actions, et on le pousse une seule fois.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="16" y="22">Un enregistrement composé (Magpie)</text>
+<rect fill="#fff" height="140" rx="6" stroke="#1F5F7A" stroke-width="1.4" width="270" x="16" y="32"></rect>
+<text fill="#1F5F7A" font-size="8.6" font-weight="700" text-anchor="start" x="28" y="50">« Vider l'éditeur d'exercice »</text>
+<rect fill="#E6EFF2" height="28" rx="3" stroke="#1565C0" width="200" x="28" y="60"></rect>
+<text class="mono" fill="#1565C0" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="36" y="72">GenericObjectAction</text><text fill="#2B2F33" font-size="7.4" text-anchor="start" x="36" y="83">l'éditeur : champs, membres</text>
+<text fill="#1565C0" font-size="9" font-weight="700" text-anchor="start" x="238" y="78">1</text>
+<rect fill="#E6EFF2" height="28" rx="3" stroke="#C62828" width="200" x="28" y="94"></rect>
+<text class="mono" fill="#C62828" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="36" y="106">RemoveObjectAction</text><text fill="#2B2F33" font-size="7.4" text-anchor="start" x="36" y="117">objet de départ n° 1</text>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="start" x="238" y="112">2</text>
+<rect fill="#E6EFF2" height="28" rx="3" stroke="#C62828" width="200" x="28" y="128"></rect>
+<text class="mono" fill="#C62828" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="36" y="140">RemoveObjectAction</text><text fill="#2B2F33" font-size="7.4" text-anchor="start" x="36" y="151">objet de départ n° 2</text>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="start" x="238" y="146">3</text>
+<path d="M262 154 C 278 120, 278 90, 262 70" fill="none" stroke="#C62828" stroke-width="1.3"></path><line stroke="#C62828" stroke-width="1.4" x1="266" x2="262" y1="76" y2="68"></line><polygon fill="#C62828" points="262,68 267.3,72.5 262.4,75.0"></polygon>
+<text fill="#2B2F33" font-size="7.8" text-anchor="middle" x="150" y="190">Ctrl+Z : 3, puis 2, puis 1. Un seul geste pour l'utilisateur.</text>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="316" y="22">Fusionner avec le natif (SnapSet)</text>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="middle" x="376" y="44">après les deux poussées</text>
+<rect fill="#fff" height="24" rx="3" stroke="#6B7378" stroke-width="1.2" width="120" x="316" y="150"></rect><text fill="#6B7378" font-size="7.8" font-weight="700" text-anchor="middle" x="376" y="166">geste précédent</text>
+<rect fill="#fff" height="24" rx="3" stroke="#6D4C41" stroke-width="1.2" width="120" x="316" y="120"></rect><text fill="#6D4C41" font-size="7.8" font-weight="700" text-anchor="middle" x="376" y="136">Drag</text>
+<rect fill="#fff" height="24" rx="3" stroke="#2E7D32" stroke-width="1.2" width="120" x="316" y="90"></rect><text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="376" y="106">Adopter</text>
+<line stroke="#2B2F33" stroke-width="1.4" x1="440" x2="466" y1="120" y2="120"></line><polygon fill="#2B2F33" points="466,120 459.6,122.7 459.6,117.3"></polygon>
+<text class="mono" fill="#2B2F33" font-size="6.8" style="font-size:6.8px" text-anchor="middle" x="457" y="82">MergeRecords(2)</text>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="middle" x="530" y="44">après la fusion</text>
+<rect fill="#fff" height="24" rx="3" stroke="#6B7378" stroke-width="1.2" width="120" x="470" y="150"></rect><text fill="#6B7378" font-size="7.8" font-weight="700" text-anchor="middle" x="530" y="166">geste précédent</text>
+<rect fill="#fff" height="24" rx="3" stroke="#2E7D32" stroke-width="1.4" width="120" x="470" y="120"></rect><text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="530" y="136">Drag + Adopter</text>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="start" x="316" y="196">Fusion seulement si deux enregistrements sont nouveaux.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Magpie · Admin/MagpieExerciseEditor.cs · 216–222</span>// L'état de l'éditeur (champs, liste des membres, fils de la prise) ET la
+// suppression des objets, dans UN SEUL enregistrement d'annulation.
+var annulation = doc.UndoUtil.CreateGenericObjectEvent("Vider l'éditeur d'exercice", this);
+if (aSupprimer.Count &gt; 0)
+    foreach (var action in doc.UndoUtil.CreateRemoveObjectEvent("Vider l'éditeur d'exercice", aSupprimer).Actions)
+        annulation.AddAction(action);
+doc.UndoServer.PushUndoRecord(annulation);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Les fabriques de UndoUtil</h3>
+<p><code>CreateGenericObjectEvent</code> photographie un objet, <code>CreateRemoveObjectEvent</code> retient des objets à rendre, <code>CreatePivotEvent</code> une position. Chacune rend un enregistrement dont on prend les <code>Actions</code> pour les verser dans le sien.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Fusionner après coup</h3>
+<p>Quand Grasshopper pousse lui-même un enregistrement (« Drag » d'un glisser, « Add » d'un dépôt), SnapSet pousse le sien juste après puis réunit les deux par <code>MergeRecords(2)</code> : un seul Ctrl+Z défait le geste entier (RegistreDocument.cs, lignes 1051–1060).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Fusionner à l'aveugle. Si Grasshopper n'a rien poussé, <code>MergeRecords(2)</code> collerait ton enregistrement au <b>geste précédent</b> de l'utilisateur. SnapSet relève la pile avant (<code>undoAvant</code>) et ne fusionne que si deux enregistrements nouveaux sont apparus depuis (ligne 1059).
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 43 · Annuler et écouter le document Grasshopper</div>
+</section>
+<!-- ============ PAGE 4 · ÉCOUTER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 43</b></div>
+<p class="rubrique">Schéma 3 · Écouter le document</p>
+<h2>Réagir à ce que font les autres</h2>
+<p style="max-width:165mm">SnapSet tient un registre par document. Il s'abonne à <code>ObjectsAdded</code> et <code>ObjectsDeleted</code> dès sa création, et décide, pour chaque constituant qui arrive, s'il devient membre du conteneur sur lequel on l'a posé.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="16" y="22">Ctrl+V sur le canvas : qui fait quoi, et quand</text>
+<text fill="#6D4C41" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="58">Grasshopper</text>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="128">SnapSet</text>
+<line stroke="#6D4C41" stroke-width="1" x1="90" x2="590" y1="54" y2="54"></line>
+<line stroke="#E65100" stroke-width="1" x1="90" x2="590" y1="124" y2="124"></line>
+<circle cx="110" cy="54" fill="#6D4C41" r="5"></circle><text fill="#6D4C41" font-size="7.8" font-weight="700" text-anchor="middle" x="110" y="44">SelectAll</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="middle" x="110" y="72">collés sélectionnés</text>
+<circle cx="210" cy="54" fill="#6D4C41" r="5"></circle><text fill="#6D4C41" font-size="7.8" font-weight="700" text-anchor="middle" x="210" y="44">MergeDocument</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="middle" x="210" y="72">objets ajoutés</text>
+<circle cx="390" cy="54" fill="#6D4C41" r="5"></circle><text fill="#6D4C41" font-size="7.8" font-weight="700" text-anchor="middle" x="390" y="44">« Paste »</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="middle" x="390" y="72">enregistrement poussé</text>
+<circle cx="490" cy="54" fill="#6D4C41" r="5"></circle><text fill="#6D4C41" font-size="7.8" font-weight="700" text-anchor="middle" x="490" y="44">fin de la boucle</text>
+<line stroke="#E65100" stroke-width="1.4" x1="240" x2="290" y1="60" y2="116"></line><polygon fill="#E65100" points="290,116 283.7,113.0 287.7,109.4"></polygon>
+<text class="mono" fill="#E65100" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="280" y="92">ObjectsAdded</text>
+<rect fill="#fff" height="34" rx="4" stroke="#E65100" stroke-width="1.3" width="110" x="250" y="118"></rect>
+<text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="305" y="132">SurAjout</text><text fill="#2B2F33" font-size="7.2" text-anchor="middle" x="305" y="145">tout sélectionné ?</text>
+<path d="M360 135 C 420 160, 470 160, 512 140" fill="none" stroke="#E65100" stroke-dasharray="4 3" stroke-width="1.2"></path><line stroke="#E65100" stroke-width="1.4" x1="505" x2="513" y1="144" y2="139"></line><polygon fill="#E65100" points="513,139 509.0,144.7 506.1,140.1"></polygon>
+<text fill="#E65100" font-size="7.4" font-style="italic" text-anchor="middle" x="436" y="168">canvas.BeginInvoke : plus tard</text>
+<rect fill="#fff" height="40" rx="4" stroke="#2E7D32" stroke-width="1.3" width="100" x="490" y="104"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="middle" x="540" y="118">Decider…</text><text fill="#2B2F33" font-size="7.2" text-anchor="middle" x="540" y="131">« Paste » vu :</text><text fill="#2B2F33" font-size="7.2" text-anchor="middle" x="540" y="141">on laisse libre</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="16" y="192">Décider dans SurAjout serait trop tôt : « Paste » n'existe pas encore. Un objet tiré de la barre arrive non</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="16" y="205">sélectionné : il est adopté tout de suite, et son « Add … » fusionné après (lignes 546–565, 684–700).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">SnapSet · Appartenance/RegistreDocument.cs · 36–60</span>private static readonly ConditionalWeakTable&lt;GH_Document, RegistreDocument&gt; _registres = …;
+
+private RegistreDocument(GH_Document document)
+{
+    _doc = document;
+    foreach (var o in document.Objects) _vus.Add(o.InstanceGuid);
+    document.ObjectsAdded += SurAjout;
+    document.ObjectsDeleted += SurSuppression;
+}
+public static RegistreDocument Pour(GH_Document document)
+    =&gt; document == null ? null : _registres.GetValue(document, d =&gt; new RegistreDocument(d));</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Une table qui n'empêche pas d'oublier</h3>
+<p>Une <code>ConditionalWeakTable</code> associe un registre à un document sans retenir le document : quand Grasshopper ferme et oublie le <code>.gh</code>, le registre disparaît avec lui. Un dictionnaire ordinaire garderait tous les documents fermés en mémoire.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Décider après Grasshopper</h3>
+<p>L'enregistrement « Paste » d'un collage est poussé <b>après</b> <code>ObjectsAdded</code>. Pour savoir si c'était un collage, SnapSet remet sa décision à plus tard par <code>canvas.BeginInvoke</code> (ligne 550), quand Grasshopper a fini sa boucle.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège réel</span>
+    Croire qu'ouvrir un fichier lève <code>ObjectsAdded</code>. <code>GH_Document.Read</code> ajoute les objets sans cet événement (ComposantDepart.cs, ligne 11). D'où le constructeur, qui marque comme « déjà vus » tous les objets présents (ligne 51), et le crochet <code>AddedToDocument</code>, que <code>Read</code> appelle, lui.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 43 · Annuler et écouter le document Grasshopper</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 43</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>PreparerEnregistrement : la photo avant le geste</h2>
+<p style="max-width:165mm">Quand un constituant change de conteneur, plusieurs listes de membres changent à la fois. SnapSet photographie chacune avant de toucher à quoi que ce soit, et range le tout dans un seul enregistrement.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">1013</span><span class="ty">GH_UndoRecord</span> PreparerEnregistrement(<span class="kw">string</span> nom,</div>
+<div class="l"><span class="n"> </span> <span class="ty">ArbreAppartenance</span> nouvel, <span class="ty">IEnumerable</span>&lt;<span class="ty">Guid</span>&gt; devenusRacines)</div>
+<div class="l k1"><span class="n">1015</span> <span class="kw">var</span> changes = Conteneurs()<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n">1016</span>    .Where(c =&gt; !c.Membres.SequenceEqual(</div>
+<div class="l k1"><span class="n"> </span>        nouvel.MembresDe(c.InstanceGuid))).ToList();</div>
+<div class="l k2"><span class="n">1018</span> <span class="kw">if</span> (changes.Count == 0) <span class="kw">return null</span>;<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">1020</span> <span class="kw">var</span> enregistrement = <span class="kw">new</span> <span class="ty">GH_UndoRecord</span>(nom);<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">1021</span> <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> changes)<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n"> </span>    enregistrement.AddAction(<span class="kw">new</span> <span class="ty">GH_GenericObjectAction</span>(c));</div>
+<div class="l k5"><span class="n">1023</span> <span class="kw">foreach</span> (<span class="kw">var</span> id <span class="kw">in</span> devenusRacines) {<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">1025</span> <span class="kw">var</span> o = Trouver(id); <span class="kw">if</span> (o == <span class="kw">null</span>) <span class="kw">continue</span>;</div>
+<div class="l k5"><span class="n">1027</span> <span class="kw">foreach</span> (<span class="kw">var</span> a <span class="kw">in</span> _doc.UndoUtil</div>
+<div class="l k5"><span class="n"> </span>        .CreatePivotEvent(nom, o).Actions)</div>
+<div class="l k5"><span class="n"> </span>      enregistrement.AddAction(a);</div>
+<div class="l"><span class="n">1028</span>  }</div>
+<div class="l k6"><span class="n">1030</span> <span class="kw">return</span> enregistrement;<span class="rep r6">6</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Qui change ?</b>Les conteneurs dont la liste diffère du nouvel arbre.</li>
+<li><span class="rep r2">2</span><b>Rien à annuler</b>Pas d'enregistrement vide.</li>
+<li><span class="rep r3">3</span><b>Le nom</b>Celui du menu Édition : « Undo Adopter ».</li>
+<li><span class="rep r4">4</span><b>Une photo par liste</b>Prise maintenant, avant le changement.</li>
+<li><span class="rep r5">5</span><b>Les positions</b>Ceux qui deviennent racines retrouveront leur place.</li>
+<li><span class="rep r6">6</span><b>Pas encore poussé</b>L'appelant applique, puis pousse.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Préparer, appliquer, pousser</span>
+    L'adoption suit ces trois temps (lignes 688–700) : l'enregistrement est préparé avant le changement, le nouvel arbre est appliqué, puis l'enregistrement est poussé, tout de suite ou par <code>BeginInvoke</code> quand Grasshopper n'a pas encore poussé le sien. Préparer après coup photographierait l'état déjà changé.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 43 · Annuler et écouter le document Grasshopper</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 43</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">RecordUndoEvent(libelle)</td><td>photographier un objet</td><td>Constituant.cs:314</td></tr>
+<tr><td class="c">new GH_UndoRecord(nom)</td><td>un enregistrement à composer</td><td>RegistreDocument.cs:1020</td></tr>
+<tr><td class="c">doc.UndoUtil.CreateRemoveObjectEvent(…)</td><td>rendre des objets supprimés</td><td>MagpieExerciseEditor.cs:220</td></tr>
+<tr><td class="c">doc.UndoServer.PushUndoRecord(r)</td><td>pousser dans la pile</td><td>RegistreDocument.cs:1053</td></tr>
+<tr><td class="c">doc.UndoServer.MergeRecords(2)</td><td>fusionner les deux derniers</td><td>RegistreDocument.cs:1059</td></tr>
+<tr><td class="c">document.ObjectsAdded += SurAjout</td><td>écouter les ajouts</td><td>RegistreDocument.cs:52</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Pile d'annulation</dt><dd>Les enregistrements du document, du plus ancien au plus récent ; Ctrl+Z défait le dernier.</dd>
+<dt>Enregistrement d'annulation</dt><dd>Un GH_UndoRecord : un nom et une liste d'actions, défaites ensemble.</dd>
+<dt>Action générique</dt><dd>GH_GenericObjectAction : l'objet entier écrit, relu par Read pour l'annuler.</dd>
+<dt>Événement du document</dt><dd>ObjectsAdded, ObjectsDeleted… : un signal auquel on s'abonne avec +=.</dd>
+<dt>Référence faible</dt><dd>Un lien qui n'empêche pas le ramasse-miettes de libérer l'objet visé.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 44</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 43 · Annuler et écouter le document Grasshopper</div>
+</section>
+</body>
+</html>

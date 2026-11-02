@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>140 · Aire et intérieur d'un polygone</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 140</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Aire et intérieur d'un polygone</h1>
+<p class="chapeau">Deux questions reviennent sans cesse sur un contour fermé : quelle surface, et ce point est-il dedans ? Une boucle sur les sommets répond à la première, un rayon qui compte ses croisements à la seconde. Les deux ont leurs pièges : la distance à l'origine, et les sommets posés pile sur le rayon.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>49</b>, <b>139</b></span>
+<span class="pastille">Exemples · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 204" width="100%">
+<polygon fill="#E0F2F1" fill-opacity="1" points="40.0,140.0 150.0,150.0 175.0,70.0 95.0,30.0 30.0,80.0" stroke="#00695C" stroke-width="1.2"></polygon>
+<line stroke="#00695C" stroke-width="1.1" x1="40" x2="100.5" y1="140" y2="145.5"></line><polygon fill="#00695C" points="100.5,145.5 93.8,147.6 94.3,142.2"></polygon>
+<line stroke="#00695C" stroke-width="1.1" x1="150" x2="163.75" y1="150" y2="106.0"></line><polygon fill="#00695C" points="163.75,106.0 164.4,113.0 159.2,111.3"></polygon>
+<line stroke="#00695C" stroke-width="1.1" x1="175" x2="131.0" y1="70" y2="48.0"></line><polygon fill="#00695C" points="131.0,48.0 138.0,48.4 135.5,53.3"></polygon>
+<line stroke="#00695C" stroke-width="1.1" x1="95" x2="59.25" y1="30" y2="57.5"></line><polygon fill="#00695C" points="59.25,57.5 62.7,51.4 66.0,55.7"></polygon>
+<line stroke="#00695C" stroke-width="1.1" x1="30" x2="35.5" y1="80" y2="113.0"></line><polygon fill="#00695C" points="35.5,113.0 31.8,107.1 37.1,106.2"></polygon>
+<circle cx="40" cy="140" fill="#00695C" r="3"></circle>
+<text fill="#00695C" font-size="8" font-weight="700" text-anchor="start" x="24" y="152">p0</text>
+<circle cx="150" cy="150" fill="#00695C" r="3"></circle>
+<text fill="#00695C" font-size="8" font-weight="700" text-anchor="start" x="156" y="162">p1</text>
+<circle cx="175" cy="70" fill="#00695C" r="3"></circle>
+<text fill="#00695C" font-size="8" font-weight="700" text-anchor="start" x="181" y="66">p2</text>
+<circle cx="95" cy="30" fill="#00695C" r="3"></circle>
+<text fill="#00695C" font-size="8" font-weight="700" text-anchor="start" x="79" y="26">p3</text>
+<circle cx="30" cy="80" fill="#00695C" r="3"></circle>
+<text fill="#00695C" font-size="8" font-weight="700" text-anchor="start" x="14" y="76">p4</text>
+<text fill="#2B2F33" font-size="9" font-weight="700" text-anchor="start" x="220" y="40">aire signée = ½ Σ (xᵢ · yᵢ₊₁ − xᵢ₊₁ · yᵢ)</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="220" y="62">chaque arête ajoute l'aire signée du triangle (origine, pᵢ, pᵢ₊₁) ;</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="220" y="78">ce qui dépasse le polygone s'annule d'une arête à l'autre.</text>
+<rect fill="#fff" height="22" rx="4" stroke="#2E7D32" stroke-width="1.2" width="170" x="220" y="94"></rect>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="middle" x="305.0" y="107.53333333333333">sens trigonométrique : aire &gt; 0</text>
+<rect fill="#fff" height="22" rx="4" stroke="#C62828" stroke-width="1.2" width="170" x="400" y="94"></rect>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="middle" x="485.0" y="107.53333333333333">sens horaire : aire &lt; 0</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="220" y="136">Mesuré : le carré unité donne +1 dans un sens, −1 dans l'autre.</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="10" y="176">Le signe de l'aire dit le sens de parcours ; sa valeur absolue, la surface. Une seule boucle sur les sommets.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="10" y="192">Exemple construit à la main ; à l'écran, l'axe Y descend, et le sens apparent s'inverse.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>L'aire signée additionne des triangles orientés ; l'intérieur se décide en comptant combien de fois un rayon partant du point traverse le bord.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Sortir d'un bâtiment en ligne droite : chaque mur franchi fait passer de dedans à dehors. Un nombre impair de murs, et tu étais à l'intérieur.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>calculer aire et sens d'un contour ;</li>
+<li>garder la précision loin de l'origine ;</li>
+<li>tester dedans ou dehors sans faux pas ;</li>
+<li>choisir pair-impair ou enroulement.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Le signe de l'aire donne le sens de parcours gratuitement : inutile de deviner l'intérieur d'un contour par essais.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 140 · Aire et intérieur d'un polygone</div>
+</section>
+<!-- ============ PAGE 2 · PRÉCISION ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 140</b></div>
+<p class="rubrique">Schéma 1 · Loin de l'origine</p>
+<h2>Retrancher un sommet avant de multiplier</h2>
+<p style="max-width:165mm">La formule du lacet est exacte en mathématiques. En flottant, elle multiplie des coordonnées entières puis soustrait des produits presque égaux. On a déplacé le même polygone de plus en plus loin.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Un polygone de 1 000 sommets, d'aire 3,2828, déplacé loin de l'origine (.NET 8, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">centre du polygone en</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="170" y="40">lacet direct</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="300" y="40">erreur relative</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="440" y="40">lacet, sommets − p₀</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">(0, 0)</text>
+<text class="mono" fill="#2E7D32" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="170" y="61">3,2828060073</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="61">1·10⁻¹⁶</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="61">0</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">(10³, 10³)</text>
+<text class="mono" fill="#E65100" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="170" y="79">3,2828060066</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="79">2·10⁻¹⁰</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="79">4·10⁻¹⁵</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">(10⁶, 10⁶)</text>
+<text class="mono" fill="#C62828" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="170" y="97">3,2822875977</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="97">1,6·10⁻⁴</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="97">5·10⁻¹³</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">(10⁸, 10⁸)</text>
+<text class="mono" fill="#C62828" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="170" y="115">13,0000000000</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="115">300 %</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="115">4·10⁻¹⁰</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="140">Le lacet direct multiplie des coordonnées d'un million pour obtenir une aire de 3 : il soustrait des produits</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="156">de 10¹² presque égaux. Retrancher d'abord un sommet ramène le calcul près de zéro, à coût nul.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="180">Dernière colonne : erreur relative du même calcul, coordonnées prises par rapport au premier sommet.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, l'aire signée, calculée près de zéro</span>double s = 0; var o = p[0];
+for (int i = 0; i &lt; p.Length; i++) { var a = p[i] - o; var b = p[(i + 1) % p.Length] - o;
+    s += a.X * b.Y - b.X * a.Y; }
+return s / 2;                                    // &gt; 0 : sens trigonométrique</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi ça marche</h3>
+<p>L'aire ne dépend pas de l'origine : on peut la placer où l'on veut. Sur un sommet, les coordonnées restent de la taille du polygone, et les produits aussi.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Rhino s'en charge</h3>
+<p>AreaMassProperties.Compute rend aire et centroïde d'une courbe fermée ; Cuttlefish s'en sert. Ce cours explique ce qu'il y a dessous, pour les cas où l'on calcule soi-même.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Appliquer le lacet tel quel à des coordonnées de chantier. Centré à un million, l'aire était fausse dès le quatrième chiffre ; à cent millions, elle valait 13 au lieu de 3,28 (mesuré).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 140 · Aire et intérieur d'un polygone</div>
+</section>
+<!-- ============ PAGE 3 · DEDANS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 140</b></div>
+<p class="rubrique">Schéma 2 · Dedans ou dehors</p>
+<h2>Compter les croisements, une seule fois chacun</h2>
+<p style="max-width:165mm">Tirer un rayon horizontal vers la droite et compter les arêtes qu'il coupe : c'est la règle pair-impair. Le nombre d'enroulement compte, lui, combien de fois le contour tourne autour du point.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Dedans ou dehors : deux règles, et le cas du rayon qui passe par un sommet (mesuré)</text>
+<polygon fill="#00695C" fill-opacity="0.18" points="70.0,48.0 39.4,142.1 119.5,83.9 20.5,83.9 100.6,142.1" stroke="#00695C" stroke-width="1.2"></polygon>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="middle" x="70" y="172">pentagramme</text>
+<circle cx="70" cy="100" fill="#C62828" r="3"></circle>
+<circle cx="70" cy="64" fill="#2E7D32" r="3"></circle>
+<line stroke="#C62828" stroke-width="0.9" x1="70" x2="168" y1="100" y2="100"></line><polygon fill="#C62828" points="168,100 161.6,102.7 161.6,97.3"></polygon>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="190" y="46">rouge, au centre :</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="46">pair-impair : dehors (2 croisements) ; enroulement : 2, dedans</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="190" y="64">vert, dans une branche :</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="64">pair-impair : dedans ; enroulement : 1, dedans</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="190" y="82">aire par le lacet : 1,4695, le centre compté deux fois (aire × enroulement).</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="190" y="110">Zigzag de 20 dents, 6 231 points dont beaucoup à la hauteur exacte d'un sommet :</text>
+<rect fill="#fff" height="22" rx="4" stroke="#2E7D32" stroke-width="1.2" width="195" x="190" y="120"></rect>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="middle" x="287.5" y="133.53333333333333">règle demi-ouverte : 0 erreur</text>
+<rect fill="#fff" height="22" rx="4" stroke="#C62828" stroke-width="1.2" width="195" x="395" y="120"></rect>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="middle" x="492.5" y="133.53333333333333">bornes comprises : 196 erreurs</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="190" y="162">Demi-ouverte : une arête compte si l'un de ses sommets est strictement</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="190" y="176">au-dessus du rayon et l'autre non. Un sommet sur le rayon n'est</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="190" y="190">alors compté qu'une fois, jamais deux.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, pair-impair avec la règle demi-ouverte</span>bool dedans = false;
+for (int i = 0, j = p.Length - 1; i &lt; p.Length; j = i++)
+    if ((p[i].Y &gt; y) != (p[j].Y &gt; y) &amp;&amp; x &lt; XCroisement(p[i], p[j], y)) dedans = !dedans;</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>La règle demi-ouverte</h3>
+<p>Un sommet exactement à la hauteur du rayon appartient à l'arête du dessus, pas à celle du dessous. Chaque sommet est ainsi compté une fois, et les arêtes horizontales jamais.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Quand les règles divergent</h3>
+<p>Seulement si le contour se recoupe. Pair-impair troue le centre d'une étoile, l'enroulement le remplit. Les deux existent dans les logiciels de dessin.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Compter une arête quand y est entre ses extrémités, bornes comprises. Un sommet sur le rayon compte alors deux fois : 196 erreurs sur 6 231 points dans un zigzag (mesuré).
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 140 · Aire et intérieur d'un polygone</div>
+</section>
+<!-- ============ PAGE 4 · VITESSE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 140</b></div>
+<p class="rubrique">Schéma 3 · Le coût</p>
+<h2>Un test par point, toutes les arêtes</h2>
+<p style="max-width:165mm">Le test est linéaire dans le nombre d'arêtes. Pour beaucoup de points, la première économie est d'éliminer ceux qui sont hors de la boîte englobante.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">100 000 points contre un polygone de 1 000 arêtes (trois séries, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">méthode</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="300" y="40">durée</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="450" y="40">points dedans</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">pair-impair, toutes les arêtes</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="61">170 à 289 ms</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="61">20 473</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">boîte englobante d'abord, puis pair-impair</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="79">76 à 233 ms</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="79">20 473</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">nombre d'enroulement</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="97">311 à 322 ms</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="97">20 473</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="122">Chaque test parcourt toutes les arêtes : c'est n par point. La boîte rejette d'un coup les points lointains.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="138">Pour un polygone simple, les deux règles s'accordent ; elles ne divergent que s'il se recoupe.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="162">Les points tirés dans un carré de 16 donnent une aire de 3,276 par comptage, contre 3,283 par le lacet.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="176">La première série inclut la compilation à la volée.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, le sens de parcours sans rien deviner</span>bool trigo = AireSignee(p) &gt; 0;
+var interieur = trigo ? +1 : -1;              // côté gauche des arêtes si trigo</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Plus vite encore</h3>
+<p>Pour des millions de tests, on découpe le polygone en bandes horizontales, ou on le range dans un index spatial (cours 93). Chaque test ne regarde plus que quelques arêtes.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Compter pour mesurer</h3>
+<p>La part de points tirés au hasard qui tombent dedans estime l'aire : 3,276 pour 3,283. C'est la méthode de Monte-Carlo, utile quand aucune formule n'existe.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Utiliser le sens de parcours sans le vérifier. Un contour dessiné à la main peut tourner dans un sens ou dans l'autre ; seul le signe de l'aire le dit.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 140 · Aire et intérieur d'un polygone</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 140</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Pebble devine l'intérieur, Hatch compte les croisements</h2>
+<p style="max-width:165mm">Pebble décale une cellule vers l'intérieur sans connaître son sens : il essaie les deux côtés et garde la plus petite aire. Hatch applique la règle pair-impair le long de chaque ligne de hachure.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Pebble.cs</span></div>
+<div class="l k1"><span class="n">95</span>foreach (double d in new[] { distance, -distance })<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">100</span>if (a &gt; 0 &amp;&amp; a &lt; bestArea) { best = off[0]; … }<span class="rep r2">2</span></div>
+<div class="l"><span class="cm">cuttlefish/Hatch.cs · Flow.cs</span></div>
+<div class="l k3"><span class="n">94</span>… .Select(e =&gt; e.ParameterA).OrderBy(x =&gt; x)…<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">95</span>for (int k = 0; k + 1 &lt; ts.Count; k += 2)<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">100</span>… rect.Contains(p) != PointContainment.Inside …<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Deux essais</b>Les deux côtés.</li>
+<li><span class="rep r2">2</span><b>Par l'aire</b>Le plus petit.</li>
+<li><span class="rep r3">3</span><b>Croisements</b>Triés le long.</li>
+<li><span class="rep r4">4</span><b>Pair-impair</b>Un sur deux.</li>
+<li><span class="rep r5">5</span><b>Rhino</b>Dedans ou non.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · Pebble décale deux fois pour connaître l'intérieur</span>
+    Inward (Pebble.cs:90) calcule un décalage de chaque côté et garde le plus petit en aire. Le sens de la cellule, donc le bon côté, se lit directement : par le signe d'une aire, ou par ClosedCurveOrientation de Rhino. On économiserait un décalage sur deux, l'opération la plus chère de la boucle (déduit, non mesuré : Rhino ne tourne pas ici). De plus, une cellule concave dont le décalage se scinde en plusieurs morceaux est rejetée (ligne 98, off.Length != 1) et comptée comme perdue. Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 140 · Aire et intérieur d'un polygone</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 140</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">½ Σ (xᵢ yᵢ₊₁ − xᵢ₊₁ yᵢ)</td><td>l'aire signée, formule du lacet</td><td>page 2</td></tr>
+<tr><td class="c">p[i] - p[0]</td><td>calculer près de zéro</td><td>page 2</td></tr>
+<tr><td class="c">AreaMassProperties.Compute(c)</td><td>aire et centroïde par Rhino</td><td>Pebble.cs:107</td></tr>
+<tr><td class="c">(a.Y &gt; y) != (b.Y &gt; y)</td><td>l'arête coupe le rayon, règle demi-ouverte</td><td>page 3</td></tr>
+<tr><td class="c">curve.Contains(p)</td><td>dedans, dehors ou sur le bord, par Rhino</td><td>Flow.cs:100</td></tr>
+<tr><td class="c">k += 2</td><td>un morceau sur deux, pair-impair</td><td>Hatch.cs:95</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Aire signée</dt><dd>Une aire positive ou négative selon le sens de parcours.</dd>
+<dt>Formule du lacet</dt><dd>L'aire d'un polygone calculée à partir de ses seuls sommets.</dd>
+<dt>Règle pair-impair</dt><dd>Dedans si un rayon coupe le bord un nombre impair de fois.</dd>
+<dt>Nombre d'enroulement</dt><dd>Combien de fois le contour tourne autour d'un point.</dd>
+<dt>Règle demi-ouverte</dt><dd>Un sommet sur le rayon appartient à une seule de ses deux arêtes.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 141</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 140 · Aire et intérieur d'un polygone</div>
+</section>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>11 · Le cycle de vie du document et la résolution</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 11</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Le cycle de vie du document<br/>et la résolution</h1>
+<p class="chapeau">Ce qui se passe entre le moment où tu bouges un curseur et celui où le résultat change : expiration, solution, messages et événements.</p>
+<div class="meta">
+<span class="pastille"><b>55 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>07</b> anatomie d'un plugin · <b>08</b> modèle de données</span>
+<span class="pastille">Exemples · <b>Magpie</b> (éditeur d'exercice) et <b>SnapSet</b></span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 230" width="100%">
+<defs><marker id="a1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+<!-- fils -->
+<g fill="none" stroke="#3A3A3A" stroke-width="2">
+<path d="M124 60 C 160 60, 170 70, 206 70"></path>
+<path d="M304 70 C 340 70, 350 60, 386 60"></path>
+<path d="M304 70 C 340 70, 350 140, 386 140"></path>
+<path d="M124 160 C 160 160, 340 190, 386 190"></path>
+</g>
+<!-- A : curseur modifié -->
+<rect fill="#FFF3E8" height="36" rx="6" stroke="#E65100" stroke-width="2" width="104" x="20" y="42"></rect>
+<text fill="#E65100" font-size="10.5" font-weight="700" text-anchor="middle" x="72" y="64">A · curseur</text>
+<!-- B -->
+<rect fill="#fff" height="36" rx="6" stroke="#E65100" stroke-dasharray="5 3" stroke-width="1.8" width="98" x="206" y="52"></rect>
+<text font-size="10.5" font-weight="700" text-anchor="middle" x="255" y="74">B</text>
+<!-- C, D -->
+<rect fill="#fff" height="36" rx="6" stroke="#E65100" stroke-dasharray="5 3" stroke-width="1.8" width="98" x="386" y="42"></rect>
+<text font-size="10.5" font-weight="700" text-anchor="middle" x="435" y="64">C</text>
+<rect fill="#fff" height="36" rx="6" stroke="#E65100" stroke-dasharray="5 3" stroke-width="1.8" width="98" x="386" y="122"></rect>
+<text font-size="10.5" font-weight="700" text-anchor="middle" x="435" y="144">D</text>
+<!-- E, F intacts -->
+<rect fill="#fff" height="36" rx="6" stroke="#9A9A9A" stroke-width="1.4" width="104" x="20" y="142"></rect>
+<text fill="#6B7378" font-size="10.5" font-weight="700" text-anchor="middle" x="72" y="164">E</text>
+<rect fill="#fff" height="36" rx="6" stroke="#9A9A9A" stroke-width="1.4" width="98" x="386" y="172"></rect>
+<text fill="#6B7378" font-size="10.5" font-weight="700" text-anchor="middle" x="435" y="194">F</text>
+<!-- Ordres -->
+<g fill="#fff" font-size="10" font-weight="800" text-anchor="middle">
+<circle cx="20" cy="42" fill="#1F5F7A" r="9"></circle><text x="20" y="46">1</text>
+<circle cx="206" cy="52" fill="#1F5F7A" r="9"></circle><text x="206" y="56">2</text>
+<circle cx="386" cy="42" fill="#1F5F7A" r="9"></circle><text x="386" y="46">3</text>
+<circle cx="386" cy="122" fill="#1F5F7A" r="9"></circle><text x="386" y="126">3</text>
+</g>
+<!-- Légende -->
+<rect fill="#fff" height="14" rx="3" stroke="#E65100" stroke-dasharray="4 2" width="22" x="504" y="44"></rect>
+<text fill="#2B2F33" font-size="9.5" x="532" y="55">expiré</text>
+<rect fill="#fff" height="14" rx="3" stroke="#9A9A9A" width="22" x="504" y="70"></rect>
+<text fill="#2B2F33" font-size="9.5" x="532" y="81">intact</text>
+<circle cx="515" cy="105" fill="#1F5F7A" r="8"></circle><text fill="#fff" font-size="9" font-weight="800" text-anchor="middle" x="515" y="109">1</text>
+<text fill="#2B2F33" font-size="9.5" x="532" y="102">ordre de</text><text fill="#2B2F33" font-size="9.5" x="532" y="114">calcul</text>
+<text fill="#2B2F33" font-size="11" text-anchor="middle" x="300" y="224">Seul ce qui <tspan font-weight="700">dépend</tspan> du curseur est recalculé, toujours de l'amont vers l'aval. E et F gardent leurs données.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un changement <b>expire</b> l'objet touché et tout ce qui en dépend ; Grasshopper lance alors une <b>solution</b>, qui ne recalcule que les objets expirés, chacun après ses sources.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Une cuisine de restaurant. Si la recette de la sauce change, on jette la sauce et les plats qui la contiennent, puis on les refait dans l'ordre : sauce d'abord, plats ensuite. Le dessert, lui, ne bouge pas.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>suivre une modification jusqu'au nouveau résultat : expiration, solution, itérations ;</li>
+<li>choisir entre <code>ExpireSolution</code>, <code>ExpireLayout</code> et un simple rafraîchissement ;</li>
+<li>afficher un message qui survit aux solutions, et réagir aux événements du document.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Toute solution commence par <b>effacer</b> : les données et les messages des objets expirés disparaissent. Ce que ton composant doit montrer, il doit le <b>reproduire</b> à chaque <code>SolveInstance</code>.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 11 · Le cycle de vie du document et la résolution</div>
+</section>
+<!-- ============ PAGE 2 · EXPIRER PUIS RÉSOUDRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 11</b></div>
+<p class="rubrique">Schéma 1 · Expirer, puis résoudre</p>
+<h2>Deux temps : marquer, puis recalculer</h2>
+<p style="max-width:165mm">Grasshopper sépare le moment où il apprend qu'une donnée est périmée du moment où il la recalcule. Entre les deux, plusieurs changements peuvent s'accumuler.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 330" width="100%">
+<defs><marker id="b1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+<rect fill="#EFE9E1" height="330" width="290" x="0" y="0"></rect><rect fill="#EFE9E1" height="330" width="290" x="310" y="0"></rect>
+<text fill="#E65100" font-size="13" font-weight="800" x="14" y="26">Temps 1 · Expirer</text>
+<text fill="#1F5F7A" font-size="13" font-weight="800" x="324" y="26">Temps 2 · Résoudre</text>
+<!-- Temps 1 -->
+<g font-size="10">
+<rect fill="#fff" height="44" rx="6" stroke="#2B2F33" width="250" x="20" y="44"></rect>
+<text font-weight="700" x="32" y="62">Un changement</text>
+<text fill="#6B7378" font-size="9.5" x="32" y="78">curseur, fil branché, réglage du menu…</text>
+<path d="M145 88 V 104" marker-end="url(#b1)" stroke="#2B2F33" stroke-width="1.4"></path>
+<rect fill="#fff" height="44" rx="6" stroke="#E65100" width="250" x="20" y="108"></rect>
+<text class="mono" fill="#E65100" font-weight="700" style="font-size:10.5px" x="32" y="126">ExpireSolution(true)</text>
+<text fill="#2B2F33" font-size="9.5" x="32" y="142">l'objet se déclare périmé</text>
+<path d="M145 152 V 168" marker-end="url(#b1)" stroke="#2B2F33" stroke-width="1.4"></path>
+<rect fill="#fff" height="56" rx="6" stroke="#E65100" stroke-dasharray="5 3" width="250" x="20" y="172"></rect>
+<text font-weight="700" x="32" y="190">Propagation vers l'aval</text>
+<text fill="#2B2F33" font-size="9.5" x="32" y="206">chaque destinataire est expiré à son tour ;</text>
+<text fill="#2B2F33" font-size="9.5" x="32" y="220">données et messages sont effacés.</text>
+<path d="M145 228 V 244" marker-end="url(#b1)" stroke="#2B2F33" stroke-width="1.4"></path>
+<rect fill="#fff" height="60" rx="6" stroke="#2B2F33" width="250" x="20" y="248"></rect>
+<text font-weight="700" x="32" y="266">L'argument décide de la suite</text>
+<text font-size="9.5" x="32" y="282"><tspan class="mono" font-weight="700" style="font-size:9.5px">true</tspan> : une solution est lancée</text>
+<text font-size="9.5" x="32" y="298"><tspan class="mono" font-weight="700" style="font-size:9.5px">false</tspan> : marquer seulement, résoudre plus tard</text>
+</g>
+<!-- Temps 2 -->
+<g font-size="10">
+<rect fill="#fff" height="44" rx="6" stroke="#1F5F7A" width="250" x="330" y="44"></rect>
+<text font-weight="700" x="342" y="62">Le document lance une solution</text>
+<text fill="#6B7378" font-size="9.5" x="342" y="78">événement SolutionStart</text>
+<path d="M455 88 V 104" marker-end="url(#b1)" stroke="#2B2F33" stroke-width="1.4"></path>
+<rect fill="#fff" height="60" rx="6" stroke="#1F5F7A" width="250" x="330" y="108"></rect>
+<text font-weight="700" x="342" y="126">Chaque objet expiré, non verrouillé</text>
+<text fill="#2B2F33" font-size="9.5" x="342" y="142">demande d'abord ses entrées à ses sources,</text>
+<text fill="#2B2F33" font-size="9.5" x="342" y="156">qui se calculent avant lui si besoin.</text>
+<path d="M455 168 V 184" marker-end="url(#b1)" stroke="#2B2F33" stroke-width="1.4"></path>
+<rect fill="#fff" height="44" rx="6" stroke="#1F5F7A" width="250" x="330" y="188"></rect>
+<text font-weight="700" x="342" y="206">SolveInstance, une ou plusieurs fois</text>
+<text fill="#2B2F33" font-size="9.5" x="342" y="222">selon les accès item, list, tree (cours 08)</text>
+<path d="M455 232 V 248" marker-end="url(#b1)" stroke="#2B2F33" stroke-width="1.4"></path>
+<rect fill="#fff" height="56" rx="6" stroke="#1F5F7A" width="250" x="330" y="252"></rect>
+<text font-weight="700" x="342" y="270">Fin de solution</text>
+<text fill="#2B2F33" font-size="9.5" x="342" y="286">SolutionEnd ; le canvas et l'aperçu</text>
+<text fill="#2B2F33" font-size="9.5" x="342" y="300">dans Rhino sont redessinés.</text>
+</g>
+</svg>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Pourquoi deux temps ?</span>
+    Pour regrouper. Si dix objets changent d'un coup (un collage, un réglage partagé), chacun peut s'expirer avec <code>false</code> ; une seule solution les recalcule ensuite tous ensemble, au lieu de dix solutions qui referaient dix fois l'aval commun. C'est exactement ce que fait le rappel de SnapSet, page 4.
+  </div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Appeler <code>ExpireSolution(true)</code> depuis <code>SolveInstance</code>. On expire pendant la solution en cours, ce que Grasshopper refuse ou transforme en boucle sans fin. Pour demander un nouveau calcul depuis une solution, on le <b>planifie</b> (page 4).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 11 · Le cycle de vie du document et la résolution</div>
+</section>
+<!-- ============ PAGE 3 · CE QU'ON EXPIRE, CE QU'ON AFFICHE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 11</b></div>
+<p class="rubrique">Schéma 2 · Recalculer, ou seulement redessiner ?</p>
+<h2>Choisir le bon niveau de rafraîchissement</h2>
+<p style="max-width:165mm">Recalculer coûte cher : tout l'aval suit. Beaucoup de changements ne touchent que l'apparence. SnapSet en a fait une règle : un constituant qui ne fait que se déplacer dans sa capsule n'appelle « jamais ExpireSolution ».</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 190" width="100%">
+<!-- échelle de coût -->
+<defs><marker id="c1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#C62828"></path></marker></defs>
+<path d="M20 176 H 586" marker-end="url(#c1)" stroke="#C62828" stroke-width="1.6"></path>
+<text fill="#6B7378" font-size="9" x="20" y="168">léger</text><text fill="#C62828" font-size="9" font-weight="700" text-anchor="end" x="586" y="168">tout l'aval recalcule</text>
+<g>
+<rect fill="#E8F3E8" height="140" rx="8" stroke="#2E7D32" width="176" x="20" y="10"></rect>
+<rect fill="#E5EEF9" height="140" rx="8" stroke="#1565C0" width="176" x="212" y="10"></rect>
+<rect fill="#FFF3E8" height="140" rx="8" stroke="#E65100" width="182" x="404" y="10"></rect>
+</g>
+<g class="mono" font-weight="700">
+<text class="mono" fill="#2E7D32" style="font-size:10px" x="32" y="34">Instances.RedrawCanvas()</text>
+<text class="mono" fill="#1565C0" style="font-size:10px" x="224" y="34">Attributes.ExpireLayout()</text>
+<text class="mono" fill="#E65100" style="font-size:10px" x="416" y="34">ExpireSolution(true)</text>
+</g>
+<g fill="#2B2F33" font-size="9.5">
+<text x="32" y="56">repeint le canvas</text><text x="32" y="70">tel quel</text>
+<text fill="#6B7378" x="32" y="98">quand : un texte affiché,</text><text fill="#6B7378" x="32" y="112">un état de survol a changé</text>
+<text fill="#2E7D32" font-weight="700" x="32" y="138">Magpie · ChangerNom</text>
+<text x="224" y="56">recalcule la taille et la</text><text x="224" y="70">place des zones, puis repeint</text>
+<text fill="#6B7378" x="224" y="98">quand : la capsule change</text><text fill="#6B7378" x="224" y="112">de forme ou de contenu</text>
+<text fill="#1565C0" font-weight="700" x="224" y="138">SnapSet · mise en page</text>
+<text x="416" y="56">efface les données de l'objet</text><text x="416" y="70">et de l'aval, puis résout</text>
+<text fill="#6B7378" x="416" y="98">quand : une valeur qui entre</text><text fill="#6B7378" x="416" y="112">dans le calcul a changé</text>
+<text fill="#E65100" font-weight="700" x="416" y="138">Magpie · Modifier</text>
+</g>
+</svg>
+<h3 style="margin-top:5mm">Les messages : effacés à chaque solution</h3>
+<svg viewbox="0 0 600 140" width="100%">
+<defs><marker id="m1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+<rect fill="#EFE9E1" height="140" width="600" x="0" y="0"></rect>
+<!-- trois composants -->
+<g font-size="10" font-weight="700" text-anchor="middle">
+<rect fill="#C9C9C9" height="38" rx="6" stroke="#4E4E4E" width="120" x="20" y="26"></rect><text x="80" y="50">Remark</text>
+<rect fill="#F7C873" height="38" rx="6" stroke="#C77700" width="120" x="160" y="26"></rect><text x="220" y="50">Warning</text>
+<rect fill="#E57373" height="38" rx="6" stroke="#B71C1C" width="120" x="300" y="26"></rect><text x="360" y="50">Error</text>
+</g>
+<g fill="#2B2F33" font-size="9" text-anchor="middle">
+<text x="80" y="84">simple bulle,</text><text x="80" y="97">couleur inchangée</text>
+<text x="220" y="84">orange : résultat</text><text x="220" y="97">partiel ou douteux</text>
+<text x="360" y="84">rouge : pas de</text><text x="360" y="97">résultat utilisable</text>
+</g>
+<text fill="#1F5F7A" font-size="10" font-weight="700" x="440" y="34">Pour qu'un message dure</text>
+<g fill="#2B2F33" font-size="9.5">
+<text x="440" y="54">1. le ranger dans un champ</text>
+<text class="mono" style="font-size:9.5px" x="440" y="70">   _message, _niveauMessage</text>
+<text x="440" y="86">2. ExpireSolution(true)</text>
+<text x="440" y="102">3. dans SolveInstance :</text>
+<text class="mono" style="font-size:9.5px" x="440" y="118">   AddRuntimeMessage(…)</text>
+</g>
+<text fill="#6B7378" font-size="9" font-style="italic" x="20" y="128">Les couleurs du composant sont celles du thème Grasshopper ; seules les bulles portent le texte.</text>
+</svg>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Magpie · Signaler, dans le lanceur de parcours</span>
+    Un import échoue en dehors de toute solution, dans un clic. Le lanceur ne peut pas appeler <code>AddRuntimeMessage</code> à cet instant : le message serait effacé par la solution suivante. Il range le texte dans <code>_message</code>, expire, et <code>SolveInstance</code> le republie (MagpieParcoursLauncher.cs, lignes 132 et 135–140).
+  </div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Recalculer pour un changement d'apparence. Un <code>ExpireSolution</code> de trop relance tout l'aval à chaque clic : sur une définition lourde, le canvas se fige. Pose-toi la question : cette valeur entre-t-elle dans le <b>calcul</b> ?
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 11 · Le cycle de vie du document et la résolution</div>
+</section>
+<!-- ============ PAGE 4 · ÉVÉNEMENTS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 11</b></div>
+<p class="rubrique">Schéma 3 · Les événements</p>
+<h2>Écouter le document plutôt que le surveiller</h2>
+<p style="max-width:165mm">Le document et chacun de ses objets lèvent des <b>événements</b> (les <code>event</code> de C#). Un code qui doit réagir s'y <b>abonne</b> avec <code>+=</code>, et Grasshopper l'appelle au bon moment : c'est encore l'inversion de contrôle du cours 07.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 220" width="100%">
+<rect fill="#fff" height="220" rx="8" stroke="#1F5F7A" stroke-width="1.6" width="292" x="0" y="0"></rect>
+<rect fill="#fff" height="220" rx="8" stroke="#7B1FA2" stroke-width="1.6" width="292" x="308" y="0"></rect>
+<text fill="#1F5F7A" font-size="12" font-weight="700" x="14" y="24">Le document · GH_Document</text>
+<text fill="#7B1FA2" font-size="12" font-weight="700" x="322" y="24">Un objet · IGH_DocumentObject</text>
+<g fill="#2B2F33">
+<text class="mono" font-weight="700" style="font-size:10px" x="14" y="52">ObjectsAdded</text><text font-size="9.5" x="140" y="52">un objet posé, collé</text>
+<text class="mono" font-weight="700" style="font-size:10px" x="14" y="76">ObjectsDeleted</text><text font-size="9.5" x="140" y="76">un objet supprimé</text>
+<text class="mono" font-weight="700" style="font-size:10px" x="14" y="100">SolutionStart</text><text font-size="9.5" x="140" y="100">une solution commence</text>
+<text class="mono" font-weight="700" style="font-size:10px" x="14" y="124">SolutionEnd</text><text font-size="9.5" x="140" y="124">elle est terminée</text>
+<text class="mono" font-weight="700" style="font-size:10px" x="14" y="148">UndoStateChanged</text><text font-size="9.5" x="140" y="148">annuler / rétablir</text>
+<text class="mono" font-weight="700" style="font-size:10px" x="14" y="172">ModifiedChanged</text><text font-size="9.5" x="140" y="172">le fichier devient « modifié »</text>
+<text class="mono" font-weight="700" style="font-size:10px" x="322" y="52">ObjectChanged</text><text font-size="9.5" x="448" y="52">avec un type :</text>
+<text class="mono" fill="#7B1FA2" style="font-size:9px" x="336" y="70">GH_ObjectEventType.NickName,</text>
+<text class="mono" fill="#7B1FA2" style="font-size:9px" x="336" y="84">Layout, Sources, Selected,</text>
+<text class="mono" fill="#7B1FA2" style="font-size:9px" x="336" y="98">Enabled, Preview, PersistentData,</text>
+<text class="mono" fill="#7B1FA2" style="font-size:9px" x="336" y="112">DataMatching, Options… Custom</text>
+<text class="mono" font-weight="700" style="font-size:10px" x="322" y="140">SolutionExpired</text><text font-size="9.5" x="448" y="140">il vient d'expirer</text>
+<text class="mono" font-weight="700" style="font-size:10px" x="322" y="164">AttributesChanged</text><text font-size="9.5" x="448" y="164">son dessin change</text>
+</g>
+<text fill="#6B7378" font-size="9" font-style="italic" x="14" y="204">SnapSet s'abonne aux deux premiers.</text>
+<text fill="#6B7378" font-size="9" font-style="italic" x="322" y="204">Custom : pour tes propres événements.</text>
+</svg>
+<div class="deuxcol" style="margin-top:4mm">
+<div>
+<h3>S'abonner</h3>
+<div class="boite apres" style="margin-top:3mm"><span class="etiq">RegistreDocument.cs · 48–54</span>private RegistreDocument(GH_Document document)
+{
+    _doc = document;
+    foreach (var o in document.Objects)
+        _vus.Add(o.InstanceGuid);
+    document.ObjectsAdded += SurAjout;
+    document.ObjectsDeleted += SurSuppression;
+}</div>
+<p style="font-size:8.4pt; margin-top:2mm">SnapSet tient un registre par document : à chaque ajout ou suppression, Grasshopper appelle <code>SurAjout</code> ou <code>SurSuppression</code>.</p>
+</div>
+<div>
+<h3>Planifier, au lieu d'expirer</h3>
+<div class="boite apres" style="margin-top:3mm"><span class="etiq">RegistreDocument.cs · 349–353</span>_doc.ScheduleSolution(1, d =&gt;
+{
+    _placementPlanifie = false;
+    foreach (var c in Constituants()
+             .Where(PlacementChange).ToList())
+        c.ExpireSolution(false);
+});</div>
+<p style="font-size:8.4pt; margin-top:2mm">Une solution est demandée dans 1 ms ; le rappel s'exécute <b>au début</b> de cette solution et n'expire, sans relancer, que les constituants concernés.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    S'abonner sans jamais se désabonner, ou deux fois. Le gestionnaire est alors appelé en double, et l'objet abonné reste en mémoire tant que le document vit. Un drapeau comme <code>_placementPlanifie</code> évite aussi de planifier deux fois la même solution.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 11 · Le cycle de vie du document et la résolution</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 11</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>MagpieExerciseEditor.cs : un cycle complet</h2>
+<p style="max-width:165mm">L'éditeur d'exercice de Magpie (plugin auteur). En haut, ce qui se passe pendant une solution ; en bas, ce qui se passe quand l'auteur modifie un réglage dans la capsule.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">134</span><span class="kw">protected override void</span> SolveInstance(<span class="ty">IGH_DataAccess</span> DA)</div>
+<div class="l"><span class="n">135</span>{</div>
+<div class="l"><span class="n">136</span> <span class="cm">// Toute la donnée, quelle que soit sa structure : un arbre à</span></div>
+<div class="l"><span class="n">137</span> <span class="cm">// plusieurs branches relancerait SolveInstance par branche…</span></div>
+<div class="l k1"><span class="n">138</span> <span class="kw">if</span> (DA.Iteration == 0)<span class="rep r1">1</span></div>
+<div class="l"><span class="n">139</span>  {</div>
+<div class="l k2"><span class="n">140</span> <span class="kw">var</span> donnees = Params.Input[0].VolatileData;<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">141</span>    _reponse = donnees.AllData(<span class="kw">true</span>).ToList();</div>
+<div class="l"><span class="n"> </span> <span class="cm">// … tailles des branches, lignes 144–146</span></div>
+<div class="l k3"><span class="n">147</span>    InvaliderEtat();<span class="rep r3">3</span></div>
+<div class="l"><span class="n"> </span> <span class="cm">// … adoption après calcul, lignes 149–153</span></div>
+<div class="l"><span class="n">154</span>  }</div>
+<div class="l k4"><span class="n">156</span> <span class="kw">if</span> (_message != <span class="kw">null</span>)<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n"> </span>    AddRuntimeMessage(_niveauMessage, _message);</div>
+<div class="l"><span class="n">157</span>}</div>
+<div class="l"><span class="n"> </span></div>
+<div class="l"><span class="n">161</span><span class="kw">private void</span> Modifier(<span class="kw">string</span> libelle, <span class="ty">Action</span> changement)</div>
+<div class="l"><span class="n">162</span>{</div>
+<div class="l k5"><span class="n">163</span>  RecordUndoEvent(libelle);<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">164</span>  changement();</div>
+<div class="l k6"><span class="n">165</span>  _message = <span class="kw">null</span>;<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">166</span>  InvaliderEtat();</div>
+<div class="l k6"><span class="n">167</span>  Attrs?.ExpireLayout();</div>
+<div class="l k7"><span class="n">168</span>  ExpireSolution(<span class="kw">true</span>);<span class="rep r7">7</span></div>
+<div class="l"><span class="n">169</span>}</div>
+<div class="l"><span class="n"> </span></div>
+<div class="l"><span class="n">172</span><span class="kw">public void</span> ChangerTitre(<span class="kw">string</span> valeur)</div>
+<div class="l"><span class="n"> </span>    =&gt; Modifier(<span class="st">"Titre de l'exercice"</span>,</div>
+<div class="l"><span class="n"> </span>         () =&gt; Titre = valeur ?? <span class="kw">string</span>.Empty);</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Une seule fois par solution</b>L'entrée est en list : un arbre de 3 branches donnerait 3 itérations. On ne lit qu'à la première.</li>
+<li><span class="rep r2">2</span><b>Lire le paramètre directement</b><code>VolatileData</code> : toutes les données de l'entrée pour cette solution, en arbre (cours 08).</li>
+<li><span class="rep r3">3</span><b>Oublier l'ancien état</b>Ce qui dépendait de l'ancienne réponse est remis à zéro.</li>
+<li><span class="rep r4">4</span><b>Republier le message</b>Effacé par l'expiration, il revient à chaque solution tant que <code>_message</code> existe.</li>
+<li><span class="rep r5">5</span><b>Annulable</b>L'instantané est pris <em>avant</em> le changement : Ctrl+Z revient à l'état d'avant (cours 21).</li>
+<li><span class="rep r6">6</span><b>Faire place nette</b>Plus de message périmé ; la capsule se remet en page.</li>
+<li><span class="rep r7">7</span><b>Relancer</b>Le titre entre dans l'exercice exporté : il faut recalculer, pas seulement repeindre.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Un ordre qui ne doit rien au hasard</span>
+    Annulation, changement, nettoyage, mise en page, solution. C'est la même chaîne que SnapSet impose au code qu'il génère : <code>RecordUndoEvent</code>, valeur, <code>OnObjectChanged</code>, <code>ExpireSolution(true)</code> (docs/TAGS.md).
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 11 · Le cycle de vie du document et la résolution</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 11</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">ExpireSolution(true)</td><td>périme l'objet et l'aval, lance une solution</td><td>MagpieExerciseEditor:168</td></tr>
+<tr><td class="c">ExpireSolution(false)</td><td>périme sans lancer</td><td>RegistreDocument:352</td></tr>
+<tr><td class="c">doc.ScheduleSolution(ms, rappel)</td><td>demande une solution, rappel au début</td><td>RegistreDocument:349</td></tr>
+<tr><td class="c">Attributes.ExpireLayout()</td><td>refait la mise en page de la capsule</td><td>MagpieExerciseEditor:167</td></tr>
+<tr><td class="c">Instances.RedrawCanvas()</td><td>repeint le canvas</td><td>MagpieParcoursLauncher</td></tr>
+<tr><td class="c">AddRuntimeMessage(niveau, texte)</td><td>bulle Remark, Warning ou Error</td><td>MagpieExerciseEditor:156</td></tr>
+<tr><td class="c">DA.Iteration</td><td>numéro de l'appel en cours, à partir de 0</td><td>MagpieExerciseEditor:138</td></tr>
+<tr><td class="c">doc.ObjectsAdded += …</td><td>s'abonne aux ajouts d'objets</td><td>RegistreDocument:52</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Expirer</dt><dd>Déclarer périmées les données d'un objet et de son aval.</dd>
+<dt>Solution</dt><dd>Un passage de calcul sur tous les objets expirés du document.</dd>
+<dt>Itération</dt><dd>Un appel de SolveInstance au sein d'une solution.</dd>
+<dt>Événement</dt><dd>Un point d'accroche où Grasshopper appelle les méthodes abonnées.</dd>
+<dt>Planifier</dt><dd>Demander une solution plus tard, plutôt que d'expirer pendant une solution.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 12</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 11 · Le cycle de vie du document et la résolution</div>
+</section>
+</body>
+</html>

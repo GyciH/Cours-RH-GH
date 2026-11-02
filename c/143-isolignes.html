@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>143 · Les isolignes</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 143</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Les isolignes</h1>
+<p class="chapeau">Les courbes de niveau d'une carte, les isobares d'une météo, les contours de Cuttlefish : partout la même question, où le champ vaut-il exactement telle valeur ? On ne connaît le champ qu'aux nœuds d'une grille. Marching squares devine le reste case par case, avec une erreur qu'on sait chiffrer et une ambiguïté qu'on sait trancher.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>49</b>, <b>138</b>, <b>140</b></span>
+<span class="pastille">Exemples · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 204" width="100%">
+<rect fill="#fff" height="120" stroke="#6B7378" stroke-width="1" width="120" x="30" y="30"></rect>
+<line stroke="#00695C" stroke-width="2" x1="90.0" x2="90.0" y1="150.0" y2="30.0"></line>
+<circle cx="90.0" cy="150.0" fill="#00695C" r="3.4"></circle>
+<circle cx="90.0" cy="30.0" fill="#00695C" r="3.4"></circle>
+<circle cx="30" cy="150" fill="#1565C0" r="5"></circle>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="end" x="20" y="164">2</text>
+<circle cx="150" cy="150" fill="#E65100" r="5"></circle>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="160" y="164">7</text>
+<circle cx="150" cy="30" fill="#E65100" r="5"></circle>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="160" y="22">6</text>
+<circle cx="30" cy="30" fill="#1565C0" r="5"></circle>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="end" x="20" y="22">3</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="200" y="40">Niveau 4,5. Chaque coin est sous le niveau (bleu) ou au-dessus (orange).</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="200" y="58">Une arête dont les deux bouts diffèrent est traversée ; le point de passage</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="200" y="74">s'obtient par interpolation linéaire : t = (niveau − va) / (vb − va).</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="200" y="98">Ici : l'arête du bas (2 → 7) et celle du haut (6 → 3), toutes deux à t = 0,5 ;</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="200" y="112">les arêtes de gauche (3, 2) et de droite (7, 6) ne sont pas traversées.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="200" y="136">16 configurations de coins ; 14 donnent 0 ou 1 segment, 2 en donnent deux.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="10" y="176">Marching squares : parcourir toutes les cases d'une grille de valeurs, poser un ou deux segments par case, puis les recoudre.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="10" y="192">Exemple construit à la main.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Dans chaque case, les coins sous le niveau et ceux au-dessus disent quelles arêtes l'isoligne traverse ; une interpolation dit où.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Une marée qui monte sur un damier de rochers : pour chaque carré, tu regardes quels coins sont mouillés, et tu traces la ligne d'eau entre eux.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>écrire marching squares ;</li>
+<li>chiffrer l'erreur selon le pas ;</li>
+<li>reconnaître et trancher une selle ;</li>
+<li>recoudre les segments.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Chaque case se traite seule, sans connaître ses voisines : c'est ce qui rend l'algorithme simple et parallélisable, et ce qui oblige à recoudre ensuite.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 143 · Les isolignes</div>
+</section>
+<!-- ============ PAGE 2 · PRÉCISION ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 143</b></div>
+<p class="rubrique">Schéma 1 · La finesse de la grille</p>
+<h2>Moitié moins de pas, quatre fois moins d'erreur</h2>
+<p style="max-width:165mm">Autour d'un seul point, la distance a pour isolignes des cercles parfaits. On a donc pu mesurer l'écart entre ce que trace l'algorithme et la vraie courbe, sur une recopie hors de Rhino.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Un attracteur ponctuel, niveau 5 : l'isoligne devrait être un cercle de rayon 5 (recopie, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">pas de la grille</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="160" y="40">segments</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="300" y="40">écart maximal au cercle</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="450" y="40">rapport au pas précédent</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">1</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="61">40</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="61">5,0·10⁻²</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="61">—</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">0,5</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="79">80</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="79">1,16·10⁻²</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="79">÷ 4,3</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">0,25</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="97">160</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="97">2,80·10⁻³</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="97">÷ 4,1</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">0,125</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="115">320</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="115">6,86·10⁻⁴</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="115">÷ 4,1</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="140">Pas divisé par deux, erreur divisée par quatre : l'erreur suit le carré du pas. La distance n'est pas</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="156">linéaire dans une case ; l'interpolation linéaire la remplace par une droite, et la courbure se paie.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="180">Écart mesuré aux extrémités et au milieu de chaque segment. Deux fois plus fin : deux fois plus de segments, quatre fois plus de cases.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, le point de passage sur une arête</span>if ((va &lt; niveau) != (vb &lt; niveau)) {
+    double t = (niveau - va) / (vb - va);        // vb ≠ va, sinon pas de traversée
+    croisements.Add(pa + t * (pb - pa)); }</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi le carré</h3>
+<p>Sur une arête, on remplace une courbe par sa corde. L'écart entre une courbe et sa corde croît comme le carré de la longueur : c'est le même calcul qu'au cours 52 pour les polylignes.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le prix</h3>
+<p>Diviser le pas par deux quadruple le nombre de cases, donc d'évaluations du champ. Pour gagner un chiffre de précision, il faut environ trois fois plus de points par côté.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Comparer une isoligne à une valeur exacte avec la tolérance du document. À un pas de 1, le cercle tracé s'écartait de 0,05 du vrai (mesuré sur recopie) : la grille fixe la précision, pas Rhino.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 143 · Les isolignes</div>
+</section>
+<!-- ============ PAGE 3 · SELLES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 143</b></div>
+<p class="rubrique">Schéma 2 · L'ambiguïté</p>
+<h2>La case en selle</h2>
+<p style="max-width:165mm">Quand les coins alternent, dessus et dessous en diagonale, l'isoligne traverse les quatre arêtes. Deux tracés sont possibles, et les seuls coins ne permettent pas de choisir.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Quatre croisements dans une case : deux façons de relier (recopie, 30 attracteurs, 10 niveaux, mesuré)</text>
+<rect fill="#fff" height="80" stroke="#6B7378" width="80" x="30" y="36"></rect>
+<circle cx="30" cy="116" fill="#1565C0" r="4.5"></circle>
+<circle cx="110" cy="116" fill="#E65100" r="4.5"></circle>
+<circle cx="110" cy="36" fill="#1565C0" r="4.5"></circle>
+<circle cx="30" cy="36" fill="#E65100" r="4.5"></circle>
+<line stroke="#00695C" stroke-width="2" x1="70.0" x2="110" y1="116" y2="76.0"></line>
+<line stroke="#00695C" stroke-width="2" x1="70.0" x2="30" y1="36" y2="76.0"></line>
+<text fill="#00695C" font-size="7.4" font-weight="700" text-anchor="middle" x="70.0" y="134">Contour.cs : (e0, e1), (e2, e3)</text>
+<rect fill="#fff" height="80" stroke="#6B7378" width="80" x="170" y="36"></rect>
+<circle cx="170" cy="116" fill="#1565C0" r="4.5"></circle>
+<circle cx="250" cy="116" fill="#E65100" r="4.5"></circle>
+<circle cx="250" cy="36" fill="#1565C0" r="4.5"></circle>
+<circle cx="170" cy="36" fill="#E65100" r="4.5"></circle>
+<line stroke="#6B7378" stroke-width="2" x1="210.0" x2="170" y1="116" y2="76.0"></line>
+<line stroke="#6B7378" stroke-width="2" x1="250" x2="210.0" y1="76.0" y2="36"></line>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="middle" x="210.0" y="134">l'autre choix</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="290" y="44">Bleus en diagonale, orange en diagonale : quatre arêtes</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="290" y="60">traversées. Les coins seuls ne disent pas lesquelles relier.</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="290" y="84">Contour.cs relie toujours dans l'ordre des arêtes.</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="290" y="100">Mesuré : 10 cases à quatre croisements, dont 3 où le vrai</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="290" y="116">champ au centre donnait l'autre choix.</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="290" y="140">Deux attracteurs seuls, grille de 41 × 41 : aucune case</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="290" y="156">à quatre croisements sur 10 niveaux.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="192">Remède classique : évaluer le champ au centre (ou la moyenne des coins) et relier du côté qu'il désigne.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, trancher par la valeur au centre</span>if (croisements.Count == 4) {
+    bool centreDessous = (v0 + v1 + v2 + v3) / 4 &lt; niveau;      // ou le vrai champ au centre
+    if (centreDessous == (v0 &lt; niveau)) Relier(0, 1, 2, 3); else Relier(0, 3, 1, 2); }</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Ce que change le mauvais choix</h3>
+<p>Les lignes ne se croisent pas ; elles se rejoignent mal. Deux îlots voisins fusionnent, ou une vallée se coupe en deux. Le dessin reste propre, la topologie est fausse.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Quand les selles apparaissent</h3>
+<p>Entre deux attracteurs, le champ de distance forme un col. Avec beaucoup d'attracteurs et une grille assez fine pour voir les cols, les cases ambiguës arrivent.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Tester l'algorithme sur un ou deux attracteurs et conclure qu'il n'y a pas d'ambiguïté. Deux attracteurs : aucune selle ; trente : 10 selles, dont 3 mal reliées (mesuré sur recopie).
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 143 · Les isolignes</div>
+</section>
+<!-- ============ PAGE 4 · RECOUDRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 143</b></div>
+<p class="rubrique">Schéma 3 · Recoudre</p>
+<h2>Des segments qui se touchent presque</h2>
+<p style="max-width:165mm">Chaque arête intérieure est vue par deux cases, qui calculent chacune son point de passage. Le même point, deux calculs : on a compté combien différaient.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Le même point de passage, calculé par les deux cases qui partagent l'arête (recopie, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">cas</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="260" y="40">points partagés</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="420" y="40">différents au bit près</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">deux attracteurs, 41 × 41, 10 niveaux</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="260" y="61">913</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="61">39 (4,3 %)</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">30 attracteurs, 81 × 81, 10 niveaux</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="260" y="79">3 618</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="79">120 (3,3 %)</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="104">Une case parcourt l'arête de a vers b, sa voisine de b vers a : pa + t(pb − pa) n'arrondit pas pareil.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="120">Les segments ne se touchent donc pas toujours exactement : il faut une tolérance pour les recoudre.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="144">Temps, grille de 201 × 201, 30 attracteurs ponctuels : champ 4,2 à 4,5 ms, 10 niveaux 35,8 à 49,9 ms, 9 262 segments.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="158">Avec des courbes pour attracteurs, chaque valeur coûte un ClosestPoint de Rhino (non mesuré ici).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, calculer chaque arête une seule fois</span>var passage = new Dictionary&lt;(int, int, int, int), Point3d&gt;();   // clé : l'arête, coins ordonnés
+Point3d Passage(int a0, int a1, int b0, int b1) =&gt; ...;           // calcul fait une fois, dans un seul sens</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Deux façons de recoudre</h3>
+<p>Joindre ensuite avec une tolérance, comme le fait Cuttlefish avec Curve.JoinCurves. Ou mémoriser chaque point par arête : les segments partagent alors exactement leurs extrémités.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le lien avec union-find</h3>
+<p>Avec des points mémorisés par arête, recoudre revient à regrouper les segments qui partagent une extrémité : c'est exactement le travail d'union-find (cours 138).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Recoudre en comparant les extrémités par ==. Un point partagé sur trente environ différait au bit près (mesuré sur recopie) : les courbes se seraient coupées en morceaux.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 143 · Les isolignes</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 143</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Contour.cs, un marching squares complet</h2>
+<p style="max-width:165mm">Le composant calcule la distance aux attracteurs en chaque point de la grille, choisit des niveaux régulièrement espacés, trace les segments case par case, puis les confie à Rhino pour les joindre.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Contour.cs</span></div>
+<div class="l k1"><span class="n">110</span>… = min + (max - min) * (l + 1) / (levels + 1);<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">123</span>if ((va &lt; level) != (vb &lt; level))<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">125</span>double t = (level - va) / (vb - va);<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">130</span>for (int k = 0; k + 1 &lt; cross.Count; k += 2)<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">135</span>….AddRange(Curve.JoinCurves(segments, tolerance), …);<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Niveaux</b>Sans les bornes.</li>
+<li><span class="rep r2">2</span><b>Traversée</b>Bouts opposés.</li>
+<li><span class="rep r3">3</span><b>Interpoler</b>Le long de l'arête.</li>
+<li><span class="rep r4">4</span><b>Relier</b>Deux par deux.</li>
+<li><span class="rep r5">5</span><b>Recoudre</b>Avec tolérance.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · les cases en selle sont reliées dans l'ordre des arêtes</span>
+    Ligne 130, les croisements sont reliés deux par deux dans l'ordre où les arêtes sont parcourues. Pour une case à quatre croisements, c'est un choix fixe, sans regarder le champ au centre. Sur une recopie hors Rhino, 30 attracteurs ponctuels et 10 niveaux ont donné 10 cases de ce type, dont 3 reliées à l'inverse du vrai champ (mesuré sur recopie). Les courbes restent lisses ; ce sont des îlots qui fusionnent ou se séparent à tort. Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 143 · Les isolignes</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 143</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">(va &lt; n) != (vb &lt; n)</td><td>l'arête est-elle traversée ?</td><td>Contour.cs:123</td></tr>
+<tr><td class="c">t = (n - va) / (vb - va)</td><td>où, le long de l'arête</td><td>Contour.cs:125</td></tr>
+<tr><td class="c">k += 2</td><td>relier les croisements deux par deux</td><td>Contour.cs:130</td></tr>
+<tr><td class="c">Curve.JoinCurves(s, tol)</td><td>recoudre les segments</td><td>Contour.cs:135</td></tr>
+<tr><td class="c">c.ClosestPoint(p, out t)</td><td>la distance à une courbe attracteur</td><td>Contour.cs:81</td></tr>
+<tr><td class="c">Dictionary&lt;arête, Point3d&gt;</td><td>un point de passage par arête, exact</td><td>page 4</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Isoligne</dt><dd>La courbe où un champ prend une valeur donnée.</dd>
+<dt>Marching squares</dt><dd>Tracer une isoligne case par case sur une grille de valeurs.</dd>
+<dt>Interpolation linéaire</dt><dd>Estimer une valeur entre deux autres comme sur une droite.</dd>
+<dt>Selle</dt><dd>Un col : le champ monte dans une direction et descend dans l'autre.</dd>
+<dt>Champ de distance</dt><dd>En chaque point, la distance au plus proche attracteur.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 144</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 143 · Les isolignes</div>
+</section>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>50 · Vecteurs, produit scalaire et produit vectoriel</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 50</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Vecteurs, produit scalaire et produit vectoriel</h1>
+<p class="chapeau">Un <b>point</b> dit où l'on est, un <b>vecteur</b> dit comment se déplacer. Avec deux opérations de plus, le <b>produit scalaire</b> et le <b>produit vectoriel</b>, on mesure un angle, on projette, on construit une perpendiculaire ou on sait de quel côté d'une ligne tombe un point.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>09</b>, <b>16</b> et <b>49</b></span>
+<span class="pastille">Exemples · <b>Spiral</b>, <b>Flow</b>, <b>Hatch</b>, <b>Voronoi</b> (Cuttlefish)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 176" width="100%">
+<line stroke="#DDD5C8" stroke-width=".6" x1="20" x2="20" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="46" x2="46" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="72" x2="72" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="98" x2="98" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="124" x2="124" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="150" x2="150" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="176" x2="176" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="202" x2="202" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="228" x2="228" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="254" x2="254" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="280" x2="280" y1="10" y2="166"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="20" x2="280" y1="10" y2="10"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="20" x2="280" y1="36" y2="36"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="20" x2="280" y1="62" y2="62"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="20" x2="280" y1="88" y2="88"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="20" x2="280" y1="114" y2="114"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="20" x2="280" y1="140" y2="140"></line>
+<line stroke="#DDD5C8" stroke-width=".6" x1="20" x2="280" y1="166" y2="166"></line>
+<line stroke="#1565C0" stroke-width="2" x1="46" x2="124" y1="140" y2="88"></line><polygon fill="#1565C0" points="124,88 120.1,93.8 117.1,89.3"></polygon>
+<circle cx="46" cy="140" fill="#2B2F33" r="3.2"></circle>
+<text fill="#2B2F33" font-size="8.6" font-weight="700" text-anchor="start" x="40" y="156">P (1, 1)</text>
+<circle cx="124" cy="88" fill="#2B2F33" r="3.2"></circle>
+<text fill="#2B2F33" font-size="8.6" font-weight="700" text-anchor="start" x="130" y="82">Q (4, 3)</text>
+<text fill="#1565C0" font-size="8.6" font-weight="700" text-anchor="end" x="79.0" y="106.0">v = Q − P = (3, 2)</text>
+<line stroke="#1565C0" stroke-dasharray="5 3" stroke-width="1.6" x1="176" x2="254" y1="114" y2="62"></line><polygon fill="#1565C0" points="254,62 250.1,67.8 247.1,63.3"></polygon>
+<text fill="#1565C0" font-size="8.2" font-style="italic" text-anchor="end" x="224" y="52">le même v, ailleurs</text>
+<text fill="#2B2F33" font-size="9.4" font-weight="700" text-anchor="start" x="312" y="26">Point3d : une position</text>
+<text fill="#1565C0" font-size="9.4" font-weight="700" text-anchor="start" x="312" y="44">Vector3d : un déplacement, sans position</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="start" x="312" y="74">point − point</text>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="440" y="74">= vecteur</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="start" x="312" y="93">point + vecteur</text>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="440" y="93">= point</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="start" x="312" y="112">vecteur + vecteur</text>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="440" y="112">= vecteur</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="start" x="312" y="131">nombre × vecteur</text>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="440" y="131">= vecteur</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="start" x="312" y="150">point + point</text>
+<text fill="#C62828" font-size="8.6" font-weight="700" text-anchor="start" x="440" y="150">sans sens géométrique</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un vecteur est une <b>flèche sans adresse</b> : trois nombres qui donnent une direction et une longueur, qu'on peut additionner, étirer et comparer, sans jamais dire d'où elle part.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>« Trois pas vers l'est, deux vers le nord » est un vecteur : la consigne vaut d'où que tu partes. « Le coin de la rue » est un point. Suivre la consigne depuis le coin te mène à un autre point.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>distinguer <code>Point3d</code> et <code>Vector3d</code>, et ce que donne chaque opération ;</li>
+<li>calculer une longueur et rendre un vecteur unitaire ;</li>
+<li>lire un produit scalaire : angle, projection, même sens ou non ;</li>
+<li>utiliser un produit vectoriel : normale, aire, côté d'une ligne.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Le produit <b>scalaire</b> rend un <b>nombre</b> : il mesure à quel point deux directions vont ensemble. Le produit <b>vectoriel</b> rend un <b>vecteur</b> : il fabrique la direction perpendiculaire aux deux autres. Le premier compare, le second construit.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 50 · Vecteurs, produit scalaire et produit vectoriel</div>
+</section>
+<!-- ============ PAGE 2 · OPÉRATIONS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 50</b></div>
+<p class="rubrique">Schéma 1 · Les opérations de base</p>
+<h2>Ajouter, étirer, mesurer</h2>
+<p style="max-width:165mm">Les vecteurs s'additionnent composante par composante, comme on enchaîne deux déplacements. Multiplier par un nombre change la longueur, et le signe retourne le sens. Diviser par la longueur donne un vecteur <b>unitaire</b>, qui ne garde que la direction.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 200" width="100%">
+<rect fill="#EFE9E1" height="200" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="176" rx="6" stroke="#CFC6B8" width="182" x="16" y="12"></rect>
+<text fill="#00695C" font-size="9" font-weight="700" text-anchor="start" x="26" y="30">Additionner : bout à bout</text>
+<line stroke="#1565C0" stroke-width="1.8" x1="36" x2="126" y1="160" y2="146"></line><polygon fill="#1565C0" points="126,146 120.0,149.7 119.2,144.3"></polygon>
+<line stroke="#7B1FA2" stroke-width="1.8" x1="126" x2="170" y1="146" y2="66"></line><polygon fill="#7B1FA2" points="170,66 169.3,73.0 164.5,70.3"></polygon>
+<line stroke="#2E7D32" stroke-width="1.8" x1="36" x2="170" y1="160" y2="66"></line><polygon fill="#2E7D32" points="170,66 166.3,71.9 163.2,67.5"></polygon>
+<text fill="#1565C0" font-size="9" font-weight="700" text-anchor="start" x="80" y="166">a</text>
+<text fill="#7B1FA2" font-size="9" font-weight="700" text-anchor="start" x="156" y="112">b</text>
+<text fill="#2E7D32" font-size="9" font-weight="700" text-anchor="end" x="96" y="100">a + b</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="26" y="180">dans un ordre ou l'autre : même bout</text>
+<rect fill="#fff" height="176" rx="6" stroke="#CFC6B8" width="182" x="209" y="12"></rect>
+<text fill="#00695C" font-size="9" font-weight="700" text-anchor="start" x="219" y="30">Multiplier par un nombre</text>
+<line stroke="#1565C0" stroke-width="1.8" x1="300" x2="334" y1="110" y2="88"></line><polygon fill="#1565C0" points="334,88 330.1,93.8 327.1,89.2"></polygon>
+<text fill="#1565C0" font-size="9" font-weight="700" text-anchor="start" x="338" y="86">v</text>
+<line stroke="#2E7D32" stroke-width="1.8" x1="260" x2="328" y1="172" y2="128"></line><polygon fill="#2E7D32" points="328,128 324.1,133.8 321.1,129.2"></polygon>
+<text fill="#2E7D32" font-size="9" font-weight="700" text-anchor="start" x="332" y="130">2 v</text>
+<line stroke="#C62828" stroke-width="1.8" x1="280" x2="246" y1="58" y2="80"></line><polygon fill="#C62828" points="246,80 249.9,74.2 252.9,78.8"></polygon>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="end" x="242" y="84">− v</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="219" y="180">même direction ; le signe la retourne</text>
+<rect fill="#fff" height="176" rx="6" stroke="#CFC6B8" width="182" x="402" y="12"></rect>
+<text fill="#00695C" font-size="9" font-weight="700" text-anchor="start" x="412" y="30">Longueur et vecteur unitaire</text>
+<path d="M436,164 H496 V84" fill="none" stroke="#6B7378" stroke-dasharray="3 2"></path>
+<line stroke="#1565C0" stroke-width="1.8" x1="436" x2="496" y1="164" y2="84"></line><polygon fill="#1565C0" points="496,84 494.3,90.8 490.0,87.5"></polygon>
+<text fill="#6B7378" font-size="8.4" text-anchor="middle" x="466.0" y="159">3</text>
+<text fill="#6B7378" font-size="8.4" text-anchor="start" x="502" y="124.0">4</text>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="start" x="414" y="48">|v| = √(3² + 4²) = 5</text>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="414" y="62">v / 5 = (0,6 ; 0,8)</text>
+<text fill="#2E7D32" font-size="7.8" text-anchor="start" x="414" y="76">longueur 1</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="412" y="180">unitaire : garder la seule direction</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · RhinoCommon</span>Vector3d v = q - p;          // Point3d - Point3d → Vector3d
+double L = v.Length;          // √(x² + y² + z²)
+bool ok = v.Unitize();        // v devient unitaire ; false si v est nul
+Point3d r = p + 2.0 * v;      // Point3d + Vector3d → Point3d</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Unitize modifie sur place</h3>
+<p><code>Vector3d</code> est une structure : <code>v.Unitize()</code> change <code>v</code> lui-même et rend un booléen. Pour garder l'original, on copie d'abord, ou on divise par <code>v.Length</code>.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Longueur au carré</h3>
+<p>Pour comparer des distances, <code>SquareLength</code> évite la racine carrée : si <i>a</i>² &lt; <i>b</i>², alors <i>a</i> &lt; <i>b</i>. C'est le réflexe des recherches de plus proche voisin (cours 17).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Un vecteur nul n'a pas de direction. <code>Unitize</code> rend alors <code>false</code> et laisse le vecteur tel quel ; diviser à la main par une longueur nulle donne NaN (cours 49). Deux points confondus suffisent à produire ce cas : on teste toujours le booléen.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 50 · Vecteurs, produit scalaire et produit vectoriel</div>
+</section>
+<!-- ============ PAGE 3 · PRODUIT SCALAIRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 50</b></div>
+<p class="rubrique">Schéma 2 · Le produit scalaire</p>
+<h2>Un nombre qui dit si deux directions vont ensemble</h2>
+<p style="max-width:165mm">On multiplie les composantes deux à deux et on additionne. Le résultat vaut aussi |a| |b| cos θ : son <b>signe</b> dit si l'angle est aigu ou obtus, et avec un vecteur <b>a</b> unitaire, il donne la longueur de l'ombre de <b>b</b> sur <b>a</b>.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="182" rx="6" stroke="#CFC6B8" width="300" x="16" y="12"></rect>
+<line stroke="#1565C0" stroke-width="2" x1="44" x2="284" y1="150" y2="150"></line><polygon fill="#1565C0" points="284,150 277.6,152.7 277.6,147.3"></polygon>
+<text fill="#1565C0" font-size="9.4" font-weight="700" text-anchor="end" x="280" y="166">a</text>
+<line stroke="#7B1FA2" stroke-width="2" x1="44" x2="162.2" y1="150" y2="57.7"></line><polygon fill="#7B1FA2" points="162.2,57.7 158.8,63.8 155.4,59.5"></polygon>
+<text fill="#7B1FA2" font-size="9.4" font-weight="700" text-anchor="start" x="168.2" y="57.7">b</text>
+<line stroke="#6B7378" stroke-dasharray="3 2" x1="162.2" x2="162.2" y1="57.7" y2="150"></line>
+<line stroke="#2E7D32" stroke-opacity=".75" stroke-width="4" x1="44" x2="162.2" y1="153" y2="153"></line>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="103.10080652050414" y="168">projection de b sur a : |b| cos θ</text>
+<path d="M74,150 A30,30 0 0,0 67.6,131.5" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<text fill="#E65100" font-size="9" font-weight="700" text-anchor="start" x="80" y="142">θ</text>
+<text class="mono" fill="#2B2F33" font-size="9.4" font-weight="700" style="font-size:9.4px" text-anchor="start" x="28" y="32">a · b = |a| |b| cos θ</text>
+<text class="mono" fill="#6B7378" font-size="9.4" style="font-size:9.4px;white-space:pre" text-anchor="start" x="28" y="48">    = ax·bx + ay·by + az·bz</text>
+<rect fill="#fff" height="54" rx="5" stroke="#2E7D32" stroke-width="1.3" width="252" x="332" y="12"></rect>
+<line stroke="#1565C0" stroke-width="1.4" x1="364" x2="394" y1="52" y2="52"></line><polygon fill="#1565C0" points="394,52 387.6,54.7 387.6,49.3"></polygon>
+<line stroke="#7B1FA2" stroke-width="1.4" x1="364" x2="388.2" y1="52" y2="38.0"></line><polygon fill="#7B1FA2" points="388.2,38.0 384.0,43.6 381.3,38.9"></polygon>
+<text class="mono" fill="#2E7D32" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="412" y="36">a · b &gt; 0</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="412" y="52">angle aigu : b va dans le sens de a</text>
+<rect fill="#fff" height="54" rx="5" stroke="#1565C0" stroke-width="1.3" width="252" x="332" y="74"></rect>
+<line stroke="#1565C0" stroke-width="1.4" x1="364" x2="394" y1="114" y2="114"></line><polygon fill="#1565C0" points="394,114 387.6,116.7 387.6,111.3"></polygon>
+<line stroke="#7B1FA2" stroke-width="1.4" x1="364" x2="364.0" y1="114" y2="86.0"></line><polygon fill="#7B1FA2" points="364.0,86.0 366.7,92.4 361.3,92.4"></polygon>
+<text class="mono" fill="#1565C0" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="412" y="98">a · b = 0</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="412" y="114">angle droit : perpendiculaires</text>
+<rect fill="#fff" height="54" rx="5" stroke="#C62828" stroke-width="1.3" width="252" x="332" y="136"></rect>
+<line stroke="#1565C0" stroke-width="1.4" x1="364" x2="394" y1="176" y2="176"></line><polygon fill="#1565C0" points="394,176 387.6,178.7 387.6,173.3"></polygon>
+<line stroke="#7B1FA2" stroke-width="1.4" x1="364" x2="342.6" y1="176" y2="158.0"></line><polygon fill="#7B1FA2" points="342.6,158.0 349.3,160.1 345.8,164.2"></polygon>
+<text class="mono" fill="#C62828" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="412" y="160">a · b &lt; 0</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="412" y="176">angle obtus : b va à rebours</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · RhinoCommon</span>double d = a * b;                        // Vector3d * Vector3d : produit scalaire
+double angle = Vector3d.VectorAngle(a, b); // en radians, entre 0 et π
+bool face = normale * versCamera &gt; 0;     // la face regarde-t-elle la caméra ?
+double ombre = b * aUnitaire;             // longueur de la projection de b sur a</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Ce qu'on en tire</h3>
+<p>Un angle (par l'arc cosinus), une projection (l'ombre sur un axe), un test de perpendicularité (zéro, à une tolérance près), et le test « devant ou derrière » qui sert à cacher les faces tournées vers l'arrière.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>L'opérateur * est trompeur</h3>
+<p>Entre deux <code>Vector3d</code>, <code>*</code> fait le produit scalaire et rend un <code>double</code>. Entre un nombre et un vecteur, il étire le vecteur. Même symbole, deux opérations différentes.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Écrire soi-même <code>Math.Acos(a * b)</code> avec deux vecteurs unitaires : à cause des arrondis, le produit vaut parfois <code>1.0000000000000002</code>, et l'arc cosinus rend NaN. Sur des vecteurs tirés au hasard, cela touche environ un cas sur cinq quand <b>a</b> = <b>b</b>. On borne à [−1, 1], ou on prend <code>VectorAngle</code>.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 50 · Vecteurs, produit scalaire et produit vectoriel</div>
+</section>
+<!-- ============ PAGE 4 · PRODUIT VECTORIEL ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 50</b></div>
+<p class="rubrique">Schéma 3 · Le produit vectoriel</p>
+<h2>Un vecteur perpendiculaire aux deux autres</h2>
+<p style="max-width:165mm">Le produit vectoriel <b>a × b</b> est perpendiculaire à <b>a</b> et à <b>b</b>. Sa longueur vaut l'aire du parallélogramme qu'ils forment, et son sens suit la règle de la main droite. En plan, seule sa composante Z compte : son signe dit si l'on tourne à gauche ou à droite.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="182" rx="6" stroke="#CFC6B8" width="300" x="16" y="12"></rect>
+<polygon fill="#E65100" fill-opacity=".14" points="70,160 210,160 270,112 130,112" stroke="#E65100" stroke-dasharray="3 2"></polygon>
+<line stroke="#1565C0" stroke-width="2" x1="70" x2="210" y1="160" y2="160"></line><polygon fill="#1565C0" points="210,160 203.6,162.7 203.6,157.3"></polygon>
+<text fill="#1565C0" font-size="9.4" font-weight="700" text-anchor="end" x="208" y="176">a</text>
+<line stroke="#7B1FA2" stroke-width="2" x1="70" x2="130" y1="160" y2="112"></line><polygon fill="#7B1FA2" points="130,112 126.7,118.2 123.3,113.9"></polygon>
+<text fill="#7B1FA2" font-size="9.4" font-weight="700" text-anchor="end" x="116" y="114">b</text>
+<line stroke="#2E7D32" stroke-width="2.2" x1="70" x2="70" y1="160" y2="40"></line><polygon fill="#2E7D32" points="70,40 72.7,46.4 67.3,46.4"></polygon>
+<text fill="#2E7D32" font-size="9.4" font-weight="700" text-anchor="start" x="76" y="46">a × b</text>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="middle" x="150" y="146">aire = |a × b|</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="184" y="46">perpendiculaire à a et à b</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="184" y="60">sens : règle de la main droite</text>
+<text class="mono" fill="#C62828" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="start" x="184" y="74">b × a = − (a × b)</text>
+<rect fill="#fff" height="182" rx="6" stroke="#CFC6B8" width="252" x="332" y="12"></rect>
+<text fill="#00695C" font-size="9" font-weight="700" text-anchor="start" x="344" y="30">En plan : de quel côté est q ?</text>
+<line stroke="#2B2F33" stroke-width="1.8" x1="356" x2="560" y1="150" y2="70"></line><polygon fill="#2B2F33" points="560,70 555.0,74.9 553.0,69.8"></polygon>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="start" x="356" y="166">From</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="end" x="550" y="62">To</text>
+<circle cx="420" cy="70" fill="#2E7D32" r="3.2"></circle>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="428" y="74">q à gauche : Z &gt; 0</text>
+<circle cx="500" cy="150" fill="#C62828" r="3.2"></circle>
+<text fill="#C62828" font-size="8.6" font-weight="700" text-anchor="end" x="492" y="168">q à droite : Z &lt; 0</text>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="start" x="344" y="182">(To − From) × (q − From), composante Z</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · RhinoCommon · triangle a, b, c</span>Vector3d n = Vector3d.CrossProduct(b - a, c - a);
+double aire = n.Length / 2;   // la moitié du parallélogramme
+bool direct = n.Z &gt; 0;        // vu de dessus : a, b, c dans le sens anti-horaire
+n.Unitize();                  // la normale du triangle</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>L'ordre compte</h3>
+<p>Échanger les deux vecteurs retourne le résultat : <b>b × a</b> = −(<b>a × b</b>). C'est ce qui donne l'orientation d'une face, et c'est pourquoi l'ordre des sommets d'un maillage n'est pas un détail.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Main droite, Z en haut</h3>
+<p>Rhino et three.js utilisent tous deux un repère direct (main droite). Mais Rhino met Z en haut, three.js Y en haut (cours 32) : la même normale n'a pas les mêmes composantes des deux côtés.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Deux vecteurs parallèles donnent un produit vectoriel nul : pas de normale, pas de plan. Trois points presque alignés donnent une normale minuscule, très sensible aux arrondis. On compare la longueur obtenue à une tolérance avant d'unitiser.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 50 · Vecteurs, produit scalaire et produit vectoriel</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 50</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Les vecteurs de Cuttlefish</h2>
+<p style="max-width:165mm">Cuttlefish emploie presque toutes ces opérations. Aucun de tes dépôts n'écrit de produit scalaire explicite : les angles passent par les plans et les courbes de RhinoCommon.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Spiral.cs</span></div>
+<div class="l k1"><span class="n">71</span><span class="ty">Vector3d</span> dir = ring[j] - center;<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">72</span><span class="kw">if</span> (!dir.Unitize()) <span class="kw">continue</span>;<span class="rep r2">2</span></div>
+<div class="l k1"><span class="n">74</span><span class="kw">if</span> (r &gt; <span class="nb">0</span>) path.Add(center + dir * r);</div>
+<div class="l"><span class="cm">cuttlefish/Flow.cs</span></div>
+<div class="l k2"><span class="n">84</span><span class="kw">return</span> sum.Unitize() ? sum : <span class="ty">Vector3d</span>.Zero;</div>
+<div class="l"><span class="cm">cuttlefish/Voronoi.cs</span></div>
+<div class="l k3"><span class="n">143</span>perpVect = B - A;<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">144</span>perpVect = <span class="kw">new</span> <span class="ty">Vector3d</span>(-perpVect.Y, perpVect.X, <span class="nb">0</span>);</div>
+<div class="l k4"><span class="n">158</span><span class="ty">Vector3d</span> a = line.To - line.From;<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n">159</span><span class="ty">Vector3d</span> b = q - line.From;</div>
+<div class="l k4"><span class="n">160</span><span class="kw">return</span> <span class="ty">Vector3d</span>.CrossProduct(a, b).Z;</div>
+<div class="l"><span class="cm">cuttlefish/Hatch.cs</span></div>
+<div class="l k5"><span class="n">82</span><span class="ty">Vector3d</span> dir = Math.Cos(angle) * plane.XAxis<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n"> </span>             + Math.Sin(angle) * plane.YAxis;</div>
+<div class="l k5"><span class="n">83</span><span class="ty">Vector3d</span> normal = <span class="ty">Vector3d</span>.CrossProduct(plane.ZAxis, dir);</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Point − point, point + vecteur</b>Direction depuis le centre, puis on y repart à la distance r.</li>
+<li><span class="rep r2">2</span><b>Le booléen testé</b>Un point au centre est sauté ; un champ nul rend Zero.</li>
+<li><span class="rep r3">3</span><b>Quart de tour en plan</b>(x, y) → (−y, x) : la perpendiculaire sans calcul.</li>
+<li><span class="rep r4">4</span><b>De quel côté ?</b>Le signe de Z range chaque sommet (lignes 178–181).</li>
+<li><span class="rep r5">5</span><b>Une base dans le plan</b>Une direction d'angle donné, puis sa perpendiculaire.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Lire Hatch ligne à ligne</span>
+    La ligne 82 combine les deux axes du plan de la cellule avec cos et sin : c'est un vecteur unitaire qui fait l'angle voulu dans ce plan. La ligne 83 le croise avec l'axe Z du plan : le résultat reste dans le plan et lui est perpendiculaire. Les hachures avancent le long de <code>normal</code> (ligne 88) et s'étendent le long de <code>dir</code>.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 50 · Vecteurs, produit scalaire et produit vectoriel</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 50</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">ring[j] - center</td><td>point − point → vecteur</td><td>Spiral.cs:71</td></tr>
+<tr><td class="c">if (!dir.Unitize())</td><td>unitaire, ou vecteur nul écarté</td><td>Spiral.cs:72</td></tr>
+<tr><td class="c">new Vector3d(-v.Y, v.X, 0)</td><td>quart de tour en plan</td><td>Voronoi.cs:144</td></tr>
+<tr><td class="c">CrossProduct(a, b).Z</td><td>côté d'une ligne en plan</td><td>Voronoi.cs:160</td></tr>
+<tr><td class="c">CrossProduct(plane.ZAxis, dir)</td><td>perpendiculaire dans le plan</td><td>Hatch.cs:83</td></tr>
+<tr><td class="c">a * b</td><td>produit scalaire de deux Vector3d</td><td>exemple page 3</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Vecteur</dt><dd>Une direction et une longueur, sans position : un déplacement.</dd>
+<dt>Vecteur unitaire</dt><dd>Un vecteur de longueur 1, qui ne porte que la direction.</dd>
+<dt>Produit scalaire</dt><dd>a · b = |a| |b| cos θ : un nombre qui mesure l'accord de deux directions.</dd>
+<dt>Produit vectoriel</dt><dd>a × b : le vecteur perpendiculaire aux deux, de longueur l'aire du parallélogramme.</dd>
+<dt>Repère direct</dt><dd>Un repère qui suit la règle de la main droite, comme Rhino et three.js.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 51</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 50 · Vecteurs, produit scalaire et produit vectoriel</div>
+</section>
+</body>
+</html>

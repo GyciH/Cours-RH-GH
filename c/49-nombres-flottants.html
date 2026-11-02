@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>49 · Les nombres à virgule flottante</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-2">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 2B</b> · Le texte et les nombres</span><b>Cours 49</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Les nombres à virgule flottante</h1>
+<p class="chapeau">Toute la géométrie de Rhino, chaque coordonnée, chaque longueur, chaque tolérance, passe par le type <b>double</b>. C'est une approximation binaire : <b>0,1 + 0,2</b> n'y vaut pas exactement 0,3, et la précision diminue à mesure qu'on s'éloigne de zéro.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>01</b> et <b>09</b></span>
+<span class="pastille">Exemples · <b>GenericChecker</b>, <b>ComparaisonGeometrie</b> (Magpie), <b>ModeleJauge</b> (SnapSet)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 160" width="100%">
+<rect fill="#fff" height="22" stroke="#C62828" stroke-width=".8" width="8.9" x="15.0" y="40"></rect>
+<text class="mono" fill="#C62828" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="19.4" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="23.9" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="28.3" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="32.8" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="37.2" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="41.7" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="46.2" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="50.6" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="55.1" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="59.5" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="64.0" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="68.4" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="72.9" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="77.3" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="81.8" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="86.2" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="90.7" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="95.1" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="99.6" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="104.0" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="108.5" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width=".8" width="8.9" x="112.9" y="40"></rect>
+<text class="mono" fill="#1565C0" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="117.4" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="121.8" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="126.3" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="130.7" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="135.1" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="139.6" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="144.1" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="148.5" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="152.9" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="157.4" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="161.8" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="166.3" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="170.8" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="175.2" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="179.7" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="184.1" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="188.5" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="193.0" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="197.4" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="201.9" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="206.3" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="210.8" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="215.2" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="219.7" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="224.2" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="228.6" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="233.1" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="237.5" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="241.9" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="246.4" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="250.8" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="255.3" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="259.8" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="264.2" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="268.7" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="273.1" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="277.6" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="282.0" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="286.4" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="290.9" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="295.4" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="299.8" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="304.2" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="308.7" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="313.1" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="317.6" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="322.1" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="326.5" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="330.9" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="335.4" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="339.9" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="344.3" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="348.8" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="353.2" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="357.6" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="362.1" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="366.6" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="371.0" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="375.4" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="379.9" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="384.4" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="388.8" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="393.2" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="397.7" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="402.1" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="406.6" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="411.1" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="415.5" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="419.9" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="424.4" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="428.9" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="433.3" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="437.8" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="442.2" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="446.7" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="451.1" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="455.6" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="460.0" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="464.4" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="468.9" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="473.4" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="477.8" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="482.2" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="486.7" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="491.2" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="495.6" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="500.1" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="504.5" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="508.9" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="513.4" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="517.9" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="522.3" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="526.8" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="531.2" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="535.7" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="540.1" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="544.6" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="549.0" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="553.5" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="557.9" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="562.4" y="55">0</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="566.8" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="571.3" y="55">1</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width=".8" width="8.9" x="575.7" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="580.2" y="55">0</text>
+<path d="M15.0,34 v-6 H23.9 v6" fill="none" stroke="#C62828" stroke-width="1.2"></path>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="middle" x="19.4" y="22">signe</text>
+<path d="M23.9,34 v-6 H121.8 v6" fill="none" stroke="#1565C0" stroke-width="1.2"></path>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="middle" x="72.9" y="22">exposant · 11 bits</text>
+<path d="M121.8,34 v-6 H584.6 v6" fill="none" stroke="#2E7D32" stroke-width="1.2"></path>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="middle" x="353.2" y="22">mantisse · 52 bits (le « 1, » de tête n'est pas stocké)</text>
+<text fill="#2B2F33" font-size="9.4" font-weight="700" text-anchor="middle" x="300" y="90">0,1  =  + 1,6 × 2⁻⁴     (exposant stocké 1019 = −4 + 1023)</text>
+<text class="mono" fill="#5D4037" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="300" y="112">valeur réellement stockée : 0,1000000000000000055511151231257827…</text>
+<text fill="#6B7378" font-size="8.4" font-style="italic" text-anchor="middle" x="300" y="138">Un double ne contient pas 0,1 : il contient le nombre binaire le plus proche.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un double est un nombre binaire de <b>53 chiffres significatifs</b> multiplié par une puissance de 2 ; tout nombre qui ne s'écrit pas exactement ainsi est arrondi au plus proche.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Une règle graduée dont les graduations s'écartent à mesure qu'on s'éloigne du zéro. Près de l'origine, elles sont si serrées qu'on ne les voit pas ; très loin, l'écart entre deux graduations finit par compter.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>expliquer pourquoi <code>0.1 + 0.2 == 0.3</code> est faux ;</li>
+<li>estimer la précision disponible à une distance donnée de l'origine ;</li>
+<li>comparer deux nombres avec une tolérance absolue ou relative ;</li>
+<li>choisir entre <code>float</code>, <code>double</code> et <code>decimal</code>, et reconnaître NaN et l'infini.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Sur deux doubles <b>calculés</b>, le test <code>==</code> est presque toujours une erreur : deux chemins de calcul qui devraient donner le même résultat diffèrent souvent du dernier chiffre. On compare à une <b>tolérance</b>, comme Rhino le fait avec celle du document (cours 09).
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 49 · Les nombres à virgule flottante</div>
+</section>
+<!-- ============ PAGE 2 · LE BINAIRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 2B</b> · Le texte et les nombres</span><b>Cours 49</b></div>
+<p class="rubrique">Schéma 1 · Une fraction binaire</p>
+<h2>Pourquoi 0,1 n'existe pas</h2>
+<p style="max-width:165mm">Un double vaut <b>± 1,mantisse × 2<sup>exposant</sup></b>. La mantisse est écrite en base 2. Pour savoir si 0,1 tombe juste, on le convertit en binaire, chiffre par chiffre.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="64" rx="4" stroke="#2B2F33" stroke-width="0.8" width="64" x="16" y="30"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="48" y="46">0,1 × 2</text>
+<text fill="#6B7378" font-size="8" text-anchor="middle" x="48" y="60">= 0,2</text>
+<text class="mono" fill="#1565C0" font-size="15" font-weight="700" style="font-size:15px" text-anchor="middle" x="48" y="86">0</text>
+<line stroke="#6B7378" stroke-width="1" x1="80" x2="88" y1="62" y2="62"></line><polygon fill="#6B7378" points="88,62 81.6,64.7 81.6,59.3"></polygon>
+<rect fill="#fff" height="64" rx="4" stroke="#7B1FA2" stroke-width="1.4" width="64" x="88" y="30"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="120" y="46">0,2 × 2</text>
+<text fill="#6B7378" font-size="8" text-anchor="middle" x="120" y="60">= 0,4</text>
+<text class="mono" fill="#1565C0" font-size="15" font-weight="700" style="font-size:15px" text-anchor="middle" x="120" y="86">0</text>
+<line stroke="#6B7378" stroke-width="1" x1="152" x2="160" y1="62" y2="62"></line><polygon fill="#6B7378" points="160,62 153.6,64.7 153.6,59.3"></polygon>
+<rect fill="#fff" height="64" rx="4" stroke="#7B1FA2" stroke-width="1.4" width="64" x="160" y="30"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="192" y="46">0,4 × 2</text>
+<text fill="#6B7378" font-size="8" text-anchor="middle" x="192" y="60">= 0,8</text>
+<text class="mono" fill="#1565C0" font-size="15" font-weight="700" style="font-size:15px" text-anchor="middle" x="192" y="86">0</text>
+<line stroke="#6B7378" stroke-width="1" x1="224" x2="232" y1="62" y2="62"></line><polygon fill="#6B7378" points="232,62 225.6,64.7 225.6,59.3"></polygon>
+<rect fill="#fff" height="64" rx="4" stroke="#7B1FA2" stroke-width="1.4" width="64" x="232" y="30"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="264" y="46">0,8 × 2</text>
+<text fill="#6B7378" font-size="8" text-anchor="middle" x="264" y="60">= 1,6</text>
+<text class="mono" fill="#1565C0" font-size="15" font-weight="700" style="font-size:15px" text-anchor="middle" x="264" y="86">1</text>
+<line stroke="#6B7378" stroke-width="1" x1="296" x2="304" y1="62" y2="62"></line><polygon fill="#6B7378" points="304,62 297.6,64.7 297.6,59.3"></polygon>
+<rect fill="#fff" height="64" rx="4" stroke="#7B1FA2" stroke-width="1.4" width="64" x="304" y="30"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="336" y="46">0,6 × 2</text>
+<text fill="#6B7378" font-size="8" text-anchor="middle" x="336" y="60">= 1,2</text>
+<text class="mono" fill="#1565C0" font-size="15" font-weight="700" style="font-size:15px" text-anchor="middle" x="336" y="86">1</text>
+<line stroke="#6B7378" stroke-width="1" x1="368" x2="376" y1="62" y2="62"></line><polygon fill="#6B7378" points="376,62 369.6,64.7 369.6,59.3"></polygon>
+<rect fill="#fff" height="64" rx="4" stroke="#6B7378" stroke-width="0.8" width="64" x="376" y="30"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="408" y="46">0,2 × 2</text>
+<text fill="#6B7378" font-size="8" text-anchor="middle" x="408" y="60">= 0,4</text>
+<text class="mono" fill="#1565C0" font-size="15" font-weight="700" style="font-size:15px" text-anchor="middle" x="408" y="86">0</text>
+<line stroke="#6B7378" stroke-width="1" x1="440" x2="448" y1="62" y2="62"></line><polygon fill="#6B7378" points="448,62 441.6,64.7 441.6,59.3"></polygon>
+<rect fill="#fff" height="64" rx="4" stroke="#6B7378" stroke-width="0.8" width="64" x="448" y="30"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="480" y="46">0,4 × 2</text>
+<text fill="#6B7378" font-size="8" text-anchor="middle" x="480" y="60">= 0,8</text>
+<text class="mono" fill="#1565C0" font-size="15" font-weight="700" style="font-size:15px" text-anchor="middle" x="480" y="86">0</text>
+<line stroke="#6B7378" stroke-width="1" x1="512" x2="520" y1="62" y2="62"></line><polygon fill="#6B7378" points="520,62 513.6,64.7 513.6,59.3"></polygon>
+<rect fill="#fff" height="64" rx="4" stroke="#6B7378" stroke-width="0.8" width="64" x="520" y="30"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="552" y="46">0,8 × 2</text>
+<text fill="#6B7378" font-size="8" text-anchor="middle" x="552" y="60">= 1,6</text>
+<text class="mono" fill="#1565C0" font-size="15" font-weight="700" style="font-size:15px" text-anchor="middle" x="552" y="86">1</text>
+<text fill="#5D4037" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="22">On multiplie la partie après la virgule par 2 ; la partie entière donne le chiffre binaire suivant.</text>
+<path d="M336,94 v14 H120 v-10" fill="none" stroke="#7B1FA2" stroke-width="1.3"></path>
+<polygon fill="#7B1FA2" points="120,96 116,104 124,104"></polygon>
+<text fill="#7B1FA2" font-size="8.4" font-weight="700" text-anchor="middle" x="228.0" y="122">0,2 revient : le motif 0011 se répète sans fin</text>
+<text class="mono" fill="#2B2F33" font-size="10" style="font-size:10px" text-anchor="start" x="16" y="150">0,1  =  0,0 0011 0011 0011 0011 0011 …  en base 2</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="16" y="172">Le double garde 53 chiffres significatifs et arrondit le reste : …1001 1001 1010 (dernier groupe arrondi vers le haut).</text>
+<text fill="#6B7378" font-size="8.2" font-style="italic" text-anchor="start" x="16" y="192">Comme 1/3 = 0,3333… en décimal : seules les fractions dont le dénominateur est une puissance de 2 tombent juste.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#</span>double a = 0.1 + 0.2;
+Console.WriteLine(a == 0.3);          // False
+Console.WriteLine(a.ToString("R"));   // 0.30000000000000004
+Console.WriteLine(0.5 + 0.25 == 0.75); // True : puissances de 2, exactes</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Ce qui est exact</h3>
+<p>Les entiers jusqu'à 2<sup>53</sup> (9 007 199 254 740 992), et les fractions dont le dénominateur est une puissance de 2 : 0,5, 0,25, 0,375. Leurs sommes et produits restent exacts tant qu'ils tiennent en 53 chiffres binaires.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Ce qui ne l'est pas</h3>
+<p>0,1, 0,2, 0,3, 1/3 : leur écriture binaire ne s'arrête pas. Chacun est arrondi à l'entrée, et l'erreur de la somme 0,1 + 0,2 tombe d'un côté différent de celle de 0,3.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Le même double ne s'affiche pas pareil partout. Sous .NET Framework 4.8 (profil <code>netfx</code>, cours 47), <code>ToString()</code> arrondit à 15 chiffres et montre <code>0.3</code> ; sous .NET Core 3.0 et suivants, il montre la forme la plus courte qui se relit exactement : <code>0.30000000000000004</code>. Le format <code>"R"</code> donne cette forme partout.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 49 · Les nombres à virgule flottante</div>
+</section>
+<!-- ============ PAGE 3 · L'ÉCART ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 2B</b> · Le texte et les nombres</span><b>Cours 49</b></div>
+<p class="rubrique">Schéma 2 · Les graduations s'écartent</p>
+<h2>La précision dépend de la taille</h2>
+<p style="max-width:165mm">L'exposant fait glisser la virgule : les 53 chiffres servent aussi bien autour de 1 qu'autour d'un milliard. L'écart entre deux nombres voisins, qu'on appelle <b>ULP</b>, grandit donc avec la valeur. Le <b>float</b> (32 bits, 24 chiffres binaires) suit la même règle, 2<sup>29</sup> fois plus grossière.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 232" width="100%">
+<rect fill="#EFE9E1" height="232" width="600" x="0" y="0"></rect>
+<text fill="#5D4037" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="22">Écart entre un nombre et son voisin représentable (échelle logarithmique)</text>
+<line stroke="#D8D0C4" stroke-width=".6" x1="120.0" x2="120.0" y1="34" y2="190"></line>
+<text class="mono" fill="#6B7378" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="120.0" y="202">1e-17</text>
+<line stroke="#D8D0C4" stroke-width=".6" x1="183.2" x2="183.2" y1="34" y2="190"></line>
+<text class="mono" fill="#6B7378" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="183.2" y="202">1e-14</text>
+<line stroke="#D8D0C4" stroke-width=".6" x1="246.3" x2="246.3" y1="34" y2="190"></line>
+<text class="mono" fill="#6B7378" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="246.3" y="202">1e-11</text>
+<line stroke="#D8D0C4" stroke-width=".6" x1="309.5" x2="309.5" y1="34" y2="190"></line>
+<text class="mono" fill="#6B7378" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="309.5" y="202">1e-8</text>
+<line stroke="#D8D0C4" stroke-width=".6" x1="372.6" x2="372.6" y1="34" y2="190"></line>
+<text class="mono" fill="#6B7378" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="372.6" y="202">1e-5</text>
+<line stroke="#D8D0C4" stroke-width=".6" x1="435.8" x2="435.8" y1="34" y2="190"></line>
+<text class="mono" fill="#6B7378" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="435.8" y="202">1e-2</text>
+<line stroke="#D8D0C4" stroke-width=".6" x1="498.9" x2="498.9" y1="34" y2="190"></line>
+<text class="mono" fill="#6B7378" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="498.9" y="202">1e1</text>
+<line stroke="#C62828" stroke-dasharray="4 3" stroke-width="1.2" x1="414.7" x2="414.7" y1="30" y2="190"></line>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="end" x="410.7" y="214">0,001 : tolérance Rhino courante</text>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="end" x="110" y="53">1</text>
+<rect fill="#2E7D32" height="9" width="28.3" x="120" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="152.3" y="48">2,2e-16</text>
+<rect fill="#E65100" height="9" width="212.1" x="120" y="51"></rect>
+<rect fill="#EFE9E1" height="10" width="31.6" x="334.1" y="51"></rect>
+<text class="mono" fill="#E65100" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="336.1" y="59">1,2e-7</text>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="end" x="110" y="83">1 000</text>
+<rect fill="#2E7D32" height="9" width="85.4" x="120" y="70"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="209.4" y="78">1,1e-13</text>
+<rect fill="#E65100" height="9" width="269.2" x="120" y="81"></rect>
+<rect fill="#EFE9E1" height="10" width="31.6" x="391.2" y="81"></rect>
+<text class="mono" fill="#E65100" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="393.2" y="89">6,1e-5</text>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="end" x="110" y="113">1 000 000</text>
+<rect fill="#2E7D32" height="9" width="148.7" x="120" y="100"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="272.7" y="108">1,2e-10</text>
+<rect fill="#E65100" height="9" width="332.5" x="120" y="111"></rect>
+<rect fill="#EFE9E1" height="10" width="31.6" x="454.5" y="111"></rect>
+<text class="mono" fill="#E65100" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="456.5" y="119">0,0625</text>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="end" x="110" y="143">6 000 000</text>
+<rect fill="#2E7D32" height="9" width="167.8" x="120" y="130"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="291.8" y="138">9,3e-10</text>
+<rect fill="#E65100" height="9" width="351.6" x="120" y="141"></rect>
+<rect fill="#EFE9E1" height="10" width="17.8" x="473.6" y="141"></rect>
+<text class="mono" fill="#E65100" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="475.6" y="149">0,5</text>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="end" x="110" y="173">1 000 000 000</text>
+<rect fill="#2E7D32" height="9" width="212.1" x="120" y="160"></rect>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="336.1" y="168">1,2e-7</text>
+<rect fill="#E65100" height="9" width="395.9" x="120" y="171"></rect>
+<rect fill="#EFE9E1" height="10" width="13.2" x="517.9" y="171"></rect>
+<text class="mono" fill="#E65100" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="519.9" y="179">64</text>
+<rect fill="#2E7D32" height="8" width="10" x="440" y="208"></rect>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="454" y="215">double</text>
+<rect fill="#E65100" height="8" width="10" x="500" y="208"></rect>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="514" y="215">float</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C# · à 100 000 000 de l'origine</span>double x = 1e8;
+Console.WriteLine((x + 0.1) - x);   // 0.09999999403953552 : 0,1 a perdu 8 chiffres
+Console.WriteLine(Math.BitIncrement(1.0) - 1.0); // 2.220446049250313E-16 (.NET Core 3.0+)</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le calcul est en double</h3>
+<p>RhinoCommon calcule en double : à 6 000 km de l'origine, l'écart reste sous le nanomètre, bien en deçà d'une tolérance de 0,001. La géométrie elle-même ne souffre pas d'un modèle géoréférencé.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>L'affichage, souvent en float</h3>
+<p>Les cartes graphiques travaillent le plus souvent en float. À 6 000 000 m, un float n'a plus qu'une graduation tous les 50 cm : l'affichage tremble ou se crénelle. D'où le conseil classique de modéliser près de l'origine.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    La <b>soustraction de deux nombres voisins</b> efface les chiffres communs et ne laisse que les erreurs (on parle d'annulation). Calculer une petite différence entre deux grandes coordonnées, c'est la placer dans la zone où les graduations sont larges : mieux vaut ramener les points près de l'origine avant.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 49 · Les nombres à virgule flottante</div>
+</section>
+<!-- ============ PAGE 4 · COMPARER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 2B</b> · Le texte et les nombres</span><b>Cours 49</b></div>
+<p class="rubrique">Schéma 3 · Comparer et les valeurs spéciales</p>
+<h2>Une tolérance, et trois valeurs à part</h2>
+<p style="max-width:165mm">Deux doubles « égaux » le sont à une tolérance ε près. Celle-ci peut être <b>absolue</b> (un nombre fixe) ou <b>relative</b> (une fraction de la taille des nombres). Et la norme IEEE 754 réserve trois valeurs qu'on ne compare pas comme les autres.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="168" rx="6" stroke="#1565C0" stroke-width="1.3" width="300" x="16" y="14"></rect>
+<text fill="#1565C0" font-size="9.4" font-weight="700" text-anchor="start" x="28" y="34">Comparer à une tolérance</text>
+<line stroke="#2B2F33" stroke-width="1" x1="36" x2="296" y1="92" y2="92"></line>
+<rect fill="#1565C0" fill-opacity=".12" height="36" stroke="#1565C0" stroke-dasharray="3 2" width="120" x="106" y="74"></rect>
+<line stroke="#2E7D32" stroke-width="2" x1="160" x2="160" y1="80" y2="104"></line>
+<line stroke="#E65100" stroke-width="2" x1="172" x2="172" y1="80" y2="104"></line>
+<text class="mono" fill="#2E7D32" font-size="7.8" style="font-size:7.8px" text-anchor="end" x="160" y="70">0.3</text>
+<text class="mono" fill="#E65100" font-size="7.8" style="font-size:7.8px" text-anchor="start" x="174" y="70">0.1 + 0.2</text>
+<text fill="#1565C0" font-size="8" font-weight="700" text-anchor="middle" x="106" y="124">− ε</text>
+<text fill="#1565C0" font-size="8" font-weight="700" text-anchor="middle" x="226" y="124">+ ε</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" font-weight="700" style="font-size:8.8px" text-anchor="start" x="28" y="148">égaux si  |a − b| ≤ ε</text>
+<text fill="#6B7378" font-size="8" text-anchor="start" x="28" y="166">ε absolu (0,001) ou relatif (1e-12 × la taille)</text>
+<rect fill="#fff" height="50" rx="5" stroke="#C62828" stroke-width="1.3" width="252" x="332" y="14"></rect>
+<text class="mono" fill="#C62828" font-size="14" font-weight="700" style="font-size:14px" text-anchor="middle" x="352" y="45">NaN</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="start" x="378" y="35">0.0 / 0.0, Math.Sqrt(−1)</text>
+<text fill="#C62828" font-size="8" font-weight="700" text-anchor="start" x="378" y="52">NaN == NaN est faux</text>
+<rect fill="#fff" height="50" rx="5" stroke="#E65100" stroke-width="1.3" width="252" x="332" y="72"></rect>
+<text class="mono" fill="#E65100" font-size="14" font-weight="700" style="font-size:14px" text-anchor="middle" x="352" y="103">+∞</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="start" x="378" y="93">1.0 / 0.0</text>
+<text fill="#E65100" font-size="8" font-weight="700" text-anchor="start" x="378" y="110">aucune exception levée</text>
+<rect fill="#fff" height="50" rx="5" stroke="#7B1FA2" stroke-width="1.3" width="252" x="332" y="130"></rect>
+<text class="mono" fill="#7B1FA2" font-size="14" font-weight="700" style="font-size:14px" text-anchor="middle" x="352" y="161">−0</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="start" x="378" y="151">−1.0 × 0.0</text>
+<text fill="#7B1FA2" font-size="8" font-weight="700" text-anchor="start" x="378" y="168">−0.0 == 0.0 est vrai</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#</span>bool egalAbs = Math.Abs(a - b) &lt;= 1e-9;
+bool egalRel = Math.Abs(a - b) &lt;= 1e-12 * Math.Max(Math.Abs(a), Math.Abs(b));
+bool estNaN  = double.IsNaN(x);       // x == double.NaN est TOUJOURS faux
+bool fini    = double.IsFinite(x);    // ni NaN ni infini (.NET Core 2.1+)
+decimal d    = 0.1m + 0.2m;           // 0.3 exactement : base 10</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Absolue ou relative</h3>
+<p>Une tolérance absolue convient quand l'ordre de grandeur est connu : des longueurs en mm, une tolérance de 0,001. Une tolérance relative suit la taille des nombres, ce qui compte si une même comparaison voit passer 0,5 et 5 000 000.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>float, double, decimal</h3>
+<p><code>float</code> : 32 bits, environ 7 chiffres. <code>double</code> : 64 bits, 15 à 17 chiffres, le type de RhinoCommon. <code>decimal</code> : 128 bits en base 10, 28 à 29 chiffres, exact pour 0,1, fait pour l'argent ; plus lent, et inutile en géométrie.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    NaN se propage en silence : <code>Math.Sqrt(-1)</code> vaut NaN, puis toute opération qui le touche aussi, sans exception levée. Et <code>1 / 0</code> en entiers lève <code>DivideByZeroException</code>, mais <code>1.0 / 0.0</code> rend +∞. Une entrée utilisateur se teste donc avant le calcul.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 49 · Les nombres à virgule flottante</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 2B</b> · Le texte et les nombres</span><b>Cours 49</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Tolérances et gardes</h2>
+<p style="max-width:165mm">Tes dépôts appliquent déjà les trois réflexes : comparer à une tolérance, prendre celle du document Rhino, et refuser NaN et l'infini avant de calculer.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">magpie/plugin/Core/GenericChecker.cs</span></div>
+<div class="l k1"><span class="n">375</span><span class="kw">bool</span> ok = Math.Abs(values[0]<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n"> </span>  - _definition.ExpectedNumbers.First()) &lt; <span class="nb">1e-9</span>;</div>
+<div class="l"><span class="cm">magpie/plugin/Core/ComparaisonGeometrie.cs</span></div>
+<div class="l k2"><span class="n">97</span><span class="kw">var</span> doc = Rhino.RhinoDoc.ActiveDoc;<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">98</span><span class="kw">return</span> doc != <span class="kw">null</span> ? doc.ModelAbsoluteTolerance : <span class="nb">0.001</span>;</div>
+<div class="l"><span class="cm">SnapSet/…/Pur/ModeleJauge.cs</span></div>
+<div class="l k4"><span class="n">130</span>+ maximum.ToString(<span class="st">"R"</span>, CultureInfo.InvariantCulture)<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">134</span><span class="kw">private static bool</span> SontFinies(<span class="kw">double</span> a, <span class="kw">double</span> b)<span class="rep r4">4</span></div>
+<div class="l k3"><span class="n">136</span> <span class="kw">return</span> !<span class="kw">double</span>.IsNaN(a) &amp;&amp; !<span class="kw">double</span>.IsInfinity(a) …</div>
+<div class="l"><span class="cm">SnapSet/…/Pur/ModeleCurseur.cs</span></div>
+<div class="l k5"><span class="n">188</span><span class="kw">public static decimal</span> VersDecimal(<span class="kw">double</span> d)<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">190</span> <span class="kw">if</span> (<span class="kw">double</span>.IsNaN(d)) <span class="kw">return</span> <span class="nb">0m</span>;</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Tolérance absolue</b>Une réponse numérique est juste à 1e-9 près.</li>
+<li><span class="rep r2">2</span><b>Celle du document</b>Et 0,001 sous Rhino Compute, sans document.</li>
+<li><span class="rep r3">3</span><b>Format « R »</b>Le message d'erreur montre la valeur exacte.</li>
+<li><span class="rep r4">4</span><b>Garde avant calcul</b><code>double.IsFinite</code> n'existe pas en net48.</li>
+<li><span class="rep r5">5</span><b>Vers decimal</b>NaN n'a pas d'équivalent : on choisit 0.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller</span>
+    Le <code>1e-9</code> de GenericChecker est absolu. Pour une réponse attendue autour de 1 000 000 000 (une aire en mm², par exemple), l'écart entre deux doubles voisins vaut déjà 1,2e-7 : seule une valeur calculée exactement de la même façon passera. Une tolérance relative ferait le même travail à toutes les échelles.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 49 · Les nombres à virgule flottante</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 2B</b> · Le texte et les nombres</span><b>Cours 49</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">Math.Abs(a - b) &lt; 1e-9</td><td>égalité à tolérance absolue</td><td>GenericChecker.cs:375</td></tr>
+<tr><td class="c">doc.ModelAbsoluteTolerance</td><td>la tolérance du document Rhino</td><td>ComparaisonGeometrie.cs:98</td></tr>
+<tr><td class="c">double.IsNaN(x)</td><td>seul test fiable de NaN</td><td>ModeleJauge.cs:136</td></tr>
+<tr><td class="c">x.ToString("R")</td><td>afficher la valeur exacte</td><td>ModeleJauge.cs:130</td></tr>
+<tr><td class="c">(decimal) et 0m</td><td>passer en base 10</td><td>ModeleCurseur.cs:188–190</td></tr>
+<tr><td class="c">Math.BitIncrement(x) - x</td><td>l'écart au voisin (ULP)</td><td>exemple page 3</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Virgule flottante</dt><dd>Un nombre écrit comme une mantisse fois une puissance de 2 (norme IEEE 754).</dd>
+<dt>Mantisse</dt><dd>Les chiffres significatifs du nombre : 53 en binaire pour un double.</dd>
+<dt>ULP</dt><dd>L'écart entre un nombre flottant et son voisin ; il grandit avec la valeur.</dd>
+<dt>NaN</dt><dd>« Not a Number » : le résultat d'un calcul indéfini, jamais égal à lui-même.</dd>
+<dt>Annulation</dt><dd>La perte de chiffres quand on soustrait deux nombres très proches.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 56</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 49 · Les nombres à virgule flottante</div>
+</section>
+</body>
+</html>

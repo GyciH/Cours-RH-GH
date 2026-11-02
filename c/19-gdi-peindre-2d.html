@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>19 · GDI+ : peindre en 2D</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-6">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 19</b></div>
+<p class="rubrique">Le concept</p>
+<h1>GDI+ :<br/>peindre en 2D</h1>
+<p class="chapeau">Chaque bouton, chaque jauge de SnapSet est peint à la main, couche après couche, sur la surface que Grasshopper prête : fonds, formes, texte, contours.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>01</b> C# moderne · <b>07</b> plugin Grasshopper</span>
+<span class="pastille">Exemples · <b>PeintreFeuilles</b>, <b>MesureurGdi</b> (SnapSet)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 150" width="100%">
+<text fill="#2F6B3A" font-size="11.5" font-weight="700" text-anchor="middle" x="300" y="30">La Jauge de SnapSet, peinte en cinq couches</text>
+<defs><clippath id="pistea0"><rect height="22.0" rx="2.0" width="96.0" x="14.0" y="70.0"></rect></clippath>
+<clippath id="bara0"><rect height="22.0" width="74.0" x="14.0" y="70.0"></rect></clippath>
+<clippath id="horsa0"><rect height="22.0" width="22.0" x="88.0" y="70.0"></rect></clippath>
+<lineargradient id="gra0" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F2F2F2"></stop><stop offset="1" stop-color="#C9C9C9"></stop></lineargradient></defs>
+<rect fill="url(#gra0)" height="22.0" rx="2.0" width="96.0" x="14.0" y="70.0"></rect>
+<text fill="#2B2F33" font-size="10" text-anchor="middle" x="62.0" y="118">1 · le fond</text>
+<text fill="#2F6B3A" font-size="14" font-weight="700" text-anchor="middle" x="118.0" y="86">›</text>
+<defs><clippath id="pistea1"><rect height="22.0" rx="2.0" width="96.0" x="130.0" y="70.0"></rect></clippath>
+<clippath id="bara1"><rect height="22.0" width="74.0" x="130.0" y="70.0"></rect></clippath>
+<clippath id="horsa1"><rect height="22.0" width="22.0" x="204.0" y="70.0"></rect></clippath>
+<lineargradient id="gra1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F2F2F2"></stop><stop offset="1" stop-color="#C9C9C9"></stop></lineargradient></defs>
+<rect fill="url(#gra1)" height="22.0" rx="2.0" width="96.0" x="130.0" y="70.0"></rect>
+<rect clip-path="url(#pistea1)" fill="#4A4A4A" height="22.0" width="74.0" x="130.0" y="70.0"></rect>
+<text fill="#2B2F33" font-size="10" text-anchor="middle" x="178.0" y="118">2 · la barre</text>
+<text fill="#2F6B3A" font-size="14" font-weight="700" text-anchor="middle" x="234.0" y="86">›</text>
+<defs><clippath id="pistea2"><rect height="22.0" rx="2.0" width="96.0" x="246.0" y="70.0"></rect></clippath>
+<clippath id="bara2"><rect height="22.0" width="74.0" x="246.0" y="70.0"></rect></clippath>
+<clippath id="horsa2"><rect height="22.0" width="22.0" x="320.0" y="70.0"></rect></clippath>
+<lineargradient id="gra2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F2F2F2"></stop><stop offset="1" stop-color="#C9C9C9"></stop></lineargradient></defs>
+<rect fill="url(#gra2)" height="22.0" rx="2.0" width="96.0" x="246.0" y="70.0"></rect>
+<rect clip-path="url(#pistea2)" fill="#4A4A4A" height="22.0" width="74.0" x="246.0" y="70.0"></rect>
+<text clip-path="url(#horsa2)" fill="#1E1E1E" font-size="11.0" font-weight="700" text-anchor="end" x="338.0" y="85.0">78 %</text>
+<text fill="#2B2F33" font-size="10" text-anchor="middle" x="294.0" y="118">3 · texte hors barre</text>
+<text fill="#2F6B3A" font-size="14" font-weight="700" text-anchor="middle" x="350.0" y="86">›</text>
+<defs><clippath id="pistea3"><rect height="22.0" rx="2.0" width="96.0" x="362.0" y="70.0"></rect></clippath>
+<clippath id="bara3"><rect height="22.0" width="74.0" x="362.0" y="70.0"></rect></clippath>
+<clippath id="horsa3"><rect height="22.0" width="22.0" x="436.0" y="70.0"></rect></clippath>
+<lineargradient id="gra3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F2F2F2"></stop><stop offset="1" stop-color="#C9C9C9"></stop></lineargradient></defs>
+<rect fill="url(#gra3)" height="22.0" rx="2.0" width="96.0" x="362.0" y="70.0"></rect>
+<rect clip-path="url(#pistea3)" fill="#4A4A4A" height="22.0" width="74.0" x="362.0" y="70.0"></rect>
+<text clip-path="url(#horsa3)" fill="#1E1E1E" font-size="11.0" font-weight="700" text-anchor="end" x="454.0" y="85.0">78 %</text>
+<text clip-path="url(#bara3)" fill="#F2F2F2" font-size="11.0" font-weight="700" text-anchor="end" x="454.0" y="85.0">78 %</text>
+<text fill="#2B2F33" font-size="10" text-anchor="middle" x="410.0" y="118">4 · texte sur la barre</text>
+<text fill="#2F6B3A" font-size="14" font-weight="700" text-anchor="middle" x="466.0" y="86">›</text>
+<defs><clippath id="pistea4"><rect height="22.0" rx="2.0" width="96.0" x="478.0" y="70.0"></rect></clippath>
+<clippath id="bara4"><rect height="22.0" width="74.0" x="478.0" y="70.0"></rect></clippath>
+<clippath id="horsa4"><rect height="22.0" width="22.0" x="552.0" y="70.0"></rect></clippath>
+<lineargradient id="gra4" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F2F2F2"></stop><stop offset="1" stop-color="#C9C9C9"></stop></lineargradient></defs>
+<rect fill="url(#gra4)" height="22.0" rx="2.0" width="96.0" x="478.0" y="70.0"></rect>
+<rect clip-path="url(#pistea4)" fill="#4A4A4A" height="22.0" width="74.0" x="478.0" y="70.0"></rect>
+<text clip-path="url(#horsa4)" fill="#1E1E1E" font-size="11.0" font-weight="700" text-anchor="end" x="570.0" y="85.0">78 %</text>
+<text clip-path="url(#bara4)" fill="#F2F2F2" font-size="11.0" font-weight="700" text-anchor="end" x="570.0" y="85.0">78 %</text>
+<rect fill="none" height="22.0" rx="2.0" stroke="#1E1E1E" stroke-width="1.0" width="96.0" x="478.0" y="70.0"></rect>
+<text fill="#2B2F33" font-size="10" text-anchor="middle" x="526.0" y="118">5 · le contour</text>
+<text fill="#2B2F33" font-size="10" text-anchor="middle" x="300" y="142">Ce qui est peint plus tard recouvre ce qui est peint avant : l'ordre des appels est l'ordre des couches.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p><b>GDI+</b> est l'API de dessin 2D de .NET (<code>System.Drawing</code>). On reçoit un <code>Graphics</code>, la surface et ses réglages, et on y peint avec des <b>pinceaux</b> qui remplissent et des <b>stylos</b> qui tracent.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Le peintre en bâtiment. Le rouleau remplit les surfaces, le pinceau fin trace les bords, et le ruban de masquage protège ce qui ne doit pas être peint. Dans GDI+, ce ruban s'appelle le <i>clip</i>.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>peindre formes, chemins et texte avec <code>Brush</code>, <code>Pen</code> et <code>GraphicsPath</code> ;</li>
+<li>libérer les ressources avec <code>using</code> et rendre le <code>Graphics</code> dans l'état reçu ;</li>
+<li>mesurer un texte pour que ce qui est mesuré soit exactement ce qui est peint.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Le <code>Graphics</code> ne t'appartient pas : Grasshopper le prête pour peindre tout le canvas. Tout réglage que tu changes (lissage, découpe), tu le remets comme tu l'as trouvé avant de rendre la main.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 19 · GDI+ : peindre en 2D</div>
+</section>
+<!-- ============ PAGE 2 · LES OUTILS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 19</b></div>
+<p class="rubrique">Schéma 1 · Repère, pinceau, stylo, pixels</p>
+<h2>La surface et ses trois réflexes</h2>
+<p style="max-width:165mm">Trois choses à avoir en tête avant le premier appel : où est l'origine, ce que fait un stylo sur un bord, et comment un nombre à virgule devient des pixels.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 240" width="100%">
+<rect fill="#EFE9E1" height="240" width="190" x="0" y="0"></rect><rect fill="#EFE9E1" height="240" width="190" x="205" y="0"></rect><rect fill="#EFE9E1" height="240" width="190" x="410" y="0"></rect>
+<text fill="#2F6B3A" font-size="12" font-weight="800" x="12" y="22">Le repère</text>
+<text fill="#2F6B3A" font-size="12" font-weight="800" x="217" y="22">Pinceau et stylo</text>
+<text fill="#2F6B3A" font-size="12" font-weight="800" x="422" y="22">La grille de pixels</text>
+<!-- repère -->
+<defs><marker id="f19" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+<line marker-end="url(#f19)" stroke="#2B2F33" stroke-width="1.4" x1="30" x2="165" y1="50" y2="50"></line>
+<line marker-end="url(#f19)" stroke="#2B2F33" stroke-width="1.4" x1="30" x2="30" y1="50" y2="180"></line>
+<circle cx="30" cy="50" fill="#2F6B3A" r="3.5"></circle>
+<circle cx="110" cy="120" fill="#E65100" r="4"></circle>
+<line stroke="#B5AEA5" stroke-dasharray="3 2" x1="110" x2="110" y1="50" y2="120"></line><line stroke="#B5AEA5" stroke-dasharray="3 2" x1="30" x2="110" y1="120" y2="120"></line>
+<g class="mono" fill="#2B2F33">
+<text class="mono" style="font-size:9.5px" x="156" y="44">x</text><text class="mono" style="font-size:9.5px" x="38" y="180">y</text>
+<text class="mono" fill="#2F6B3A" style="font-size:9px" x="36" y="44">(0, 0)</text>
+<text class="mono" fill="#E65100" style="font-size:9px" x="116" y="134">(80, 70)</text>
+</g>
+<g fill="#2B2F33" font-size="9.5"><text x="12" y="208">Origine en haut à gauche,</text><text x="12" y="222">y vers le bas : l'inverse de Rhino.</text></g>
+<!-- pinceau et stylo -->
+<rect fill="#2F6B3A" fill-opacity=".75" height="50" width="60" x="232" y="50"></rect>
+<rect fill="none" height="40" stroke="#2B2F33" stroke-opacity=".55" stroke-width="10" width="56" x="312" y="56"></rect>
+<rect fill="none" height="40" stroke="#E65100" stroke-dasharray="3 2" stroke-width="1" width="56" x="312" y="56"></rect>
+<g class="mono" fill="#2B2F33" text-anchor="middle">
+<text class="mono" style="font-size:8.5px" x="262" y="118">FillRectangle</text><text class="mono" style="font-size:8.5px" x="262" y="130">(brush, r)</text>
+<text class="mono" style="font-size:8.5px" x="340" y="118">DrawRectangle</text><text class="mono" style="font-size:8.5px" x="340" y="130">(pen, r)</text>
+</g>
+<g fill="#2B2F33" font-size="9.5"><text x="217" y="166">Le pinceau remplit l'intérieur.</text><text x="217" y="180">Le stylo est centré sur le bord</text><text x="217" y="194">(tirets orange) : une moitié</text><text x="217" y="208">de son épaisseur déborde</text><text x="217" y="222">à l'extérieur.</text></g>
+<!-- pixels -->
+<g stroke="#D8D0C6" stroke-width="1">
+<line x1="430" x2="580" y1="40" y2="40"></line><line x1="430" x2="580" y1="65" y2="65"></line><line x1="430" x2="580" y1="90" y2="90"></line><line x1="430" x2="580" y1="115" y2="115"></line><line x1="430" x2="580" y1="140" y2="140"></line><line x1="430" x2="580" y1="165" y2="165"></line>
+</g>
+<rect fill="#2B2F33" height="25" width="70" x="430" y="65"></rect>
+<rect fill="#2B2F33" fill-opacity=".4" height="25" width="70" x="510" y="65"></rect><rect fill="#2B2F33" fill-opacity=".6" height="25" width="70" x="510" y="90"></rect>
+<line stroke="#E65100" stroke-dasharray="3 2" x1="510" x2="580" y1="80" y2="80"></line><line stroke="#E65100" stroke-dasharray="3 2" x1="510" x2="580" y1="105" y2="105"></line>
+<g class="mono" fill="#2B2F33" text-anchor="middle"><text class="mono" style="font-size:8.5px" x="465" y="182">y = 20</text><text class="mono" style="font-size:8.5px" x="545" y="182">y = 20,6</text></g>
+<g fill="#2B2F33" font-size="9.5"><text x="422" y="208">Un filet de 1 calé sur un entier :</text><text x="422" y="222">une ligne nette. À 20,6 : deux grises.</text></g>
+</svg>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>using : rendre les outils</h3>
+<p>Un <code>SolidBrush</code>, un <code>Pen</code>, une police tiennent des ressources de Windows. <code>using (var pinceau = new SolidBrush(c)) { … }</code> les libère dès la sortie du bloc, même en cas d'exception. Exception : les polices du mesureur, gardées en cache et jamais libérées.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Lisser, ou pas</h3>
+<p><code>SmoothingMode.AntiAlias</code> adoucit les bords obliques et courbes en teintant les pixels partiels : parfait pour la coche d'une Case. Pour un filet horizontal, SnapSet coupe le lissage et cale la boîte sur les entiers (<code>FiletCale</code>) : une seule ligne nette.</p>
+</div>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">PeintreFeuilles.cs · 200–207</span>var lissage = g.SmoothingMode;
+g.SmoothingMode = SmoothingMode.AntiAlias;
+using (var pinceau = new SolidBrush(style.Text))
+{
+    g.FillPolygon(pinceau, points);
+}
+g.SmoothingMode = lissage;</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Changer un réglage sans le remettre. Si la Case laissait <code>SmoothingMode.AntiAlias</code>, tout ce que Grasshopper peindrait ensuite sur le canvas serait lissé, fils et composants compris. D'où le motif de trois lignes : noter, changer, rétablir.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 19 · GDI+ : peindre en 2D</div>
+</section>
+<!-- ============ PAGE 3 · CHEMINS ET DÉCOUPE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 19</b></div>
+<p class="rubrique">Schéma 2 · Chemins et découpe</p>
+<h2>Peindre une forme, puis peindre dedans</h2>
+<p style="max-width:165mm">Un <code>GraphicsPath</code> est une forme faite de segments et d'arcs ; on peut la remplir, la tracer, ou s'en servir comme <b>découpe</b> : tout ce qui est peint ensuite est rogné à sa forme. La Jauge s'en sert deux fois.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 220" width="100%">
+<rect fill="#EFE9E1" height="220" width="600" x="0" y="0"></rect>
+<defs><clippath id="pisteb"><rect height="48.4" rx="4.4" width="211.2" x="40.0" y="60.0"></rect></clippath>
+<clippath id="barb"><rect height="48.4" width="162.8" x="40.0" y="60.0"></rect></clippath>
+<clippath id="horsb"><rect height="48.4" width="48.4" x="202.8" y="60.0"></rect></clippath>
+<lineargradient id="grb" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F2F2F2"></stop><stop offset="1" stop-color="#C9C9C9"></stop></lineargradient></defs>
+<rect fill="url(#grb)" height="48.4" rx="4.4" width="211.2" x="40.0" y="60.0"></rect>
+<rect clip-path="url(#pisteb)" fill="#4A4A4A" height="48.4" width="162.8" x="40.0" y="60.0"></rect>
+<text clip-path="url(#horsb)" fill="#1E1E1E" font-size="24.2" font-weight="700" text-anchor="end" x="242.4" y="92.9">78 %</text>
+<text clip-path="url(#barb)" fill="#F2F2F2" font-size="24.2" font-weight="700" text-anchor="end" x="242.4" y="92.9">78 %</text>
+<rect fill="none" height="48.4" rx="4.4" stroke="#1E1E1E" stroke-width="2.2" width="211.2" x="40.0" y="60.0"></rect>
+<rect fill="none" height="48.4" stroke="#2F6B3A" stroke-dasharray="5 3" stroke-width="1.5" width="163.2" x="40" y="60"></rect>
+<rect fill="none" height="48.4" stroke="#E65100" stroke-dasharray="5 3" stroke-width="1.5" width="48" x="203.2" y="60"></rect>
+<g fill="#2B2F33" font-size="9.5">
+<text fill="#2F6B3A" font-weight="700" x="40" y="44">la barre : IntersectClip(barre)</text>
+<text fill="#E65100" font-weight="700" text-anchor="end" x="252" y="134">le reste : ExcludeClip(barre)</text>
+<text x="40" y="160">Les mêmes lettres sont peintes deux fois, chaque fois</text>
+<text x="40" y="174">dans une découpe différente : sombres hors de la barre,</text>
+<text x="40" y="188">claires dessus. Ici, la limite traverse le « 8 ».</text>
+</g>
+<g fill="#2B2F33" font-size="10">
+<text fill="#2F6B3A" font-weight="700" x="300" y="44">L'ordre exact de PeindreJauge</text>
+<text x="300" y="66">1. fond de la piste : RenderBackground</text>
+<text x="300" y="84">2. g.Save() ; SetClip(forme de la piste)</text>
+<text x="300" y="102">3. la barre, rognée aux coins arrondis</text>
+<text x="300" y="120">4. texte, découpe sans la barre : canal Text</text>
+<text x="300" y="138">5. texte, découpe sur la barre : canal Fill</text>
+<text x="300" y="156">6. g.Restore(etat) : découpe d'origine</text>
+<text x="300" y="174">7. contour : RenderOutlines</text>
+</g>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">PeintreFeuilles.cs · 600–618, accolades retirées</span>var horsBarre = g.Save();
+using (var zoneBarre = new Region(barre))
+    g.ExcludeClip(zoneBarre);
+using (var pinceau = new SolidBrush(style.Text))
+    g.DrawString(texte, police, pinceau, zoneTexte, format);
+g.Restore(horsBarre);
+if (barre.Width &gt; 0f)
+{
+    g.IntersectClip(barre);
+    using (var pinceau = new SolidBrush(style.Fill))
+        g.DrawString(texte, police, pinceau, zoneTexte, format);
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Save et Restore</h3>
+<p><code>g.Save()</code> rend un <code>GraphicsState</code> : un instantané de la découpe, des transformations et des réglages. <code>g.Restore(etat)</code> y revient. On peut les emboîter : <code>horsBarre</code> vit à l'intérieur de <code>etat</code>. Le <code>try / finally</code> autour garantit le retour, même sur une erreur.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>La forme de la capsule</h3>
+<p><code>capsule.OutlineShape</code> est le <code>GraphicsPath</code> que Grasshopper construit pour la boîte arrondie. SnapSet ne le refait pas : il le remplit (<code>FillPath</code>, bouton enfoncé) ou s'en sert de découpe (Jauge).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Coder l'information par la seule couleur. La Jauge se lit à la <b>longueur</b> de la barre, et au texte s'il est montré ; la double passe garde ce texte lisible des deux côtés. C'est une règle d'accessibilité de SnapSet, écrite dans l'en-tête de <code>PeindreJauge</code>.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 19 · GDI+ : peindre en 2D</div>
+</section>
+<!-- ============ PAGE 4 · LE TEXTE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 19</b></div>
+<p class="rubrique">Schéma 3 · Mesurer et peindre le texte</p>
+<h2>Ce qui est mesuré est ce qui est peint</h2>
+<p style="max-width:165mm">SnapSet ne rogne jamais : la boîte d'un libellé vient de la <b>mesure</b> de son texte. Cette promesse ne tient que si la mesure et la peinture emploient la même police, le même format et la même résolution.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 230" width="100%">
+<rect fill="#EFE9E1" height="230" width="292" x="0" y="0"></rect><rect fill="#EFE9E1" height="230" width="292" x="308" y="0"></rect>
+<text fill="#2F6B3A" font-size="12" font-weight="800" x="14" y="22">Le StringFormat partagé</text>
+<text fill="#2F6B3A" font-size="12" font-weight="800" x="322" y="22">Points ou pixels ?</text>
+<!-- formats -->
+<g fill="#2B2F33" font-size="10.5">
+<rect fill="#fff" height="26" stroke="#B5AEA5" width="250" x="20" y="40"></rect><text x="26" y="57">Near : collé à gauche</text>
+<rect fill="#fff" height="26" stroke="#B5AEA5" width="250" x="20" y="74"></rect><text text-anchor="middle" x="145" y="91">Center : au milieu</text>
+<rect fill="#fff" height="26" stroke="#B5AEA5" width="250" x="20" y="108"></rect><text text-anchor="end" x="264" y="125">Far : libellé d'une sortie</text>
+<rect fill="#fff" height="26" stroke="#B5AEA5" width="150" x="20" y="142"></rect><text x="26" y="159">NoWrap, Ellipsis : un libel…</text>
+</g>
+<g fill="#2B2F33" font-size="9.5"><text x="14" y="192">LineAlignment = Center : centré en hauteur.</text><text x="14" y="206">La dernière boîte est trop étroite : l'ellipse</text><text x="14" y="220">l'annonce. Avec la mesure, elle n'arrive jamais.</text></g>
+<!-- points/pixels -->
+<g fill="#2B2F33" font-size="9.5">
+<text font-weight="700" x="322" y="46">Mesure : bitmap à 96 ppp</text>
+<rect fill="#fff" height="24" stroke="#2F6B3A" stroke-width="1.4" width="58" x="322" y="54"></rect><text font-size="13" x="328" y="71">Valider</text>
+<text x="392" y="70">boîte : 12 px de police</text>
+<text font-weight="700" x="322" y="104">Peinture : écran à 144 ppp</text>
+<rect fill="#fff" height="24" stroke="#C62828" stroke-width="1.4" width="58" x="322" y="112"></rect>
+<clippath id="rog19"><rect height="24" width="58" x="322" y="112"></rect></clippath>
+<text clip-path="url(#rog19)" fill="#C62828" font-size="19.5" x="326" y="132">Valider</text>
+<text fill="#C62828" x="392" y="122">police en points : 18 px,</text><text fill="#C62828" x="392" y="136">texte rogné</text>
+<rect fill="#fff" height="24" stroke="#2F6B3A" stroke-width="1.4" width="58" x="322" y="150"></rect><text font-size="13" x="328" y="167">Valider</text>
+<text fill="#2F6B3A" x="392" y="160">police en pixels : 12 px</text><text fill="#2F6B3A" x="392" y="174">partout, boîte juste</text>
+<text x="322" y="206">9 pt × 96 / 72 = 12 px ; MesureurGdi crée ses</text>
+<text x="322" y="220">polices avec GraphicsUnit.Pixel (ligne 125).</text>
+</g>
+</svg>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Deux passes, la plus grande</h3>
+<p>Le canvas peint le texte en ClearType au zoom 1 exactement, et en AntiAlias ailleurs. Le calage de ClearType sur la grille peut élargir un mot de quelques dixièmes de pixel. MesureurGdi mesure donc avec les deux réglages et garde le maximum, puis arrondit la largeur au supérieur.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le texte vide</h3>
+<p><code>MeasureString("")</code> rend 0 × 0 : un bouton sans libellé aurait une boîte sans hauteur. <code>Metrique.TexteAMesurer</code> remplace un texte vide par une espace, qui mesure environ 3,6 × 14,3 en Verdana 8 (relevé noté dans <code>Metrique.cs</code>).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Mesurer avec un format et peindre avec un autre. Un <code>StringFormat</code> sans <code>NoWrap</code> à la mesure, avec à la peinture, et la boîte n'a plus la bonne hauteur. MesureurGdi expose ses formats (<code>FormatPeinture</code>, <code>FormatBloc</code>, <code>FormatZone</code>) pour que PeintreFeuilles peigne avec les mêmes.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 19 · GDI+ : peindre en 2D</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 19</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>MesureurGdi.cs : mesurer une ligne</h2>
+<p style="max-width:165mm"><code>MesurerChaine</code> sert à la mise en page de la conception comme au code généré. Elle ne dépend pas de Grasshopper : les tests l'emploient avec une police du système.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">134</span><span class="kw">public</span> <span class="ty">SizeF</span> MesurerChaine(<span class="kw">string</span> texte,</div>
+<div class="l"><span class="n"> </span> <span class="kw">float</span> taillePoints, <span class="kw">bool</span> gras)</div>
+<div class="l"><span class="n">135</span>{</div>
+<div class="l k1"><span class="n">136</span> <span class="kw">string</span> chaine = <span class="ty">Metrique</span>.TexteAMesurer(texte);<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">137</span> <span class="kw">string</span> cle = chaine + <span class="st">"\u0001"</span><span class="rep r2">2</span></div>
+<div class="l k2"><span class="n"> </span>    + taillePoints.ToString(<span class="st">"R"</span>, ...)</div>
+<div class="l k2"><span class="n"> </span>    + (gras ? <span class="st">"g"</span> : <span class="st">"r"</span>);</div>
+<div class="l k3"><span class="n">138</span> <span class="kw">lock</span> (_verrou)<span class="rep r3">3</span></div>
+<div class="l"><span class="n">139</span>  {</div>
+<div class="l k2"><span class="n">140</span> <span class="kw">if</span> (_mesures.TryGetValue(cle, <span class="kw">out var</span> deja))</div>
+<div class="l k2"><span class="n"> </span> <span class="kw">return</span> deja;</div>
+<div class="l k4"><span class="n">142</span> <span class="kw">var</span> police = Police(taillePoints, gras);<span class="rep r4">4</span></div>
+<div class="l"><span class="n">143</span> <span class="ty">SizeF</span> brute;</div>
+<div class="l k5"><span class="n">144</span> <span class="kw">using</span> (<span class="kw">var</span> bitmap = <span class="kw">new</span> <span class="ty">Bitmap</span>(1, 1))<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">145</span> <span class="kw">using</span> (<span class="kw">var</span> g = <span class="ty">Graphics</span>.FromImage(bitmap))</div>
+<div class="l"><span class="n">146</span>    {</div>
+<div class="l k6"><span class="n">147</span>      g.TextRenderingHint = <span class="ty">TextRenderingHint</span>.AntiAlias;<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">148</span> <span class="kw">var</span> a = g.MeasureString(chaine, police,</div>
+<div class="l k6"><span class="n"> </span> <span class="kw">int</span>.MaxValue, _formatCentre);</div>
+<div class="l k6"><span class="n">149</span>      g.TextRenderingHint =</div>
+<div class="l k6"><span class="n"> </span> <span class="ty">TextRenderingHint</span>.ClearTypeGridFit;</div>
+<div class="l k6"><span class="n">150</span> <span class="kw">var</span> b = g.MeasureString(chaine, police,</div>
+<div class="l k6"><span class="n"> </span> <span class="kw">int</span>.MaxValue, _formatCentre);</div>
+<div class="l k6"><span class="n">151</span>      brute = <span class="kw">new</span> <span class="ty">SizeF</span>(<span class="ty">Math</span>.Max(a.Width, b.Width),</div>
+<div class="l k6"><span class="n"> </span> <span class="ty">Math</span>.Max(a.Height, b.Height));</div>
+<div class="l"><span class="n">152</span>    }</div>
+<div class="l k7"><span class="n">154</span> <span class="kw">var</span> mesure = <span class="kw">new</span> <span class="ty">SizeF</span>(<span class="ty">Metrique</span><span class="rep r7">7</span></div>
+<div class="l k7"><span class="n"> </span>      .ArrondirLargeurMesuree(brute.Width), brute.Height);</div>
+<div class="l k2"><span class="n">155</span>    _mesures[cle] = mesure;</div>
+<div class="l"><span class="n">156</span> <span class="kw">return</span> mesure;</div>
+<div class="l"><span class="n">157</span>  }</div>
+<div class="l"><span class="n">158</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Jamais vide</b>Un texte vide devient une espace (page 4).</li>
+<li><span class="rep r2">2</span><b>Le cache</b>Même texte, même taille, même graisse : même mesure, calculée une seule fois puis rangée.</li>
+<li><span class="rep r3">3</span><b>Le verrou</b>Protège les deux dictionnaires si deux fils mesurent en même temps.</li>
+<li><span class="rep r4">4</span><b>La police de la peinture</b>En pixels, elle aussi en cache : celle que PeintreFeuilles emploiera.</li>
+<li><span class="rep r5">5</span><b>Une surface de mesure</b>Un bitmap de 1 × 1 suffit à obtenir un <code>Graphics</code> ; les deux <code>using</code> les libèrent.</li>
+<li><span class="rep r6">6</span><b>Deux passes</b>AntiAlias puis ClearType, avec le format de la peinture ; on garde le plus grand.</li>
+<li><span class="rep r7">7</span><b>Au supérieur</b>Une largeur entière, jamais plus étroite que le texte.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Pourquoi une règle d'arrondi « écrite une fois »</span>
+<code>ArrondirLargeurMesuree</code> vit dans <code>schema/Metrique.cs</code>, qui n'a aucune dépendance GDI+. Chaque hôte mesure avec son propre <code>Graphics</code>, mais tous arrondissent par cette même fonction : la conception et le code généré ne peuvent pas se désaccorder.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 19 · GDI+ : peindre en 2D</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 6A</b> · Dessiner sur le canvas</span><b>Cours 19</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">using (var p = new SolidBrush(c))</td><td>un pinceau, libéré en sortie</td><td>PeintreFeuilles:202</td></tr>
+<tr><td class="c">g.SmoothingMode = SmoothingMode.AntiAlias</td><td>lisser les bords</td><td>PeintreFeuilles:201</td></tr>
+<tr><td class="c">g.FillPath(pinceau, capsule.OutlineShape)</td><td>remplir un chemin</td><td>PeintreFeuilles:145</td></tr>
+<tr><td class="c">var etat = g.Save(); … g.Restore(etat);</td><td>retrouver l'état du Graphics</td><td>PeintreFeuilles:584</td></tr>
+<tr><td class="c">new Font(f, t, s, GraphicsUnit.Pixel)</td><td>une police en pixels</td><td>MesureurGdi:125</td></tr>
+<tr><td class="c">g.MeasureString(s, police, int.MaxValue, fmt)</td><td>la taille d'un texte</td><td>MesureurGdi:148</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Graphics</dt><dd>La surface de dessin et ses réglages : lissage, découpe, transformations.</dd>
+<dt>Pinceau</dt><dd>Un <code>Brush</code> : ce qui remplit une forme ou un texte.</dd>
+<dt>Stylo</dt><dd>Un <code>Pen</code> : ce qui trace un contour, avec une épaisseur.</dd>
+<dt>Découpe</dt><dd>Le <i>clip</i> : la zone hors de laquelle rien ne se peint.</dd>
+<dt>Anticrénelage</dt><dd>Teinter les pixels partiels pour adoucir les bords.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 20</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 19 · GDI+ : peindre en 2D</div>
+</section>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>07 · Anatomie d'un plugin Grasshopper</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 07</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Anatomie d'un plugin<br/>Grasshopper</h1>
+<p class="chapeau">Comment Grasshopper trouve ton code au démarrage, et comment une classe C# devient un composant posé sur le canvas.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>02</b> héritage · <b>04</b> .NET et assemblies · <b>05</b> csproj</span>
+<span class="pastille">Exemple · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 250" width="100%">
+<!-- La prise : Grasshopper -->
+<rect fill="#fff" height="170" rx="10" stroke="#1F5F7A" stroke-width="2" width="200" x="22" y="40"></rect>
+<text fill="#1F5F7A" font-size="13" font-weight="700" text-anchor="middle" x="122" y="30">GRASSHOPPER</text>
+<text fill="#6B7378" font-size="11" text-anchor="middle" x="122" y="68">fournit la prise</text>
+<!-- Trois empreintes -->
+<g class="mono" font-size="10.5">
+<rect fill="#E5EEF9" height="30" rx="4" stroke="#1565C0" stroke-dasharray="4 3" width="140" x="52" y="86"></rect>
+<text class="mono" fill="#1565C0" text-anchor="middle" x="122" y="105">GH_AssemblyInfo</text>
+<rect fill="#F1E6F5" height="30" rx="4" stroke="#7B1FA2" stroke-dasharray="4 3" width="140" x="52" y="124"></rect>
+<text class="mono" fill="#7B1FA2" text-anchor="middle" x="122" y="143">GH_AssemblyPriority</text>
+<rect fill="#E8F3E8" height="30" rx="4" stroke="#2E7D32" stroke-dasharray="4 3" width="140" x="52" y="162"></rect>
+<text class="mono" fill="#2E7D32" text-anchor="middle" x="122" y="181">GH_Component</text>
+</g>
+<!-- Flèches d'emboîtement -->
+<g fill="none" stroke="#2B2F33" stroke-width="1.6">
+<path d="M368 101 H206" marker-end="url(#fl)"></path>
+<path d="M368 139 H206" marker-end="url(#fl)"></path>
+<path d="M368 177 H206" marker-end="url(#fl)"></path>
+</g>
+<text fill="#6B7378" font-size="10" font-style="italic" text-anchor="middle" x="287" y="92">hérite de</text>
+<!-- L'appareil : ton plugin -->
+<rect fill="#fff" height="170" rx="10" stroke="#2B2F33" stroke-width="2" width="200" x="378" y="40"></rect>
+<text fill="#2B2F33" font-size="13" font-weight="700" text-anchor="middle" x="478" y="30">TON PLUGIN · Cuttlefish.gha</text>
+<text fill="#6B7378" font-size="11" text-anchor="middle" x="478" y="68">fournit l'appareil</text>
+<g class="mono" font-size="10.5">
+<rect fill="#1565C0" height="30" rx="4" width="140" x="408" y="86"></rect>
+<text class="mono" fill="#fff" text-anchor="middle" x="478" y="105">CuttlefishInfo</text>
+<rect fill="#7B1FA2" height="30" rx="4" width="140" x="408" y="124"></rect>
+<text class="mono" fill="#fff" text-anchor="middle" x="478" y="143">CuttlefishPriority</text>
+<rect fill="#2E7D32" height="30" rx="4" width="140" x="408" y="162"></rect>
+<text class="mono" fill="#fff" text-anchor="middle" x="478" y="181">Bubble, Maze… ×20</text>
+</g>
+<text fill="#2B2F33" font-size="11" text-anchor="middle" x="300" y="238">Chaque classe de ton plugin a <tspan font-weight="700">la forme</tspan> d'une empreinte prévue par Grasshopper : c'est l'héritage.</text>
+<defs><marker id="fl" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un plugin Grasshopper est une <b>DLL .NET renommée en <code>.gha</code></b>. Au démarrage, Grasshopper l'ouvre, y cherche les classes qui héritent des types de son SDK, et fait de chacune un composant.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Une prise normalisée. Grasshopper fournit la prise : des classes de base, avec des méthodes à redéfinir. Ton plugin fournit l'appareil, qui fonctionne parce qu'il en respecte la forme.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>reconnaître les trois classes d'un plugin et le rôle de chacune ;</li>
+<li>relier chaque partie visible d'un composant à la ligne de code qui la définit ;</li>
+<li>prévoir combien de fois Grasshopper appellera ton calcul, selon l'accès item, list ou tree.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Grasshopper appelle, ton code répond. Tu n'appelles jamais <code>SolveInstance</code> toi-même : c'est Grasshopper qui décide quand calculer. On appelle ce principe l'<b>inversion de contrôle</b>.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 07 · Anatomie d'un plugin Grasshopper</div>
+</section>
+<!-- ============ PAGE 2 · LE CHARGEMENT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 07</b></div>
+<p class="rubrique">Schéma 1 · Le chargement</p>
+<h2>Du fichier .gha à l'onglet Cuttlefish</h2>
+<p style="max-width:160mm">Quatre étapes, toutes déclenchées par Grasshopper au démarrage de Rhino. Chaque couleur suit une classe de ton plugin jusqu'à l'endroit où elle se voit à l'écran.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 640" width="100%">
+<defs>
+<marker id="f2" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker>
+<marker id="fb" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#1565C0"></path></marker>
+<marker id="fv" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#7B1FA2"></path></marker>
+<marker id="fg" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2E7D32"></path></marker>
+</defs>
+<!-- Étape 1 : dossier Libraries -->
+<rect fill="#EFE9E1" height="150" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="22" font-weight="800" x="16" y="26">1</text>
+<text font-size="12" font-weight="700" x="40" y="25">Grasshopper parcourt le dossier des bibliothèques</text>
+<path d="M60 50 h60 l10 12 h120 v76 h-190 z" fill="#fff" stroke="#2B2F33" stroke-width="1.5"></path>
+<text class="mono" font-size="9.5" text-anchor="middle" x="155" y="80">%APPDATA%\Grasshopper</text>
+<text class="mono" font-size="9.5" text-anchor="middle" x="155" y="94">\Libraries</text>
+<g class="mono" font-size="10">
+<rect fill="#1F5F7A" height="24" rx="3" width="150" x="300" y="48"></rect><text fill="#fff" text-anchor="middle" x="375" y="64">Cuttlefish.gha</text>
+<rect fill="#fff" height="24" rx="3" stroke="#B5AEA5" width="150" x="300" y="78"></rect><text fill="#6B7378" text-anchor="middle" x="375" y="94">SnapSet.Conception.gha</text>
+<rect fill="#fff" height="24" rx="3" stroke="#B5AEA5" width="150" x="300" y="108"></rect><text fill="#6B7378" text-anchor="middle" x="375" y="124">MagpieApprenant.gha</text>
+</g>
+<path d="M252 98 H292" marker-end="url(#f2)" stroke="#2B2F33" stroke-width="1.4"></path>
+<text fill="#2B2F33" font-size="10" x="470" y="64">chaque .gha est</text>
+<text fill="#2B2F33" font-size="10" x="470" y="78">chargé comme</text>
+<text fill="#2B2F33" font-size="10" x="470" y="92">une assembly .NET</text>
+<!-- Étape 2 : ouverture de l'assembly -->
+<text fill="#1F5F7A" font-size="22" font-weight="800" x="16" y="186">2</text>
+<text font-size="12" font-weight="700" x="40" y="185">Il ouvre Cuttlefish.gha et trie ses classes par type de base</text>
+<rect fill="#fff" height="132" rx="8" stroke="#2B2F33" stroke-width="1.5" width="520" x="40" y="200"></rect>
+<text class="mono" fill="#6B7378" font-size="9.5" x="52" y="218">Cuttlefish.gha</text>
+<g class="mono" font-size="10">
+<rect fill="#E5EEF9" height="88" rx="5" stroke="#1565C0" width="150" x="58" y="230"></rect>
+<text fill="#1565C0" font-weight="700" text-anchor="middle" x="133" y="252">CuttlefishInfo</text>
+<text fill="#1565C0" font-size="8.5" text-anchor="middle" x="133" y="268">: GH_AssemblyInfo</text>
+<text fill="#2B2F33" font-size="8.5" text-anchor="middle" x="133" y="290">nom, icône, auteur,</text>
+<text fill="#2B2F33" font-size="8.5" text-anchor="middle" x="133" y="303">Guid de la bibliothèque</text>
+<rect fill="#F1E6F5" height="88" rx="5" stroke="#7B1FA2" width="150" x="225" y="230"></rect>
+<text fill="#7B1FA2" font-weight="700" text-anchor="middle" x="300" y="252">CuttlefishPriority</text>
+<text fill="#7B1FA2" font-size="8.5" text-anchor="middle" x="300" y="268">: GH_AssemblyPriority</text>
+<text fill="#2B2F33" font-size="8.5" text-anchor="middle" x="300" y="290">PriorityLoad(), exécuté</text>
+<text fill="#2B2F33" font-size="8.5" text-anchor="middle" x="300" y="303">avant les composants</text>
+<rect fill="#E8F3E8" height="88" rx="5" stroke="#2E7D32" width="150" x="392" y="230"></rect>
+<text fill="#2E7D32" font-weight="700" text-anchor="middle" x="467" y="252">Bubble, Maze… ×20</text>
+<text fill="#2E7D32" font-size="8.5" text-anchor="middle" x="467" y="268">: GH_Component</text>
+<text fill="#2B2F33" font-size="8.5" text-anchor="middle" x="467" y="290">une instance modèle</text>
+<text fill="#2B2F33" font-size="8.5" text-anchor="middle" x="467" y="303">par classe trouvée</text>
+</g>
+<!-- Étape 3 et 4 : là où ça se voit -->
+<text fill="#1F5F7A" font-size="22" font-weight="800" x="16" y="372">3</text>
+<text font-size="12" font-weight="700" x="40" y="371">Il remplit le ruban</text>
+<!-- Ruban Grasshopper stylisé -->
+<rect fill="#E9E9E9" height="22" stroke="#9A9A9A" width="520" x="40" y="420"></rect>
+<g fill="#4A4A4A" font-size="10">
+<text x="52" y="435">Params</text><text x="104" y="435">Maths</text><text x="150" y="435">Sets</text><text x="190" y="435">Vector</text><text x="240" y="435">Curve</text>
+</g>
+<rect fill="#fff" height="22" stroke="#9A9A9A" width="92" x="290" y="420"></rect>
+<rect fill="#7B1FA2" height="12" rx="2" width="12" x="296" y="425"></rect><text fill="#fff" font-size="8.5" font-weight="700" text-anchor="middle" x="302" y="434.5">C</text>
+<text fill="#2B2F33" font-size="10" font-weight="700" x="314" y="435">Cuttlefish</text>
+<rect fill="#fff" height="70" stroke="#9A9A9A" width="520" x="40" y="442"></rect>
+<!-- Panneaux de sous-onglets -->
+<g>
+<line stroke="#D0D0D0" x1="140" x2="140" y1="448" y2="506"></line><line stroke="#D0D0D0" x1="240" x2="240" y1="448" y2="506"></line>
+<g fill="#E8F3E8" stroke="#2E7D32">
+<rect height="24" rx="3" width="24" x="60" y="452"></rect><rect height="24" rx="3" width="24" x="92" y="452"></rect>
+<rect height="24" rx="3" width="24" x="160" y="452"></rect><rect height="24" rx="3" width="24" x="192" y="452"></rect>
+<rect height="24" rx="3" width="24" x="260" y="452"></rect><rect height="24" rx="3" width="24" x="290" y="452"></rect><rect height="24" rx="3" width="24" x="320" y="452"></rect><rect height="24" rx="3" width="24" x="350" y="452"></rect><rect height="24" rx="3" width="24" x="380" y="452"></rect><rect height="24" rx="3" width="24" x="410" y="452"></rect><rect height="24" rx="3" width="24" x="440" y="452"></rect><rect height="24" rx="3" width="24" x="470" y="452"></rect><rect height="24" rx="3" width="24" x="500" y="452"></rect>
+</g>
+<circle cx="512" cy="464" fill="none" r="7" stroke="#2E7D32" stroke-width="1.4"></circle>
+<g fill="#6B7378" font-size="9" text-anchor="middle"><text x="90" y="500">Points ×2</text><text x="190" y="500">Transform ×2</text><text x="400" y="500">Draw ×16</text></g>
+</g>
+<!-- Flèches colorées depuis l'étape 2 -->
+<path d="M300 318 C 300 380, 302 395, 302 418" fill="none" marker-end="url(#fv)" stroke="#7B1FA2" stroke-width="1.6"></path>
+<path d="M467 318 C 520 360, 515 410, 512 448" fill="none" marker-end="url(#fg)" stroke="#2E7D32" stroke-width="1.6"></path>
+<text fill="#7B1FA2" font-size="9.5" font-weight="600" x="310" y="396">icône et lettre « C » de l'onglet</text>
+<text fill="#2E7D32" font-size="9.5" font-weight="600" text-anchor="end" x="500" y="372">Bubble, rangé dans Draw</text>
+<text fill="#6B7378" font-size="9" x="40" y="390">onglet et sous-onglet viennent du</text>
+<text fill="#6B7378" font-size="9" x="40" y="403">constructeur de chaque composant</text>
+<!-- Étape 4 -->
+<text fill="#1F5F7A" font-size="22" font-weight="800" x="16" y="552">4</text>
+<text font-size="12" font-weight="700" x="40" y="551">Tu glisses Bubble sur le canvas : Grasshopper en crée une copie</text>
+<text fill="#2B2F33" font-size="10.5" x="40" y="572">Le constructeur s'exécute, puis RegisterInputParams et RegisterOutputParams.</text>
+<text fill="#2B2F33" font-size="10.5" x="40" y="588">Ensuite, à chaque changement d'une entrée, Grasshopper appelle SolveInstance.</text>
+<text fill="#2B2F33" font-size="10.5" x="40" y="604">Tout ce cycle est détaillé page suivante.</text>
+</svg>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Laisser un ancien <code>.gha</code> ou une DLL du même nom dans <code>Libraries</code>. Grasshopper charge ce qu'il trouve, y compris une version périmée : en cas de doute, vide le dossier et redémarre Rhino.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 07 · Anatomie d'un plugin Grasshopper</div>
+</section>
+<!-- ============ PAGE 3 · ANATOMIE D'UN COMPOSANT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 07</b></div>
+<p class="rubrique">Schéma 2 · Ce que tu vois, ce que tu codes</p>
+<h2>Chaque partie du composant vient d'une ligne de code</h2>
+<p style="max-width:165mm">Voici Bubble tel qu'il apparaît sur le canvas. Chaque repère coloré renvoie au membre de la classe qui le produit ; les mêmes couleurs marquent le code page 5.</p>
+<div class="panneau" style="padding:5mm 4mm; margin-top:3mm;">
+<svg viewbox="0 0 600 380" width="100%">
+<defs>
+<marker id="d1" markerheight="5" markerwidth="5" refx="5" refy="5" viewbox="0 0 10 10"><circle cx="5" cy="5" fill="#2B2F33" r="4"></circle></marker>
+</defs>
+<!-- Fils entrants -->
+<path d="M150 168 C 190 168, 196 172, 222 172" fill="none" stroke="#3A3A3A" stroke-width="2.2"></path>
+<path d="M150 214 C 190 214, 196 210, 222 210" fill="none" stroke="#3A3A3A" stroke-width="2.2"></path>
+<path d="M378 191 C 410 191, 420 191, 452 191" fill="none" stroke="#3A3A3A" stroke-width="2.2"></path>
+<!-- Composant style Grasshopper -->
+<rect fill="#C9C9C9" height="90" rx="7" stroke="#4E4E4E" stroke-width="2" width="156" x="222" y="146"></rect>
+<rect fill="#E2E2E2" height="78" rx="4" stroke="#8A8A8A" width="40" x="230" y="152"></rect>
+<rect fill="#E2E2E2" height="78" rx="4" stroke="#8A8A8A" width="40" x="330" y="152"></rect>
+<text font-size="13" font-weight="700" text-anchor="middle" x="250" y="176">P</text>
+<text font-size="13" font-weight="700" text-anchor="middle" x="250" y="214">F</text>
+<text font-size="13" font-weight="700" text-anchor="middle" x="350" y="196">B</text>
+<rect fill="#BDBDBD" height="78" rx="3" width="48" x="276" y="152"></rect>
+<!-- Icône (cercles) -->
+<circle cx="300" cy="180" fill="none" r="9" stroke="#2B2F33" stroke-width="1.6"></circle>
+<circle cx="311" cy="198" fill="none" r="6" stroke="#2B2F33" stroke-width="1.6"></circle>
+<circle cx="290" cy="203" fill="none" r="5" stroke="#2B2F33" stroke-width="1.6"></circle>
+<!-- Grips -->
+<g fill="#fff" stroke="#4E4E4E" stroke-width="1.6"><circle cx="222" cy="172" r="4.5"></circle><circle cx="222" cy="210" r="4.5"></circle><circle cx="378" cy="191" r="4.5"></circle></g>
+<!-- Bulle d'avertissement -->
+<rect fill="#F9E5E5" height="22" rx="11" stroke="#C62828" width="176" x="212" y="250"></rect>
+<text fill="#C62828" font-size="9.5" text-anchor="middle" x="300" y="265">Factor must be greater than 0.</text>
+<!-- Repères -->
+<!-- 1 héritage : tout le composant -->
+<path d="M300 146 V 112" stroke="#2E7D32" stroke-width="1.5"></path>
+<circle cx="300" cy="104" fill="#2E7D32" r="9"></circle><text fill="#fff" font-size="10" font-weight="700" text-anchor="middle" x="300" y="108">1</text>
+<text fill="#2E7D32" font-size="10.5" font-weight="700" text-anchor="middle" x="300" y="72">: GH_Component</text>
+<text fill="#2B2F33" font-size="9.5" text-anchor="middle" x="300" y="87">sans cet héritage, aucun composant n'existe</text>
+<!-- 2 constructeur : nom et onglet -->
+<path d="M150 300 C 170 300, 200 300, 228 238" fill="none" stroke="#1565C0" stroke-width="1.5"></path>
+<circle cx="140" cy="300" fill="#1565C0" r="9"></circle><text fill="#fff" font-size="10" font-weight="700" text-anchor="middle" x="140" y="304">2</text>
+<text fill="#1565C0" font-size="10.5" font-weight="700" x="14" y="326">base(…)</text>
+<text fill="#2B2F33" font-size="9.5" x="14" y="341">nom « Bubble », surnom « BUBL »,</text>
+<text fill="#2B2F33" font-size="9.5" x="14" y="355">onglet Cuttlefish, sous-onglet Draw</text>
+<!-- 3 entrées -->
+<path d="M232 172 C 200 120, 170 110, 150 106" fill="none" stroke="#7B1FA2" stroke-width="1.5"></path>
+<path d="M232 210 C 190 140, 170 115, 150 108" fill="none" stroke="#7B1FA2" stroke-width="1.5"></path>
+<circle cx="140" cy="106" fill="#7B1FA2" r="9"></circle><text fill="#fff" font-size="10" font-weight="700" text-anchor="middle" x="140" y="110">3</text>
+<text fill="#7B1FA2" font-size="10.5" font-weight="700" x="14" y="58">RegisterInputParams</text>
+<text fill="#2B2F33" font-size="9.5" x="14" y="73">P : points, accès tree</text>
+<text fill="#2B2F33" font-size="9.5" x="14" y="87">F : nombre, accès item, défaut 1</text>
+<!-- 6 sortie -->
+<path d="M352 205 C 400 260, 430 280, 452 290" fill="none" stroke="#00838F" stroke-width="1.5"></path>
+<circle cx="462" cy="292" fill="#00838F" r="9"></circle><text fill="#fff" font-size="10" font-weight="700" text-anchor="middle" x="462" y="296">6</text>
+<text fill="#00838F" font-size="10.5" font-weight="700" x="478" y="288">RegisterOutputParams</text>
+<text fill="#2B2F33" font-size="9.5" x="478" y="303">B : cercles, accès tree</text>
+<text fill="#2B2F33" font-size="9.5" x="478" y="317">rempli par DA.SetDataTree</text>
+<!-- Icône -->
+<path d="M318 178 C 380 130, 420 110, 452 104" fill="none" stroke="#6D4C41" stroke-width="1.5"></path>
+<circle cx="462" cy="104" fill="#6D4C41" r="9"></circle><text fill="#fff" font-size="10" font-weight="700" text-anchor="middle" x="462" y="108">7</text>
+<text fill="#6D4C41" font-size="10.5" font-weight="700" x="478" y="88">Icon et ComponentGuid</text>
+<text fill="#2B2F33" font-size="9.5" x="478" y="103">l'image 24 px au centre,</text>
+<text fill="#2B2F33" font-size="9.5" x="478" y="117">et une identité invisible</text>
+<text fill="#2B2F33" font-size="9.5" x="478" y="131">écrite dans chaque .gh</text>
+<!-- 5 message -->
+<path d="M388 261 C 410 320, 350 348, 316 351" fill="none" stroke="#C62828" stroke-width="1.5"></path>
+<circle cx="306" cy="352" fill="#C62828" r="9"></circle><text fill="#fff" font-size="10" font-weight="700" text-anchor="middle" x="306" y="356">5</text>
+<text fill="#C62828" font-size="10" font-weight="700" x="200" y="372">AddRuntimeMessage</text>
+<text fill="#2B2F33" font-size="9.5" x="322" y="372">orange = Warning, rouge = Error</text>
+</svg>
+</div>
+<h3 style="margin-top:6mm">Le cycle de vie, en deux temps</h3>
+<svg viewbox="0 0 600 120" width="100%">
+<defs><marker id="f3" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+<text fill="#6B7378" font-size="9.5" font-weight="700" letter-spacing="1.2" x="0" y="14">UNE FOIS, À LA CRÉATION</text>
+<text fill="#6B7378" font-size="9.5" font-weight="700" letter-spacing="1.2" x="372" y="14">À CHAQUE CHANGEMENT D'ENTRÉE</text>
+<g font-size="10">
+<rect fill="#E5EEF9" height="40" rx="5" stroke="#1565C0" width="104" x="0" y="26"></rect><text fill="#1565C0" font-weight="700" text-anchor="middle" x="52" y="44">Constructeur</text><text font-size="8.5" text-anchor="middle" x="52" y="58">base(…)</text>
+<rect fill="#F1E6F5" height="40" rx="5" stroke="#7B1FA2" width="104" x="122" y="26"></rect><text fill="#7B1FA2" font-weight="700" text-anchor="middle" x="174" y="44">Register</text><text font-size="8.5" text-anchor="middle" x="174" y="58">InputParams</text>
+<rect fill="#E0F2F3" height="40" rx="5" stroke="#00838F" width="104" x="244" y="26"></rect><text fill="#00838F" font-weight="700" text-anchor="middle" x="296" y="44">Register</text><text font-size="8.5" text-anchor="middle" x="296" y="58">OutputParams</text>
+<rect fill="#fff" height="52" rx="6" stroke="#2B2F33" stroke-width="1.4" width="228" x="372" y="20"></rect>
+<text font-weight="700" text-anchor="middle" x="486" y="38">SolveInstance(DA)</text>
+<text fill="#E65100" font-size="9" font-weight="600" text-anchor="middle" x="410" y="58">lire</text>
+<text font-size="9" text-anchor="middle" x="486" y="58">calculer</text>
+<text fill="#00838F" font-size="9" font-weight="600" text-anchor="middle" x="562" y="58">écrire</text>
+<path d="M424 55 H 462" marker-end="url(#f3)" stroke="#2B2F33" stroke-width="1"></path><path d="M510 55 H 546" marker-end="url(#f3)" stroke="#2B2F33" stroke-width="1"></path>
+</g>
+<g stroke="#2B2F33" stroke-width="1.4"><path d="M104 46 H 118" marker-end="url(#f3)"></path><path d="M226 46 H 240" marker-end="url(#f3)"></path><path d="M348 46 H 368" marker-end="url(#f3)"></path></g>
+<path d="M560 72 C 560 104, 412 104, 412 76" fill="none" marker-end="url(#f3)" stroke="#2B2F33" stroke-dasharray="3 3" stroke-width="1.2"></path>
+<text fill="#6B7378" font-size="9" font-style="italic" text-anchor="middle" x="486" y="112">recommence dès qu'une entrée change</text>
+</svg>
+<div class="encadre" style="margin-top:6mm">
+<span class="titre">À retenir</span>
+    Le constructeur et les deux <code>Register…</code> <b>décrivent</b> le composant : ils ne calculent rien. <code>SolveInstance</code> le <b>fait travailler</b>, autant de fois que Grasshopper le juge nécessaire.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 07 · Anatomie d'un plugin Grasshopper</div>
+</section>
+<!-- ============ PAGE 4 · ITEM, LIST, TREE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 07</b></div>
+<p class="rubrique">Schéma 3 · Le mode d'accès</p>
+<h2>Item, list ou tree : combien d'appels à SolveInstance ?</h2>
+<p style="max-width:165mm">Le dernier argument de chaque <code>Add…Parameter</code> décide de ce que reçoit <code>SolveInstance</code>, et donc du nombre de fois où Grasshopper l'appelle. Même entrée dans les trois cas : trois nombres <b>0,5 · 1 · 2</b>.</p>
+<svg style="margin-top:3mm" viewbox="0 0 600 400" width="100%">
+<defs><marker id="f4" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+<!-- Trois colonnes -->
+<g>
+<rect fill="#EFE9E1" height="400" width="190" x="0" y="0"></rect>
+<rect fill="#EFE9E1" height="400" width="190" x="205" y="0"></rect>
+<rect fill="#EFE9E1" height="400" width="190" x="410" y="0"></rect>
+</g>
+<g fill="#1F5F7A" font-size="15" font-weight="800">
+<text x="14" y="28">item</text><text x="219" y="28">list</text><text x="424" y="28">tree</text>
+</g>
+<g class="mono" fill="#6B7378" font-size="8.6">
+<text x="14" y="46">GH_ParamAccess.item</text><text x="219" y="46">GH_ParamAccess.list</text><text x="424" y="46">GH_ParamAccess.tree</text>
+</g>
+<!-- ITEM : 3 appels -->
+<g font-size="10">
+<g class="mono"><rect fill="#fff" height="22" rx="3" stroke="#E65100" width="44" x="20" y="66"></rect><text text-anchor="middle" x="42" y="81">0,5</text>
+<rect fill="#fff" height="22" rx="3" stroke="#E65100" width="44" x="20" y="146"></rect><text text-anchor="middle" x="42" y="161">1</text>
+<rect fill="#fff" height="22" rx="3" stroke="#E65100" width="44" x="20" y="226"></rect><text text-anchor="middle" x="42" y="241">2</text></g>
+<g stroke="#2B2F33" stroke-width="1.3"><path d="M64 77 H 92" marker-end="url(#f4)"></path><path d="M64 157 H 92" marker-end="url(#f4)"></path><path d="M64 237 H 92" marker-end="url(#f4)"></path></g>
+<rect fill="#fff" height="34" rx="5" stroke="#2B2F33" width="80" x="96" y="60"></rect><text font-weight="700" text-anchor="middle" x="136" y="75">appel 1</text><text class="mono" font-size="8.5" text-anchor="middle" x="136" y="88">double</text>
+<rect fill="#fff" height="34" rx="5" stroke="#2B2F33" width="80" x="96" y="140"></rect><text font-weight="700" text-anchor="middle" x="136" y="155">appel 2</text><text class="mono" font-size="8.5" text-anchor="middle" x="136" y="168">double</text>
+<rect fill="#fff" height="34" rx="5" stroke="#2B2F33" width="80" x="96" y="220"></rect><text font-weight="700" text-anchor="middle" x="136" y="235">appel 3</text><text class="mono" font-size="8.5" text-anchor="middle" x="136" y="248">double</text>
+</g>
+<text fill="#E65100" font-size="26" font-weight="800" text-anchor="middle" x="95" y="296">×3</text>
+<g fill="#2B2F33" font-size="9.5"><text x="14" y="322">Grasshopper répète le calcul</text><text x="14" y="336">pour chaque valeur. Ton code</text><text x="14" y="350">ne voit qu'une valeur à la fois.</text></g>
+<text fill="#1F5F7A" font-size="9" font-weight="600" x="14" y="378">Bubble : l'entrée Factor</text>
+<!-- LIST : 1 appel -->
+<g font-size="10">
+<g class="mono"><rect fill="#fff" height="22" rx="3" stroke="#E65100" width="44" x="226" y="120"></rect><text text-anchor="middle" x="248" y="135">0,5</text>
+<rect fill="#fff" height="22" rx="3" stroke="#E65100" width="44" x="226" y="146"></rect><text text-anchor="middle" x="248" y="161">1</text>
+<rect fill="#fff" height="22" rx="3" stroke="#E65100" width="44" x="226" y="172"></rect><text text-anchor="middle" x="248" y="187">2</text></g>
+<path d="M274 120 q6 0 6 6 v62 q0 6 -6 6" fill="none" stroke="#2B2F33" stroke-width="1.2"></path>
+<path d="M282 157 H 298" marker-end="url(#f4)" stroke="#2B2F33" stroke-width="1.3"></path>
+<rect fill="#fff" height="50" rx="5" stroke="#2B2F33" width="80" x="302" y="132"></rect><text font-weight="700" text-anchor="middle" x="342" y="152">appel 1</text><text class="mono" font-size="8.5" text-anchor="middle" x="342" y="168">List&lt;double&gt;</text>
+</g>
+<text fill="#E65100" font-size="26" font-weight="800" text-anchor="middle" x="300" y="296">×1</text>
+<g fill="#2B2F33" font-size="9.5"><text x="219" y="322">Un seul appel avec toute la liste.</text><text x="219" y="336">Utile quand le résultat dépend</text><text x="219" y="350">de l'ensemble (un total, un tri).</text></g>
+<text fill="#1F5F7A" font-size="9" font-weight="600" x="219" y="378">Cuttlefish : rarement utilisé</text>
+<!-- TREE : 1 appel avec branches -->
+<g font-size="10">
+<text class="mono" fill="#6B7378" font-size="8.6" x="430" y="98">{0;0}</text>
+<g class="mono"><rect fill="#fff" height="20" rx="3" stroke="#E65100" width="40" x="466" y="84"></rect><text text-anchor="middle" x="486" y="98">0,5</text>
+<rect fill="#fff" height="20" rx="3" stroke="#E65100" width="40" x="510" y="84"></rect><text text-anchor="middle" x="530" y="98">1</text></g>
+<text class="mono" fill="#6B7378" font-size="8.6" x="430" y="128">{0;1}</text>
+<g class="mono"><rect fill="#fff" height="20" rx="3" stroke="#E65100" width="40" x="466" y="114"></rect><text text-anchor="middle" x="486" y="128">2</text></g>
+<path d="M424 78 h170 v62 h-170 z" fill="none" stroke="#2B2F33" stroke-dasharray="3 3" stroke-width="1"></path>
+<path d="M509 142 V 166" marker-end="url(#f4)" stroke="#2B2F33" stroke-width="1.3"></path>
+<rect fill="#fff" height="50" rx="5" stroke="#2B2F33" width="108" x="455" y="170"></rect><text font-weight="700" text-anchor="middle" x="509" y="190">appel 1</text><text class="mono" font-size="8.2" text-anchor="middle" x="509" y="206">GH_Structure&lt;…&gt;</text>
+</g>
+<text fill="#E65100" font-size="26" font-weight="800" text-anchor="middle" x="505" y="296">×1</text>
+<g fill="#2B2F33" font-size="9.5"><text x="424" y="322">Un seul appel avec l'arbre</text><text x="424" y="336">entier, branches et chemins</text><text x="424" y="350">compris. Tu gères tout.</text></g>
+<text fill="#1F5F7A" font-size="9" font-weight="600" x="424" y="378">Bubble : l'entrée Points</text>
+</svg>
+<div class="encadre" style="margin-top:6mm">
+<span class="titre">Pourquoi Bubble prend ses points en tree</span>
+    Pour dessiner une bulle, il faut connaître la distance au <b>plus proche voisin</b>. Ce voisin peut se trouver dans n'importe quelle branche : le composant doit donc voir tous les points en même temps. Le commentaire est dans le code : « Le plus proche voisin est cherché parmi tous les points de l'arbre. »
+  </div>
+<div class="encadre piege">
+<span class="titre">Piège courant</span>
+    Mélanger les accès. Si Factor reçoit trois valeurs et Points un arbre, Grasshopper appelle SolveInstance <b>trois fois</b>, et relit l'arbre complet à chaque fois. Le résultat est juste, mais le calcul est fait trois fois.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 07 · Anatomie d'un plugin Grasshopper</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 07</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Bubble.cs, repère par repère</h2>
+<p style="max-width:165mm">Le fichier réel de Cuttlefish, raccourci à l'essentiel (les <code>///</code> et le calcul des cercles sont repliés). Les couleurs sont celles du schéma de la page 3.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">1</span><span class="kw">using</span> Grasshopper.Kernel;</div>
+<div class="l"><span class="n">2</span><span class="kw">using</span> Rhino.Geometry;</div>
+<div class="l"><span class="n">3</span> </div>
+<div class="l k1"><span class="n">4</span><span class="kw">public class</span> <span class="ty">Bubble</span> : <span class="ty">GH_Component</span><span class="rep r1">1</span></div>
+<div class="l"><span class="n">5</span>{</div>
+<div class="l k2"><span class="n">6</span> <span class="kw">public</span> Bubble()<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">7</span>    : <span class="kw">base</span>(<span class="st">"Bubble"</span>, <span class="st">"BUBL"</span>,</div>
+<div class="l k2"><span class="n">8</span> <span class="st">"Draw a circle on each point…"</span>,</div>
+<div class="l k2"><span class="n">9</span> <span class="st">"Cuttlefish"</span>, <span class="st">"Draw"</span>)</div>
+<div class="l"><span class="n">10</span>  { }</div>
+<div class="l"><span class="n">11</span> </div>
+<div class="l k3"><span class="n">12</span> <span class="kw">protected override void</span> RegisterInputParams(<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">13</span> <span class="ty">GH_InputParamManager</span> pManager)</div>
+<div class="l"><span class="n">14</span>  {</div>
+<div class="l k3"><span class="n">15</span>    pManager.AddPointParameter(<span class="st">"Points"</span>, <span class="st">"P"</span>,</div>
+<div class="l k3"><span class="n">16</span> <span class="st">"The centers…"</span>, <span class="ty">GH_ParamAccess</span>.tree);</div>
+<div class="l k3"><span class="n">17</span>    pManager.AddNumberParameter(<span class="st">"Factor"</span>, <span class="st">"F"</span>,</div>
+<div class="l k3"><span class="n">18</span> <span class="st">"The radius…"</span>, <span class="ty">GH_ParamAccess</span>.item, 1);</div>
+<div class="l"><span class="n">19</span>  }</div>
+<div class="l"><span class="n">20</span> </div>
+<div class="l"><span class="n">21</span> <span class="kw">protected override void</span> SolveInstance(</div>
+<div class="l"><span class="n">22</span> <span class="ty">IGH_DataAccess</span> DA)</div>
+<div class="l"><span class="n">23</span>  {</div>
+<div class="l"><span class="n">24</span> <span class="ty">GH_Structure</span>&lt;<span class="ty">GH_Point</span>&gt; points;</div>
+<div class="l"><span class="n">25</span> <span class="kw">double</span> factor = 1;</div>
+<div class="l k4"><span class="n">26</span> <span class="kw">if</span> (!DA.GetDataTree(0, <span class="kw">out</span> points)) <span class="kw">return</span>;<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n">27</span>    DA.GetData(1, <span class="kw">ref</span> factor);</div>
+<div class="l k5"><span class="n">28</span> <span class="kw">if</span> (factor &lt;= 0) {<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">29</span>      AddRuntimeMessage(</div>
+<div class="l k5"><span class="n">30</span> <span class="ty">GH_RuntimeMessageLevel</span>.Error,</div>
+<div class="l k5"><span class="n">31</span> <span class="st">"Factor must be greater than 0."</span>);</div>
+<div class="l k5"><span class="n">32</span> <span class="kw">return</span>; }</div>
+<div class="l"><span class="n">33</span> <span class="cm">// … plus proche voisin, puis un cercle par point</span></div>
+<div class="l k6"><span class="n">34</span>    DA.SetDataTree(0, result);<span class="rep r6">6</span></div>
+<div class="l"><span class="n">35</span>  }</div>
+<div class="l"><span class="n">36</span> </div>
+<div class="l k7"><span class="n">37</span> <span class="kw">public override</span> <span class="ty">Guid</span> ComponentGuid<span class="rep r7">7</span></div>
+<div class="l k7"><span class="n">38</span>  {</div>
+<div class="l k7"><span class="n">39</span> <span class="kw">get</span> { <span class="kw">return new</span> <span class="ty">Guid</span>(<span class="st">"454DDC48-…-5C0A4C44757D"</span>); }</div>
+<div class="l k7"><span class="n">40</span>  }</div>
+<div class="l"><span class="n">41</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>L'héritage</b>Les deux-points disent « Bubble est un GH_Component ». C'est le seul critère que Grasshopper vérifie pour en faire un composant.</li>
+<li><span class="rep r2">2</span><b>Le constructeur parent</b><code>base(…)</code> transmet au parent nom, surnom, description, onglet et sous-onglet. Bubble n'a rien d'autre à faire à sa naissance.</li>
+<li><span class="rep r3">3</span><b>Les entrées</b>Une ligne par entrée. Le dernier argument est le mode d'accès (page 4) ; le <code>1</code> final de Factor est sa valeur par défaut.</li>
+<li><span class="rep r4">4</span><b>Lire, ou s'arrêter</b><code>GetDataTree</code> renvoie <code>false</code> si l'entrée est vide : on sort sans rien produire. <code>ref</code> laisse factor à 1 si rien n'arrive.</li>
+<li><span class="rep r5">5</span><b>Prévenir l'utilisateur</b>Le composant devient rouge et affiche ce texte en bulle. <code>Warning</code> l'aurait mis en orange.</li>
+<li><span class="rep r6">6</span><b>Écrire la sortie</b>La sortie n°0 (B) reçoit l'arbre de cercles, avec la même structure que les points.</li>
+<li><span class="rep r7">7</span><b>L'identité</b>Ce Guid est enregistré dans chaque fichier .gh qui utilise Bubble. Le changer, c'est rendre ces fichiers orphelins.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Clin d'œil au cours 01</span>
+    Repère <b style="color:var(--m7)">7</b> : la forme verbeuse <code>get { return … }</code>. Dans <code>CuttlefishInfo.cs</code>, tu as écrit la forme moderne : <code>public override string Name =&gt; "Cuttlefish";</code>. Les deux produisent exactement le même code compilé.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 07 · Anatomie d'un plugin Grasshopper</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 07</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Glossaire</p>
+<dl class="glossaire">
+<dt>.gha</dt><dd>Une DLL .NET que Grasshopper charge comme bibliothèque de composants.</dd>
+<dt>GH_AssemblyInfo</dt><dd>La carte d'identité de la bibliothèque : nom, icône, auteur, Guid.</dd>
+<dt>GH_AssemblyPriority</dt><dd>Le code exécuté au chargement, avant les composants.</dd>
+<dt>GH_Component</dt><dd>La classe de base de tout composant.</dd>
+<dt>SolveInstance</dt><dd>La méthode de calcul ; Grasshopper l'appelle, jamais toi.</dd>
+<dt>IGH_DataAccess (DA)</dt><dd>Le guichet unique pour lire les entrées et écrire les sorties.</dd>
+<dt>GH_ParamAccess</dt><dd>Le mode d'accès d'une entrée : item, list ou tree.</dd>
+<dt>Guid</dt><dd>Un identifiant unique et permanent, écrit dans chaque fichier .gh.</dd>
+<dt>Inversion de contrôle</dt><dd>Le cadre appelle ton code au moment qu'il choisit.</dd>
+</dl>
+<p class="rubrique" style="margin-top:7mm">Pour aller plus loin</p>
+<p style="font-size:8.6pt">developer.rhino3d.com, guide Grasshopper « Your First Component ». Dans tes dépôts : <code>CuttlefishInfo.cs</code>, <code>CuttlefishPriority.cs</code>, <code>Bubble.cs</code>, et <code>docs/SDK-GRASSHOPPER.md</code> dans SnapSet.</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 08</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 07 · Anatomie d'un plugin Grasshopper</div>
+</section>
+</body>
+</html>

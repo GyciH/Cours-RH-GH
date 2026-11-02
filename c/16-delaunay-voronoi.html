@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>16 · Delaunay et Voronoi</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 16</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Delaunay<br/>et Voronoi</h1>
+<p class="chapeau">Un nuage de points, deux dessins qui se répondent : des cellules autour de chaque point, et des triangles entre voisins. L'un se déduit de l'autre.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>09</b> vecteurs · <b>10</b> intersections</span>
+<span class="pastille">Exemples · <b>Delaunay</b>, <b>Voronoi</b></span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 230" width="100%">
+<rect fill="#fff" height="206" stroke="#B5AEA5" width="330" x="10" y="12"></rect>
+<path d="M10.0 12.0 L75.2 12.0 L80.1 56.2 L10.0 93.7 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M117.5 76.5 L80.1 56.2 L75.2 12.0 L167.6 12.0 L156.6 50.8 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M256.2 59.8 L210.2 92.6 L156.6 50.8 L167.6 12.0 L252.2 12.0 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M340.0 12.0 L340.0 96.2 L306.7 98.7 L256.2 59.8 L252.2 12.0 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M117.5 76.5 L119.4 95.7 L104.3 134.6 L67.8 155.9 L10.0 130.7 L10.0 93.7 L80.1 56.2 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M117.5 76.5 L156.6 50.8 L210.2 92.6 L206.2 112.0 L186.9 131.3 L119.4 95.7 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M206.2 112.0 L210.2 92.6 L256.2 59.8 L306.7 98.7 L268.5 156.8 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M340.0 96.2 L340.0 218.0 L325.2 218.0 L268.2 163.2 L268.5 156.8 L306.7 98.7 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M10.0 130.7 L67.8 155.9 L83.3 218.0 L10.0 218.0 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M104.3 134.6 L153.7 171.7 L142.8 218.0 L83.3 218.0 L67.8 155.9 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M153.7 171.7 L181.5 152.2 L227.4 192.8 L221.3 218.0 L142.8 218.0 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M268.2 163.2 L325.2 218.0 L221.3 218.0 L227.4 192.8 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M181.5 152.2 L153.7 171.7 L104.3 134.6 L119.4 95.7 L186.9 131.3 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M181.5 152.2 L186.9 131.3 L206.2 112.0 L268.5 156.8 L268.2 163.2 L227.4 192.8 Z" fill="none" stroke="#E65100" stroke-width="1.3"></path>
+<path d="M35.8 33.7 L118.3 24.5 L74.2 105.6 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M35.8 33.7 L74.2 105.6 L35.3 194.9 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M118.3 24.5 L203.1 48.4 L306.7 39.8 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M118.3 24.5 L203.1 48.4 L165.6 96.4 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M118.3 24.5 L74.2 105.6 L165.6 96.4 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M203.1 48.4 L306.7 39.8 L249.8 113.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M203.1 48.4 L165.6 96.4 L249.8 113.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M306.7 39.8 L249.8 113.7 L315.4 156.8 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M74.2 105.6 L165.6 96.4 L146.1 133.4 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M74.2 105.6 L35.3 194.9 L114.8 175.1 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M74.2 105.6 L114.8 175.1 L146.1 133.4 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M165.6 96.4 L249.8 113.7 L221.7 152.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M165.6 96.4 L146.1 133.4 L221.7 152.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M249.8 113.7 L315.4 156.8 L221.7 152.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M315.4 156.8 L263.7 210.7 L221.7 152.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M35.3 194.9 L114.8 175.1 L187.0 192.0 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M35.3 194.9 L187.0 192.0 L263.7 210.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M114.8 175.1 L187.0 192.0 L146.1 133.4 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M187.0 192.0 L263.7 210.7 L221.7 152.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<path d="M187.0 192.0 L146.1 133.4 L221.7 152.7 Z" fill="none" opacity=".85" stroke="#00695C" stroke-width="1.4"></path>
+<circle cx="35.8" cy="33.7" fill="#2B2F33" r="3.2"></circle>
+<circle cx="118.3" cy="24.5" fill="#2B2F33" r="3.2"></circle>
+<circle cx="203.1" cy="48.4" fill="#2B2F33" r="3.2"></circle>
+<circle cx="306.7" cy="39.8" fill="#2B2F33" r="3.2"></circle>
+<circle cx="74.2" cy="105.6" fill="#2B2F33" r="3.2"></circle>
+<circle cx="165.6" cy="96.4" fill="#2B2F33" r="3.2"></circle>
+<circle cx="249.8" cy="113.7" fill="#2B2F33" r="3.2"></circle>
+<circle cx="315.4" cy="156.8" fill="#2B2F33" r="3.2"></circle>
+<circle cx="35.3" cy="194.9" fill="#2B2F33" r="3.2"></circle>
+<circle cx="114.8" cy="175.1" fill="#2B2F33" r="3.2"></circle>
+<circle cx="187.0" cy="192.0" fill="#2B2F33" r="3.2"></circle>
+<circle cx="263.7" cy="210.7" fill="#2B2F33" r="3.2"></circle>
+<circle cx="146.1" cy="133.4" fill="#2B2F33" r="3.2"></circle>
+<circle cx="221.7" cy="152.7" fill="#2B2F33" r="3.2"></circle>
+<g fill="#2B2F33" font-size="9.5">
+<text x="362" y="40"><tspan fill="#2B2F33" font-weight="700">●</tspan> un site (un point donné)</text>
+<text x="362" y="58"><tspan fill="#E65100" font-weight="700">—</tspan> cellules de Voronoi</text>
+<text x="362" y="76"><tspan fill="#00695C" font-weight="700">—</tspan> triangles de Delaunay</text>
+<text x="362" y="106">Chaque cellule contient les points</text>
+<text x="362" y="120">plus proches de son site que de</text>
+<text x="362" y="134">tous les autres. Deux sites dont</text>
+<text x="362" y="148">les cellules se touchent sont</text>
+<text x="362" y="162">reliés par un côté de triangle.</text>
+</g>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Le <b>diagramme de Voronoi</b> partage le plan en cellules, une par site ; la <b>triangulation de Delaunay</b> relie les sites voisins. Ce sont deux faces d'une même structure : on dit qu'elles sont <b>duales</b>.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Les boulangeries d'une ville. Chacun va à la plus proche : les zones de clientèle sont des cellules de Voronoi. Relie deux boulangeries dès que leurs zones se touchent : tu obtiens Delaunay.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>définir une cellule de Voronoi et un triangle de Delaunay, et passer de l'un à l'autre ;</li>
+<li>vérifier le critère du cercle circonscrit vide ;</li>
+<li>lire la découpe d'un polygone par une médiatrice dans <code>Voronoi.cs</code>, et y repérer deux défauts.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Tout repose sur la <b>médiatrice</b> : la droite des points à égale distance de deux sites. Les bords des cellules sont des morceaux de médiatrices, et le centre du cercle circonscrit d'un triangle est le point où trois médiatrices se croisent.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 16 · Delaunay et Voronoi</div>
+</section>
+<!-- ============ PAGE 2 · LE CERCLE VIDE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 16</b></div>
+<p class="rubrique">Schéma 1 · Le cercle vide</p>
+<h2>Quatre points, deux façons de couper</h2>
+<p style="max-width:165mm">Quatre points forment un quadrilatère ; on peut le couper en deux triangles par l'une ou l'autre diagonale. Delaunay choisit celle dont les <b>cercles circonscrits</b> ne contiennent aucun autre point.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 300" width="100%">
+<rect fill="#EFE9E1" height="300" width="292" x="0" y="0"></rect><rect fill="#EFE9E1" height="300" width="292" x="308" y="0"></rect>
+<text fill="#C62828" font-size="12" font-weight="800" x="14" y="22">Diagonale AC : refusée</text>
+<text fill="#00695C" font-size="12" font-weight="800" x="322" y="22">Diagonale BD : Delaunay</text>
+<circle cx="139.2" cy="170.2" fill="none" r="94.3" stroke="#C62828" stroke-dasharray="4 3" stroke-width="1"></circle>
+<circle cx="133.0" cy="132.2" fill="none" r="97.9" stroke="#C62828" stroke-dasharray="4 3" stroke-width="1"></circle>
+<path d="M45.0 175.0 L125.0 77.0 L230.0 145.0 L135.0 230.0 Z" fill="none" stroke="#2B2F33" stroke-width="1.6"></path>
+<line stroke="#C62828" stroke-width="2.6" x1="45.0" x2="230.0" y1="175.0" y2="145.0"></line>
+<circle cx="45.0" cy="175.0" fill="#2B2F33" r="4"></circle>
+<circle cx="125.0" cy="77.0" fill="#2B2F33" r="4"></circle>
+<circle cx="230.0" cy="145.0" fill="#2B2F33" r="4"></circle>
+<circle cx="135.0" cy="230.0" fill="#2B2F33" r="4"></circle>
+<circle cx="427.5" cy="154.2" fill="none" r="77.4" stroke="#B5AEA5" stroke-dasharray="4 3" stroke-width="1"></circle>
+<circle cx="458.9" cy="152.1" fill="none" r="79.5" stroke="#B5AEA5" stroke-dasharray="4 3" stroke-width="1"></circle>
+<path d="M353.0 175.0 L433.0 77.0 L538.0 145.0 L443.0 230.0 Z" fill="none" stroke="#2B2F33" stroke-width="1.6"></path>
+<line stroke="#00695C" stroke-width="2.6" x1="433.0" x2="443.0" y1="77.0" y2="230.0"></line>
+<circle cx="353.0" cy="175.0" fill="#2B2F33" r="4"></circle>
+<circle cx="433.0" cy="77.0" fill="#2B2F33" r="4"></circle>
+<circle cx="538.0" cy="145.0" fill="#2B2F33" r="4"></circle>
+<circle cx="443.0" cy="230.0" fill="#2B2F33" r="4"></circle>
+<g fill="#2B2F33" font-size="11" font-weight="700">
+<text text-anchor="end" x="31" y="179">A</text><text text-anchor="middle" x="125" y="66">B</text><text x="242" y="149">C</text><text text-anchor="middle" x="135" y="250">D</text>
+<text text-anchor="end" x="339" y="179">A</text><text text-anchor="middle" x="433" y="66">B</text><text x="550" y="149">C</text><text text-anchor="middle" x="443" y="250">D</text>
+</g>
+<g fill="#2B2F33" font-size="9.5">
+<text x="14" y="282">D est dans le cercle de ABC, B dans celui de ACD.</text>
+<text x="322" y="282">Aucun cercle ne contient le quatrième point.</text>
+</g>
+</svg>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>La bascule d'arête</h3>
+<p>Si un triangle viole le critère, on remplace la diagonale par l'autre : AC devient BD. Beaucoup d'algorithmes construisent une triangulation quelconque, puis basculent les arêtes fautives jusqu'à ce qu'il n'y en ait plus.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Pourquoi ce critère ?</h3>
+<p>Parmi toutes les triangulations, celle de Delaunay rend le plus petit angle le plus grand possible : elle évite les triangles longs et plats. Ici, ABC et ACD sont étirés ; ABD et BCD sont plus réguliers.</p>
+</div>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Delaunay.cs · 63–69</span>Node2List nodes = new Node2List();
+foreach (Point3d p in pts) nodes.Append(new Node2(p.X, p.Y));
+var faces = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Faces(nodes, 1);
+…
+foreach (var f in faces)
+    result.Add(new PolylineCurve(new[] { pts[f.A], pts[f.B], pts[f.C], pts[f.A] }), path);</div>
+<p style="font-size:8.4pt; margin-top:2mm; max-width:165mm">Cuttlefish n'écrit pas Delaunay : il appelle le solveur fourni par Grasshopper. Une face ne contient que trois <b>indices</b> A, B, C ; on retrouve les points 3D avec <code>pts[f.A]</code>, ce qui garde leur Z.</p>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Trianguler des points posés dans un plan vertical. Les <code>Node2</code> ne gardent que X et Y : vus de dessus, des points du plan XZ sont tous alignés, et il n'y a plus de triangle à faire. Delaunay travaille toujours en vue de dessus.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 16 · Delaunay et Voronoi</div>
+</section>
+<!-- ============ PAGE 3 · DUALITÉ ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 16</b></div>
+<p class="rubrique">Schéma 2 · La dualité</p>
+<h2>Un triangle, un sommet ; une arête, une arête</h2>
+<p style="max-width:165mm">Superpose les deux dessins sur les mêmes sites : chaque élément de l'un correspond à un élément de l'autre. Le triangle surligné et son cercle montrent la correspondance la plus utile.</p>
+<div class="deuxcol" style="margin-top:3mm; align-items:start">
+<svg viewbox="0 0 330 260" width="100%">
+<rect fill="#EFE9E1" height="260" width="330" x="0" y="0"></rect>
+<rect fill="#fff" height="230" stroke="#B5AEA5" width="300" x="15" y="15"></rect>
+<path d="M38.8 128.8 L15.0 127.1 L15.0 15.0 L103.0 15.0 L116.1 80.6 Z" fill="none" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M225.0 15.0 L187.7 98.9 L168.6 106.8 L116.1 80.6 L103.0 15.0 Z" fill="none" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M315.0 15.0 L315.0 127.5 L268.3 139.2 L187.7 98.9 L225.0 15.0 Z" fill="none" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M168.6 106.8 L155.2 173.8 L109.3 199.3 L38.8 128.8 L116.1 80.6 Z" fill="none" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M155.2 173.8 L168.6 106.8 L187.7 98.9 L268.3 139.2 L221.5 221.1 Z" fill="none" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M15.0 127.1 L38.8 128.8 L109.3 199.3 L96.8 245.0 L15.0 245.0 Z" fill="none" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M315.0 127.5 L315.0 245.0 L227.5 245.0 L221.5 221.1 L268.3 139.2 Z" fill="none" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M109.3 199.3 L155.2 173.8 L221.5 221.1 L227.5 245.0 L96.8 245.0 Z" fill="none" stroke="#E65100" stroke-width="1.4"></path>
+<path d="M60.0 60.0 L160.0 40.0 L110.0 140.0 Z" fill="none" opacity=".8" stroke="#00695C" stroke-width="1.3"></path>
+<path d="M60.0 60.0 L110.0 140.0 L50.0 200.0 Z" fill="none" opacity=".8" stroke="#00695C" stroke-width="1.3"></path>
+<path d="M160.0 40.0 L250.0 80.0 L210.0 160.0 Z" fill="none" opacity=".8" stroke="#00695C" stroke-width="1.3"></path>
+<path d="M160.0 40.0 L110.0 140.0 L210.0 160.0 Z" fill="none" opacity=".8" stroke="#00695C" stroke-width="1.3"></path>
+<path d="M250.0 80.0 L210.0 160.0 L280.0 200.0 Z" fill="none" opacity=".8" stroke="#00695C" stroke-width="1.3"></path>
+<path d="M110.0 140.0 L210.0 160.0 L160.0 230.0 Z" fill="none" opacity=".8" stroke="#00695C" stroke-width="1.3"></path>
+<path d="M110.0 140.0 L50.0 200.0 L160.0 230.0 Z" fill="none" opacity=".8" stroke="#00695C" stroke-width="1.3"></path>
+<path d="M210.0 160.0 L280.0 200.0 L160.0 230.0 Z" fill="none" opacity=".8" stroke="#00695C" stroke-width="1.3"></path>
+<path d="M160.0 40.0 L110.0 140.0 L210.0 160.0 Z" fill="#00695C" fill-opacity=".14" stroke="#00695C" stroke-width="2.4"></path>
+<circle cx="168.6" cy="106.8" fill="none" r="67.4" stroke="#00695C" stroke-dasharray="4 3"></circle>
+<circle cx="168.6" cy="106.8" fill="#E65100" r="5" stroke="#fff" stroke-width="1.5"></circle>
+<circle cx="60.0" cy="60.0" fill="#2B2F33" r="3.4"></circle>
+<circle cx="160.0" cy="40.0" fill="#2B2F33" r="3.4"></circle>
+<circle cx="250.0" cy="80.0" fill="#2B2F33" r="3.4"></circle>
+<circle cx="110.0" cy="140.0" fill="#2B2F33" r="3.4"></circle>
+<circle cx="210.0" cy="160.0" fill="#2B2F33" r="3.4"></circle>
+<circle cx="50.0" cy="200.0" fill="#2B2F33" r="3.4"></circle>
+<circle cx="280.0" cy="200.0" fill="#2B2F33" r="3.4"></circle>
+<circle cx="160.0" cy="230.0" fill="#2B2F33" r="3.4"></circle>
+</svg>
+<div style="font-size:8.6pt">
+<table class="aide" style="margin-top:0">
+<thead><tr><th>Delaunay</th><th>Voronoi</th></tr></thead>
+<tbody>
+<tr><td>un site</td><td>une cellule</td></tr>
+<tr><td>un triangle</td><td>un sommet : le centre du cercle circonscrit</td></tr>
+<tr><td>une arête entre deux sites</td><td>une arête, sur leur médiatrice, perpendiculaire</td></tr>
+</tbody>
+</table>
+<p style="margin-top:3mm">Le point orange est à égale distance des trois sommets du triangle : c'est le centre de son cercle. Comme le cercle est vide, aucun autre site n'est plus proche : ce point est le coin commun de trois cellules.</p>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Trouver le centre du cercle</span>
+    Le centre est à égale distance de A, B et C : il est sur la médiatrice de [AB] <b>et</b> sur celle de [BC]. Il suffit donc de croiser deux médiatrices. Une médiatrice passe par le milieu <code>(A + B) / 2</code>, dans la direction de <code>B − A</code> tournée d'un quart de tour : <code>(−y, x)</code>.
+  </div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Les deux composants n'utilisent pas la dualité</span>
+    Delaunay appelle le solveur de Grasshopper ; Voronoi découpe un rectangle, cellule par cellule (page 4). On aurait pu tirer l'un de l'autre, mais chacun calcule seul : c'est plus simple à lire, et suffisant pour quelques centaines de points.
+  </div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier le bord. Les cellules des sites extérieurs s'étendent à l'infini : Voronoi.cs les arrête au rectangle donné. Et le centre du cercle d'un triangle très aplati peut tomber hors du rectangle, donc sans coin visible.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 16 · Delaunay et Voronoi</div>
+</section>
+<!-- ============ PAGE 4 · DÉCOUPE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 16</b></div>
+<p class="rubrique">Schéma 3 · Découper par demi-plans</p>
+<h2>Une cellule, c'est un rectangle qu'on rogne</h2>
+<p style="max-width:165mm">Les points plus proches du site i que du site j sont tous du même côté de la médiatrice de [ij] : un <b>demi-plan</b>. La cellule de i est ce qui reste du rectangle quand on garde, pour chaque voisin j, le bon demi-plan.</p>
+<svg style="margin-top:2mm" viewbox="0 0 590 145" width="100%">
+<rect fill="#fff" height="110" stroke="#B5AEA5" width="130" x="5" y="5"></rect>
+<path d="M5.0 5.0 L135.0 5.0 L135.0 115.0 L5.0 115.0 Z" fill="#00695C" fill-opacity=".16" stroke="#00695C" stroke-width="2"></path>
+<circle cx="70.0" cy="55.0" fill="#00695C" r="4"></circle>
+<circle cx="30.0" cy="25.0" fill="#2B2F33" r="3"></circle>
+<circle cx="115.0" cy="30.0" fill="#2B2F33" r="3"></circle>
+<circle cx="105.0" cy="95.0" fill="#2B2F33" r="3"></circle>
+<circle cx="25.0" cy="90.0" fill="#2B2F33" r="3"></circle>
+<rect fill="#fff" height="110" stroke="#B5AEA5" width="130" x="155" y="5"></rect>
+<path d="M155.0 5.0 L285.0 5.0 L285.0 115.0 L155.0 115.0 Z" fill="#B5AEA5" fill-opacity=".25" stroke="none"></path>
+<line clip-path="url(#bx1)" stroke="#E65100" stroke-dasharray="4 3" stroke-width="1.4" x1="80.0" x2="320.0" y1="200.0" y2="-120.0"></line>
+<clippath id="bx1"><rect height="110" width="130" x="155" y="5"></rect></clippath>
+<line opacity=".6" stroke="#E65100" stroke-width="1" x1="220.0" x2="180.0" y1="55.0" y2="25.0"></line>
+<path d="M226.2 5.0 L285.0 5.0 L285.0 115.0 L155.0 115.0 L155.0 100.0 Z" fill="#00695C" fill-opacity=".16" stroke="#00695C" stroke-width="2"></path>
+<circle cx="220.0" cy="55.0" fill="#00695C" r="4"></circle>
+<circle cx="180.0" cy="25.0" fill="#E65100" r="3"></circle>
+<circle cx="265.0" cy="30.0" fill="#2B2F33" r="3"></circle>
+<circle cx="255.0" cy="95.0" fill="#2B2F33" r="3"></circle>
+<circle cx="175.0" cy="90.0" fill="#2B2F33" r="3"></circle>
+<rect fill="#fff" height="110" stroke="#B5AEA5" width="130" x="305" y="5"></rect>
+<path d="M376.2 5.0 L435.0 5.0 L435.0 115.0 L305.0 115.0 L305.0 100.0 Z" fill="#B5AEA5" fill-opacity=".25" stroke="none"></path>
+<line clip-path="url(#bx2)" stroke="#E65100" stroke-dasharray="4 3" stroke-width="1.4" x1="295.4" x2="489.6" y1="-132.3" y2="217.3"></line>
+<clippath id="bx2"><rect height="110" width="130" x="305" y="5"></rect></clippath>
+<line opacity=".6" stroke="#E65100" stroke-width="1" x1="370.0" x2="415.0" y1="55.0" y2="30.0"></line>
+<path d="M432.8 115.0 L305.0 115.0 L305.0 100.0 L373.6 8.5 Z" fill="#00695C" fill-opacity=".16" stroke="#00695C" stroke-width="2"></path>
+<circle cx="370.0" cy="55.0" fill="#00695C" r="4"></circle>
+<circle cx="330.0" cy="25.0" fill="#2B2F33" r="3"></circle>
+<circle cx="415.0" cy="30.0" fill="#E65100" r="3"></circle>
+<circle cx="405.0" cy="95.0" fill="#2B2F33" r="3"></circle>
+<circle cx="325.0" cy="90.0" fill="#2B2F33" r="3"></circle>
+<rect fill="#fff" height="110" stroke="#B5AEA5" width="130" x="455" y="5"></rect>
+<path d="M491.8 115.0 L455.0 115.0 L455.0 100.0 L523.6 8.5 L553.0 61.4 Z" fill="#B5AEA5" fill-opacity=".25" stroke="none"></path>
+<line clip-path="url(#bx3)" stroke="#E65100" stroke-dasharray="4 3" stroke-width="1.4" x1="620.3" x2="374.7" y1="230.4" y2="-85.4"></line>
+<clippath id="bx3"><rect height="110" width="130" x="455" y="5"></rect></clippath>
+<line opacity=".6" stroke="#E65100" stroke-width="1" x1="520.0" x2="475.0" y1="55.0" y2="90.0"></line>
+<path d="M486.4 58.2 L523.6 8.5 L553.0 61.4 L514.9 94.8 Z" fill="#00695C" fill-opacity=".16" stroke="#00695C" stroke-width="2"></path>
+<circle cx="520.0" cy="55.0" fill="#00695C" r="4"></circle>
+<circle cx="480.0" cy="25.0" fill="#2B2F33" r="3"></circle>
+<circle cx="565.0" cy="30.0" fill="#2B2F33" r="3"></circle>
+<circle cx="555.0" cy="95.0" fill="#2B2F33" r="3"></circle>
+<circle cx="475.0" cy="90.0" fill="#E65100" r="3"></circle>
+<g fill="#2B2F33" font-size="9.5" text-anchor="middle">
+<text x="70" y="134">départ : le rectangle</text>
+<text x="220" y="134">voisin 1</text>
+<text x="370" y="134">voisin 2</text>
+<text x="520" y="134">voisin 4 : la cellule</text>
+</g>
+</svg>
+<div class="deuxcol" style="margin-top:3mm">
+<div style="font-size:8.6pt">
+<h3>De quel côté ?</h3>
+<p><code>ProdVectoriel(q, line)</code> calcule la composante Z du produit vectoriel de la direction de la droite par <code>q − From</code> (cours 09). Positive : q est à gauche ; négative : à droite. On compare chaque sommet au côté du site, <code>referenceSide</code> : même signe, le produit est positif, le sommet est gardé.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Une médiatrice assez longue</h3>
+<p><code>CreateBisector</code> part du milieu et s'étend de 1000 fois <code>(−y, x)</code> de chaque côté. Ce vecteur a la longueur de [ij] : la droite fait 2000 fois la distance entre les sites, bien plus que le rectangle.</p>
+</div>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Voronoi.cs · 98–114, else simplifié</span>for (int i = 0; i &lt; currentPoints.Count - 1; i++)
+{
+    List&lt;Point3d&gt; currentCell = new List&lt;Point3d&gt;(vertex);
+    for (int j = 0; j &lt; currentPoints.Count - 1; j++)
+    {
+        if (i == j) { continue; }
+        bisector = CreateBisector(currentPoints[i], currentPoints[j]);
+        double referenceSide = ProdVectoriel(currentPoints[i], bisector);
+        currentCell = ClipPolygon(currentCell, bisector, referenceSide);
+    }
+    cells.Add(currentCell);
+}</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire que l'ordre des voisins change la cellule. Il change les étapes intermédiaires, pas le résultat : une intersection de demi-plans ne dépend pas de l'ordre. Le coût, lui, est fixe : n sites, n × (n − 1) découpes.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 16 · Delaunay et Voronoi</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 16</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Voronoi.cs : rogner un polygone</h2>
+<p style="max-width:165mm"><code>ClipPolygon</code> parcourt les arêtes du polygone, du sommet k au sommet k + 1, et décide quoi garder selon le côté de chaque bout. C'est l'algorithme de Sutherland-Hodgman, pour une seule droite.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">171</span><span class="ty">List</span>&lt;<span class="ty">Point3d</span>&gt; ClipPolygon(<span class="ty">List</span>&lt;<span class="ty">Point3d</span>&gt; polygon,</div>
+<div class="l"><span class="n"> </span> <span class="ty">Line</span> bisector, <span class="kw">double</span> referenceSide)</div>
+<div class="l"><span class="n">172</span>{</div>
+<div class="l"><span class="n">173</span> <span class="ty">List</span>&lt;<span class="ty">Point3d</span>&gt; newCell = <span class="kw">new</span> ...;</div>
+<div class="l k1"><span class="n">175</span> <span class="kw">int</span> nbVertex = polygon.Count;<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n">176</span> <span class="kw">for</span> (<span class="kw">int</span> k = 0; k &lt; nbVertex; k++)</div>
+<div class="l"><span class="n">177</span>  {</div>
+<div class="l k2"><span class="n">178</span> <span class="kw">double</span> current = ProdVectoriel(<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n"> </span>        polygon[k % nbVertex], bisector);</div>
+<div class="l k2"><span class="n">179</span> <span class="kw">double</span> next = ProdVectoriel(</div>
+<div class="l k2"><span class="n"> </span>        polygon[(k + 1) % nbVertex], bisector);</div>
+<div class="l k3"><span class="n">180</span> <span class="kw">bool</span> currentInside = current * referenceSide &gt; 0;<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">181</span> <span class="kw">bool</span> nextInside = next * referenceSide &gt; 0;</div>
+<div class="l k4"><span class="n">183</span> <span class="kw">if</span> (currentInside &amp;&amp; nextInside)<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n">185</span>      newCell.Add(polygon[(k + 1) % nbVertex]);</div>
+<div class="l k5"><span class="n">187</span> <span class="kw">else if</span> (!currentInside &amp;&amp; nextInside)<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">188</span>    {</div>
+<div class="l k5"><span class="n">189</span>      newCell.Add(Intersection(bisector, ...));</div>
+<div class="l k5"><span class="n">190</span>      newCell.Add(polygon[(k + 1) % nbVertex]);</div>
+<div class="l k5"><span class="n">191</span>    }</div>
+<div class="l k6"><span class="n">192</span> <span class="kw">else if</span> (!currentInside &amp;&amp; !nextInside)<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">194</span> <span class="kw">continue</span>;</div>
+<div class="l k7"><span class="n">196</span> <span class="kw">else if</span> (currentInside &amp;&amp; !nextInside)<span class="rep r7">7</span></div>
+<div class="l k7"><span class="n">198</span>      newCell.Add(Intersection(bisector, ...));</div>
+<div class="l"><span class="n">200</span>  }</div>
+<div class="l"><span class="n">202</span> <span class="kw">return</span> newCell;</div>
+<div class="l"><span class="n">204</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Chaque arête</b>De k à k + 1 ; <code>% nbVertex</code> relie le dernier sommet au premier.</li>
+<li><span class="rep r2">2</span><b>Le côté des deux bouts</b>Un signe par sommet (page 4).</li>
+<li><span class="rep r3">3</span><b>Dedans ou dehors</b>Même signe que le site : produit positif. Un sommet pile sur la droite compte comme dehors.</li>
+<li><span class="rep r4">4</span><b>Dedans → dedans</b>On garde le bout d'arrivée.</li>
+<li><span class="rep r5">5</span><b>Dehors → dedans</b>On entre : le point d'entrée sur la droite, puis le bout d'arrivée.</li>
+<li><span class="rep r6">6</span><b>Dehors → dehors</b>Rien : l'arête est rognée en entier.</li>
+<li><span class="rep r7">7</span><b>Dedans → dehors</b>On sort : seulement le point de sortie.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Ce que la relecture révèle</span>
+    Deux défauts, lus dans le code et à confirmer dans Grasshopper. Les boucles des lignes 98 et 101 s'arrêtent à <code>Count - 1</code> : le dernier point n'a pas de cellule et ne rogne pas celles des autres. Et la ligne 131 sort <code>poliCells</code>, une seule liste remplie par tous les groupes ; <code>poliCellsTree</code> est construit mais jamais sorti.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 16 · Delaunay et Voronoi</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 16</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">Solver.Solve_Faces(nodes, 1)</td><td>la triangulation de Delaunay du SDK</td><td>Delaunay:65</td></tr>
+<tr><td class="c">pts[f.A], pts[f.B], pts[f.C]</td><td>des indices aux points 3D</td><td>Delaunay:69</td></tr>
+<tr><td class="c">(A + B) / 2</td><td>le milieu de deux points</td><td>Voronoi:137</td></tr>
+<tr><td class="c">new Vector3d(-perpVect.Y, perpVect.X, 0)</td><td>B − A tourné d'un quart de tour</td><td>Voronoi:144</td></tr>
+<tr><td class="c">Vector3d.CrossProduct(a, b).Z</td><td>de quel côté d'une droite</td><td>Voronoi:160</td></tr>
+<tr><td class="c">current * referenceSide &gt; 0</td><td>du même côté que le site</td><td>Voronoi:180</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Site</dt><dd>Un des points donnés, autour duquel pousse une cellule.</dd>
+<dt>Médiatrice</dt><dd>La droite des points à égale distance de deux sites.</dd>
+<dt>Cercle circonscrit</dt><dd>Le cercle qui passe par les trois sommets d'un triangle.</dd>
+<dt>Dualité</dt><dd>Correspondance terme à terme entre Delaunay et Voronoi.</dd>
+<dt>Demi-plan</dt><dd>Ce qui est d'un seul côté d'une droite.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 142</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 16 · Delaunay et Voronoi</div>
+</section>
+</body>
+</html>

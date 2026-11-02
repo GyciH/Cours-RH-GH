@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>153 · Chercher sans pente</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-5">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 153</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Chercher sans pente</h1>
+<p class="chapeau">Une définition Grasshopper ne donne pas sa dérivée ; ses résultats bougent par petits sauts dus aux tolérances ; certains objectifs comptent des pièces. Il faut alors des méthodes qui se contentent de comparer des valeurs : « ici, c'est plus bas que là ».</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>137</b>, <b>151</b>, <b>152</b></span>
+<span class="pastille">Exemples · <b>SnapSet</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 222" width="100%">
+<polyline fill="none" points="30.0,84.2 32.7,84.9 35.4,85.6 38.1,86.3 40.8,87.0 43.5,87.6 46.2,88.3 48.9,88.9 51.6,89.6 54.3,90.2 57.0,90.8 59.7,91.5 62.4,92.1 65.1,92.7 67.8,93.2 70.5,93.8 73.2,94.4 75.9,95.0 78.6,95.5 81.3,96.1 84.0,96.6 86.7,97.2 89.4,97.7 92.1,98.2 94.8,98.7 97.5,99.2 100.2,99.7 102.9,100.2 105.6,100.7 108.3,101.2 111.0,101.6 113.7,102.1 116.4,102.6 119.1,103.0 121.8,103.4 124.5,103.9 127.2,104.3 129.9,104.7 132.6,105.1 135.3,105.5 138.0,105.9 140.7,106.3 143.4,106.7 146.1,107.1 148.8,107.5 151.5,107.8 154.2,108.2 156.9,108.5 159.6,108.9 162.3,109.2 165.0,109.5 167.7,109.8 170.4,110.1 173.1,110.4 175.8,110.7 178.5,111.0 181.2,111.3 183.9,111.5 186.6,111.8 189.3,112.0 192.0,112.2 194.7,112.5 197.4,112.7 200.1,112.9 202.8,113.1 205.5,113.2 208.2,113.4 210.9,113.5 213.6,113.7 216.3,113.8 219.0,113.9 221.7,114.0 224.4,114.1 227.1,114.2 229.8,114.3 232.5,114.4 235.2,114.4 237.9,114.4 240.6,114.4 243.3,114.5 246.0,114.4 248.7,114.4 251.4,114.4 254.1,114.3 256.8,114.3 259.5,114.2 262.2,114.1 264.9,114.0 267.6,113.9 270.3,113.7 273.0,113.6 275.7,113.4 278.4,113.3 281.1,113.1 283.8,112.9 286.5,112.6 289.2,112.4 291.9,112.2 294.6,111.9 297.3,111.6 300.0,111.3 302.7,111.0 305.4,110.7 308.1,110.4 310.8,110.0 313.5,109.6 316.2,109.3 318.9,108.9 321.6,108.5 324.3,108.0 327.0,107.6 329.7,107.2 332.4,106.7 335.1,106.2 337.8,105.8 340.5,105.3 343.2,104.7 345.9,104.2 348.6,103.7 351.3,103.1 354.0,102.6 356.7,102.0 359.4,101.4 362.1,100.8 364.8,100.2 367.5,99.6 370.2,99.0 372.9,98.4 375.6,97.7 378.3,97.0 381.0,96.4 383.7,95.7 386.4,95.0 389.1,94.3 391.8,93.6 394.5,92.9 397.2,92.2 399.9,91.4 402.6,90.7 405.3,89.9 408.0,89.2 410.7,88.4 413.4,87.6 416.1,86.9 418.8,86.1 421.5,85.3 424.2,84.5 426.9,83.6 429.6,82.8 432.3,82.0 435.0,81.2 437.7,80.3 440.4,79.5 443.1,78.6 445.8,77.7 448.5,76.9 451.2,76.0 453.9,75.1 456.6,74.2 459.3,73.3 462.0,72.4 464.7,71.5 467.4,70.6 470.1,69.6 472.8,68.7 475.5,67.8 478.2,66.8 480.9,65.8 483.6,64.9 486.3,63.9 489.0,62.9 491.7,61.9 494.4,60.9 497.1,59.9 499.8,58.9 502.5,57.9 505.2,56.9 507.9,55.9 510.6,54.8 513.3,53.8 516.0,52.7 518.7,51.6 521.4,50.5 524.1,49.4 526.8,48.3 529.5,47.2 532.2,46.1 534.9,45.0 537.6,43.8 540.3,42.7 543.0,41.5 545.7,40.4 548.4,39.2 551.1,38.0 553.8,36.8 556.5,35.5 559.2,34.3 561.9,33.1 564.6,31.8 567.3,30.5 570.0,29.3" stroke="#AD1457" stroke-width="1.5"></polyline>
+<line opacity=".55" stroke="#1565C0" stroke-width="2.4" x1="30.0" x2="570.0" y1="136" y2="136"></line>
+<circle cx="236.3" cy="136" fill="#E65100" r="2.6"></circle>
+<circle cx="363.7" cy="136" fill="#E65100" r="2.6"></circle>
+<line opacity=".55" stroke="#1565C0" stroke-width="2.4" x1="30.0" x2="363.7" y1="147" y2="147"></line>
+<circle cx="157.5" cy="147" fill="#E65100" r="2.6"></circle>
+<circle cx="236.3" cy="147" fill="#E65100" r="2.6"></circle>
+<line opacity=".55" stroke="#1565C0" stroke-width="2.4" x1="157.5" x2="363.7" y1="158" y2="158"></line>
+<circle cx="236.3" cy="158" fill="#E65100" r="2.6"></circle>
+<circle cx="285.0" cy="158" fill="#E65100" r="2.6"></circle>
+<line opacity=".55" stroke="#1565C0" stroke-width="2.4" x1="157.5" x2="285.0" y1="169" y2="169"></line>
+<circle cx="206.2" cy="169" fill="#E65100" r="2.6"></circle>
+<circle cx="236.3" cy="169" fill="#E65100" r="2.6"></circle>
+<line opacity=".55" stroke="#1565C0" stroke-width="2.4" x1="206.2" x2="285.0" y1="180" y2="180"></line>
+<circle cx="236.3" cy="180" fill="#E65100" r="2.6"></circle>
+<circle cx="254.9" cy="180" fill="#E65100" r="2.6"></circle>
+<text fill="#AD1457" font-size="8" font-weight="700" text-anchor="start" x="30" y="14">un seul creux sur [0, 10] : on compare deux points intérieurs et l'on jette le côté le plus haut</text>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="end" x="570" y="196">à chaque tour, l'intervalle garde 61,8 % de sa longueur</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="10" y="214">Aucune pente n'est calculée : seulement « lequel des deux est plus bas ? ». Dessin en Python, cinq tours.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Avec une seule hypothèse sur la forme du paysage, comme « un seul creux », de simples comparaisons suffisent à resserrer la recherche à chaque essai.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Régler une douche sans thermomètre : trop chaud, trop froid, on resserre la plage du robinet à chaque essai.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>appliquer la section dorée ;</li>
+<li>décrire Nelder-Mead ;</li>
+<li>choisir face à un objectif bruité ;</li>
+<li>éliminer plutôt que chercher.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Sans pente, chaque évaluation n'apporte qu'une comparaison. Les bonnes méthodes en tirent le maximum en réutilisant les points déjà payés.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 153 · Chercher sans pente</div>
+</section>
+<!-- ============ PAGE 2 · SECTION DORÉE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 153</b></div>
+<p class="rubrique">Schéma 1 · La section dorée</p>
+<h2>Une variable, un creux, quelques dizaines d'essais</h2>
+<p style="max-width:165mm">C'est la dichotomie du cours 137 appliquée à un minimum : deux points intérieurs, on garde le côté du plus bas. Placés au nombre d'or, ils resservent d'un tour à l'autre.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Trouver le creux d'une fonction à un seul minimum sur [0, 10], à une précision donnée (.NET 8, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">précision</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="160" y="40">section dorée</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="300" y="40">tiers à chaque tour</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="450" y="40">grille régulière</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">10⁻³</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="61">22</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="61">46</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="61">10 000</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">10⁻⁶</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="79">36</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="79">80</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="79">10 millions</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">10⁻⁹</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="97">50</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="97">114</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="450" y="97">10 milliards</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="120">Évaluations de la fonction. Chaque facteur mille de précision coûte 14 évaluations à la section dorée.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="136">Le secret : un des deux points d'un tour resert au tour suivant, une seule évaluation neuve par tour.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="160">Le rapport 0,618 est le seul qui permette ce réemploi : g² = 1 − g (déduit). Le partage en tiers jette les deux points.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, la section dorée</span>double g = (Math.Sqrt(5) - 1) / 2, c = b - g * (b - a), d = a + g * (b - a), fc = f(c), fd = f(d);
+while (b - a &gt; tol)
+    if (fc &lt; fd) { b = d; d = c; fd = fc; c = b - g * (b - a); fc = f(c); }   // fc devient fd
+    else         { a = c; c = d; fc = fd; d = a + g * (b - a); fd = f(d); }</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Dans Grasshopper</h3>
+<p>Un seul curseur, un résultat à minimiser : la section dorée trouve le réglage en une trentaine de recalculs, là où balayer le curseur au millième en demanderait des milliers.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Encadrer d'abord</h3>
+<p>La méthode suppose que le creux est dans [a, b]. Un balayage grossier préalable, une dizaine de points, sert à choisir cet intervalle.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    L'appliquer à une courbe à plusieurs creux. Elle en trouve un, sans rien en dire : celui que le premier tour a gardé, pas forcément le plus bas (déduit).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 153 · Chercher sans pente</div>
+</section>
+<!-- ============ PAGE 3 · NELDER-MEAD ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 153</b></div>
+<p class="rubrique">Schéma 2 · Nelder-Mead</p>
+<h2>Un triangle qui dévale la pente</h2>
+<p style="max-width:165mm">En plusieurs variables, Nelder-Mead promène un simplexe de n + 1 points. Le plus mauvais est renvoyé de l'autre côté des autres ; selon ce qu'il trouve, le simplexe s'étire, se replie ou rétrécit.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Nelder-Mead depuis (−1, …, −1), arrêt sous 10⁻⁸ : évaluations selon le nombre de variables (mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">variables</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="160" y="40">cuvette ronde</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="330" y="40">vallée de Rosenbrock</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">2</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="61">58</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="61">150</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">5</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="79">230</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="79">485</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">10</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="97">953</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="97">3 832</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">20</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="115">5 358</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="115">349 526</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="138">Un triangle (en deux variables) se retourne, s'étire ou se contracte vers le bas, sans aucune pente.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="154">Excellent pour quelques variables ; au-delà d'une dizaine, le coût s'envole.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="178">En n variables, le « triangle » a n + 1 sommets : un simplexe. Réflexion −1, expansion −2, contraction ±0,5.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, le cœur d'un tour de Nelder-Mead</span>var xr = c + (c - pire);                         // réflexion à travers le centre c des autres points
+if (f(xr) &lt; f(meilleur)) Essayer(c + 2 * (c - pire));   // prometteur : on étire
+else if (f(xr) &gt;= f(avantDernier)) Contracter();      // pas mieux : on se replie, ou l'on rétrécit</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi il s'adapte</h3>
+<p>Le simplexe prend la forme du paysage : allongé dans une vallée, il s'étire le long du fond. C'est une pente devinée par les sommets, sans la calculer.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Ses limites</h3>
+<p>Il ne garantit pas la convergence, peut s'aplatir dans une direction et s'arrêter trop tôt. On le relance depuis son meilleur point pour s'en assurer.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Le confier à vingt curseurs. Sur Rosenbrock, il a fallu 349 526 évaluations en 20 variables contre 3 832 en 10 (mesuré) : à 50 ms le recalcul, près de cinq heures.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 153 · Chercher sans pente</div>
+</section>
+<!-- ============ PAGE 4 · LE BRUIT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 153</b></div>
+<p class="rubrique">Schéma 3 · L'objectif bruité</p>
+<h2>Quand la mesure tremble</h2>
+<p style="max-width:165mm">Booléens, maillages, tolérances : un objectif calculé par Rhino varie souvent un peu quand on bouge à peine un curseur. Ce tremblement ruine les pentes mesurées trop finement.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Cuvette ronde plus un bruit de ±0,0005 à chaque évaluation, 2 000 évaluations, 20 essais (mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">méthode</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="280" y="40">distance au vrai minimum</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="440" y="40">pire essai</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">Nelder-Mead</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="61">0,009</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="61">0,015</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">gradient centré, h = 10⁻⁶</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="79">84</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="79">140</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">gradient centré, h = 10⁻³</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="97">0,049</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="97">0,13</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">gradient centré, h = 0,1</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="115">0,0008</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="440" y="115">0,0013</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="140">Un petit h divise le bruit par un petit nombre : la pente mesurée n'est plus que du bruit, et la descente part au loin.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="156">Nelder-Mead ne compare que des valeurs : il tolère le bruit, sans viser plus fin que lui.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="178">Départ (−1, −1), minimum en (1, 1). Gradient : 500 itérations au pas 0,25, quatre évaluations chacune.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, choisir h au-dessus du bruit</span>double bruit = EcartType(Enumerable.Range(0, 10).Select(_ =&gt; f(x)));   // si f n'est pas parfaitement stable
+double h = Math.Max(1e-6, 10 * bruit / pente);   // h assez grand pour que f(x + h) - f(x - h) dépasse le bruit</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Deux remèdes</h3>
+<p>Mesurer la pente avec un écart h bien plus grand que le bruit, ou se passer de pente et comparer des valeurs. Dans les deux cas, on renonce à une précision plus fine que le bruit.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le tester</h3>
+<p>Recalculer deux fois la même définition, puis décaler un curseur d'un cheveu : si l'objectif bouge plus que prévu, il est bruité. Mieux vaut le savoir avant d'optimiser.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Garder h = 10⁻⁶, réglage parfait sans bruit (cours 152). Avec un bruit de ±0,0005, la descente a fini à 84 du minimum au lieu de 0,0008 avec h = 0,1 (mesuré).
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 153 · Chercher sans pente</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 153</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>SnapSet partage sans chercher</h2>
+<p style="max-width:165mm">Metrique.Partager répartit la place libre d'un conteneur au prorata des poids, sans jamais donner moins que la taille naturelle. Plutôt que chercher la part juste par essais, il élimine : chaque tour gèle un enfant trop gros, puis on recommence.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">SnapSet/schema/Metrique.cs</span></div>
+<div class="l k1"><span class="n">3079</span>reste -= tailles[i];<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">3102</span>float part = reste * poidsUtiles[i] / sommePoids;<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">3105</span>gele[i] = true;<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">3108</span>break;<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">3117</span>tailles[i] = reste * poidsUtiles[i] / sommePoids;<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Poids nul</b>Servi d'abord.</li>
+<li><span class="rep r2">2</span><b>Part</b>Au prorata.</li>
+<li><span class="rep r3">3</span><b>Gel</b>Trop petit : figé.</li>
+<li><span class="rep r4">4</span><b>Un par tour</b>On recommence.</li>
+<li><span class="rep r5">5</span><b>Fin</b>Le partage tient.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · un coût en n², sans conséquence ici</span>
+    Le gel du premier enfant trouvé, et non du plus gros, donne quand même le bon partage : sur 200 000 cas tirés au hasard, la recopie s'accordait avec une recherche par dichotomie de la part par unité de poids, à 2,4 × 10⁻⁵ près au pire (mesuré sur recopie). Chaque tour relit tous les enfants et en gèle un : n + 1 tours au pire, 1,9 ms pour 1 000 enfants (mesuré sur recopie), négligeable pour un conteneur réel. Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 153 · Chercher sans pente</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 153</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">(Math.Sqrt(5) - 1) / 2</td><td>le rapport de la section dorée, 0,618</td><td>page 2</td></tr>
+<tr><td class="c">if (fc &lt; fd) b = d; else a = c;</td><td>jeter le côté le plus haut</td><td>page 2</td></tr>
+<tr><td class="c">c + (c - pire)</td><td>la réflexion de Nelder-Mead</td><td>page 3</td></tr>
+<tr><td class="c">10 * bruit / pente</td><td>un ordre de grandeur pour h</td><td>page 4</td></tr>
+<tr><td class="c">part &lt; tailles[i]</td><td>l'enfant serait rogné : on le gèle</td><td>Metrique.cs:3103</td></tr>
+<tr><td class="c">while (b - a &gt; tol)</td><td>resserrer jusqu'à la précision voulue</td><td>page 2</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Section dorée</dt><dd>Une recherche du creux d'une fonction à un seul minimum, au rapport 0,618.</dd>
+<dt>Unimodale</dt><dd>Se dit d'une fonction qui n'a qu'un seul creux dans l'intervalle étudié.</dd>
+<dt>Simplexe</dt><dd>Un ensemble de n + 1 points en n variables : triangle en 2, tétraèdre en 3.</dd>
+<dt>Nelder-Mead</dt><dd>Une méthode qui déplace un simplexe par réflexions, étirements et contractions.</dd>
+<dt>Objectif bruité</dt><dd>Un objectif qui varie un peu sans raison quand on bouge à peine une variable.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 154</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 153 · Chercher sans pente</div>
+</section>
+</body>
+</html>

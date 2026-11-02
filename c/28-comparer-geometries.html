@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>28 · Comparer deux géométries</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 28</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Comparer deux<br/>géométries</h1>
+<p class="chapeau">Sur les sept modes de correction de Magpie, un seul juge une forme : <code>GeometryTolerance</code>. Deux apprenants construisent le même cercle, l'un avec Circle, l'autre avec Arc puis Join. Magpie doit les accepter tous les deux, et refuser un cercle décalé d'un millimètre de trop.</p>
+<div class="meta">
+<span class="pastille"><b>55 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>24</b> sérialisation · <b>03</b> collections</span>
+<span class="pastille">Exemples · <b>GeometryFingerprint</b>, <b>GeometrySampler</b>, <b>ComparaisonGeometrie</b> (Magpie)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 214" width="100%">
+<circle cx="150" cy="100" fill="none" r="64.0" stroke="#1565C0" stroke-dasharray="5 3" stroke-width="1.4"></circle>
+<circle cx="214.0" cy="100.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="211.8" cy="83.4" fill="#1565C0" r="1.8"></circle>
+<circle cx="205.4" cy="68.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="195.3" cy="54.7" fill="#1565C0" r="1.8"></circle>
+<circle cx="182.0" cy="44.6" fill="#1565C0" r="1.8"></circle>
+<circle cx="166.6" cy="38.2" fill="#1565C0" r="1.8"></circle>
+<circle cx="150.0" cy="36.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="133.4" cy="38.2" fill="#1565C0" r="1.8"></circle>
+<circle cx="118.0" cy="44.6" fill="#1565C0" r="1.8"></circle>
+<circle cx="104.7" cy="54.7" fill="#1565C0" r="1.8"></circle>
+<circle cx="94.6" cy="68.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="88.2" cy="83.4" fill="#1565C0" r="1.8"></circle>
+<circle cx="86.0" cy="100.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="88.2" cy="116.6" fill="#1565C0" r="1.8"></circle>
+<circle cx="94.6" cy="132.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="104.7" cy="145.3" fill="#1565C0" r="1.8"></circle>
+<circle cx="118.0" cy="155.4" fill="#1565C0" r="1.8"></circle>
+<circle cx="133.4" cy="161.8" fill="#1565C0" r="1.8"></circle>
+<circle cx="150.0" cy="164.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="166.6" cy="161.8" fill="#1565C0" r="1.8"></circle>
+<circle cx="182.0" cy="155.4" fill="#1565C0" r="1.8"></circle>
+<circle cx="195.3" cy="145.3" fill="#1565C0" r="1.8"></circle>
+<circle cx="205.4" cy="132.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="211.8" cy="116.6" fill="#1565C0" r="1.8"></circle>
+<circle cx="162.0" cy="100" fill="none" r="64.0" stroke="#2E7D32" stroke-width="1.8"></circle>
+<circle cx="226.0" cy="100.0" fill="#2E7D32" r="1.8"></circle>
+<circle cx="223.8" cy="83.4" fill="#2E7D32" r="1.8"></circle>
+<circle cx="217.4" cy="68.0" fill="#2E7D32" r="1.8"></circle>
+<circle cx="207.3" cy="54.7" fill="#2E7D32" r="1.8"></circle>
+<circle cx="194.0" cy="44.6" fill="#2E7D32" r="1.8"></circle>
+<circle cx="178.6" cy="38.2" fill="#2E7D32" r="1.8"></circle>
+<circle cx="162.0" cy="36.0" fill="#2E7D32" r="1.8"></circle>
+<circle cx="145.4" cy="38.2" fill="#2E7D32" r="1.8"></circle>
+<circle cx="130.0" cy="44.6" fill="#2E7D32" r="1.8"></circle>
+<circle cx="116.7" cy="54.7" fill="#2E7D32" r="1.8"></circle>
+<circle cx="106.6" cy="68.0" fill="#2E7D32" r="1.8"></circle>
+<circle cx="100.2" cy="83.4" fill="#2E7D32" r="1.8"></circle>
+<circle cx="98.0" cy="100.0" fill="#2E7D32" r="1.8"></circle>
+<circle cx="100.2" cy="116.6" fill="#2E7D32" r="1.8"></circle>
+<circle cx="106.6" cy="132.0" fill="#2E7D32" r="1.8"></circle>
+<circle cx="116.7" cy="145.3" fill="#2E7D32" r="1.8"></circle>
+<circle cx="130.0" cy="155.4" fill="#2E7D32" r="1.8"></circle>
+<circle cx="145.4" cy="161.8" fill="#2E7D32" r="1.8"></circle>
+<circle cx="162.0" cy="164.0" fill="#2E7D32" r="1.8"></circle>
+<circle cx="178.6" cy="161.8" fill="#2E7D32" r="1.8"></circle>
+<circle cx="194.0" cy="155.4" fill="#2E7D32" r="1.8"></circle>
+<circle cx="207.3" cy="145.3" fill="#2E7D32" r="1.8"></circle>
+<circle cx="217.4" cy="132.0" fill="#2E7D32" r="1.8"></circle>
+<circle cx="223.8" cy="116.6" fill="#2E7D32" r="1.8"></circle>
+<line stroke="#2B2F33" stroke-width="1.6" x1="214.0" x2="226.0" y1="100" y2="100"></line>
+<text fill="#2B2F33" font-size="10" font-style="italic" font-weight="700" text-anchor="middle" x="220.0" y="92">d</text>
+<text fill="#2E7D32" font-size="9.6" font-weight="700" text-anchor="middle" x="150" y="182">écart 0.300 ≤ 0.5 : réussi</text>
+<circle cx="450" cy="100" fill="none" r="64.0" stroke="#1565C0" stroke-dasharray="5 3" stroke-width="1.4"></circle>
+<circle cx="514.0" cy="100.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="511.8" cy="83.4" fill="#1565C0" r="1.8"></circle>
+<circle cx="505.4" cy="68.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="495.3" cy="54.7" fill="#1565C0" r="1.8"></circle>
+<circle cx="482.0" cy="44.6" fill="#1565C0" r="1.8"></circle>
+<circle cx="466.6" cy="38.2" fill="#1565C0" r="1.8"></circle>
+<circle cx="450.0" cy="36.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="433.4" cy="38.2" fill="#1565C0" r="1.8"></circle>
+<circle cx="418.0" cy="44.6" fill="#1565C0" r="1.8"></circle>
+<circle cx="404.7" cy="54.7" fill="#1565C0" r="1.8"></circle>
+<circle cx="394.6" cy="68.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="388.2" cy="83.4" fill="#1565C0" r="1.8"></circle>
+<circle cx="386.0" cy="100.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="388.2" cy="116.6" fill="#1565C0" r="1.8"></circle>
+<circle cx="394.6" cy="132.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="404.7" cy="145.3" fill="#1565C0" r="1.8"></circle>
+<circle cx="418.0" cy="155.4" fill="#1565C0" r="1.8"></circle>
+<circle cx="433.4" cy="161.8" fill="#1565C0" r="1.8"></circle>
+<circle cx="450.0" cy="164.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="466.6" cy="161.8" fill="#1565C0" r="1.8"></circle>
+<circle cx="482.0" cy="155.4" fill="#1565C0" r="1.8"></circle>
+<circle cx="495.3" cy="145.3" fill="#1565C0" r="1.8"></circle>
+<circle cx="505.4" cy="132.0" fill="#1565C0" r="1.8"></circle>
+<circle cx="511.8" cy="116.6" fill="#1565C0" r="1.8"></circle>
+<circle cx="482.0" cy="100" fill="none" r="64.0" stroke="#C62828" stroke-width="1.8"></circle>
+<circle cx="546.0" cy="100.0" fill="#C62828" r="1.8"></circle>
+<circle cx="543.8" cy="83.4" fill="#C62828" r="1.8"></circle>
+<circle cx="537.4" cy="68.0" fill="#C62828" r="1.8"></circle>
+<circle cx="527.3" cy="54.7" fill="#C62828" r="1.8"></circle>
+<circle cx="514.0" cy="44.6" fill="#C62828" r="1.8"></circle>
+<circle cx="498.6" cy="38.2" fill="#C62828" r="1.8"></circle>
+<circle cx="482.0" cy="36.0" fill="#C62828" r="1.8"></circle>
+<circle cx="465.4" cy="38.2" fill="#C62828" r="1.8"></circle>
+<circle cx="450.0" cy="44.6" fill="#C62828" r="1.8"></circle>
+<circle cx="436.7" cy="54.7" fill="#C62828" r="1.8"></circle>
+<circle cx="426.6" cy="68.0" fill="#C62828" r="1.8"></circle>
+<circle cx="420.2" cy="83.4" fill="#C62828" r="1.8"></circle>
+<circle cx="418.0" cy="100.0" fill="#C62828" r="1.8"></circle>
+<circle cx="420.2" cy="116.6" fill="#C62828" r="1.8"></circle>
+<circle cx="426.6" cy="132.0" fill="#C62828" r="1.8"></circle>
+<circle cx="436.7" cy="145.3" fill="#C62828" r="1.8"></circle>
+<circle cx="450.0" cy="155.4" fill="#C62828" r="1.8"></circle>
+<circle cx="465.4" cy="161.8" fill="#C62828" r="1.8"></circle>
+<circle cx="482.0" cy="164.0" fill="#C62828" r="1.8"></circle>
+<circle cx="498.6" cy="161.8" fill="#C62828" r="1.8"></circle>
+<circle cx="514.0" cy="155.4" fill="#C62828" r="1.8"></circle>
+<circle cx="527.3" cy="145.3" fill="#C62828" r="1.8"></circle>
+<circle cx="537.4" cy="132.0" fill="#C62828" r="1.8"></circle>
+<circle cx="543.8" cy="116.6" fill="#C62828" r="1.8"></circle>
+<line stroke="#2B2F33" stroke-width="1.6" x1="514.0" x2="546.0" y1="100" y2="100"></line>
+<text fill="#2B2F33" font-size="10" font-style="italic" font-weight="700" text-anchor="middle" x="530.0" y="92">d</text>
+<text fill="#C62828" font-size="9.6" font-weight="700" text-anchor="middle" x="450" y="182">écart 0.800 &gt; 0.5 : refusé</text>
+<text fill="#1565C0" font-size="8.8" font-weight="700" text-anchor="start" x="30" y="20">référence (pointillés)</text>
+<text fill="#6B7378" font-size="8.8" font-style="italic" text-anchor="middle" x="300" y="205">Même rayon, centre décalé de 0.3 puis de 0.8 unité ; tolérance 0.5. L'écart mesuré vaut le décalage.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>On ramène chaque géométrie à une <b>empreinte</b> : sa famille, sa fermeture, et un <b>nuage de points</b> posés dessus. Deux nuages se comparent par leur <b>écart maximal</b>, qu'on confronte à une tolérance.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Vérifier un dessin au calque. On ne demande pas dans quel ordre les traits ont été tracés : on pose le calque de la solution par-dessus et on cherche l'endroit où les deux s'éloignent le plus.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>ramener tout type Grasshopper à quatre familles ;</li>
+<li>expliquer comment une surface devient un nuage de points ;</li>
+<li>calculer une distance de Hausdorff bilatérale ;</li>
+<li>dire pourquoi l'ordre des filtres compte.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    On vérifie la <b>forme obtenue</b>, pas le chemin suivi. Un nuage de points n'a pas d'ordre : il ignore le sens d'une courbe, sa couture, le paramétrage UV d'une surface et l'ordre des sommets d'un maillage, qui changent tous d'une construction à l'autre.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 28 · Comparer deux géométries</div>
+</section>
+<!-- ============ PAGE 2 · FAMILLES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 28</b></div>
+<p class="rubrique">Schéma 1 · Quatre familles</p>
+<h2>Des dizaines de types, quatre cas à traiter</h2>
+<p style="max-width:165mm">Grasshopper emballe chaque géométrie dans un « goo » (<code>GH_Curve</code>, <code>GH_Box</code>…). <code>ScriptVariable()</code> rend la géométrie Rhino qu'il contient ; un <code>switch</code> sur son type la range dans une famille.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="12" font-weight="700" text-anchor="start" x="16" y="22">ScriptVariable(), puis un switch sur le type Rhino</text>
+<rect fill="#E65100" height="24" rx="4" width="104" x="16" y="36"></rect>
+<text class="mono" fill="#fff" font-size="10" font-weight="700" style="font-size:10px" text-anchor="middle" x="68" y="52">Point</text>
+<rect fill="#fff" height="104" rx="4" stroke="#E65100" width="104" x="16" y="62"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="68" y="78">Point3d</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="68" y="93">Point</text>
+<rect fill="#1565C0" height="24" rx="4" width="104" x="132" y="36"></rect>
+<text class="mono" fill="#fff" font-size="10" font-weight="700" style="font-size:10px" text-anchor="middle" x="184" y="52">Curve</text>
+<rect fill="#fff" height="104" rx="4" stroke="#1565C0" width="104" x="132" y="62"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="184" y="78">Line</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="184" y="93">Arc</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="184" y="108">Circle</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="184" y="123">Rectangle3d</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="184" y="138">Polyline</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="184" y="153">Curve</text>
+<rect fill="#2E7D32" height="24" rx="4" width="104" x="248" y="36"></rect>
+<text class="mono" fill="#fff" font-size="10" font-weight="700" style="font-size:10px" text-anchor="middle" x="300" y="52">Surface</text>
+<rect fill="#fff" height="104" rx="4" stroke="#2E7D32" width="104" x="248" y="62"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="300" y="78">Brep</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="300" y="93">Box</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="300" y="108">Extrusion</text>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="300" y="123">Surface</text>
+<rect fill="#7B1FA2" height="24" rx="4" width="104" x="364" y="36"></rect>
+<text class="mono" fill="#fff" font-size="10" font-weight="700" style="font-size:10px" text-anchor="middle" x="416" y="52">Mesh</text>
+<rect fill="#fff" height="104" rx="4" stroke="#7B1FA2" width="104" x="364" y="62"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.8" style="font-size:8.8px" text-anchor="middle" x="416" y="78">Mesh</text>
+<rect fill="#6B7378" height="24" rx="4" width="104" x="480" y="36"></rect>
+<text fill="#fff" font-size="10" font-weight="700" text-anchor="middle" x="532" y="52">autre</text>
+<rect fill="#fff" height="104" rx="4" stroke="#6B7378" stroke-dasharray="4 2" width="104" x="480" y="62"></rect>
+<text fill="#6B7378" font-size="8.4" font-style="italic" text-anchor="middle" x="532" y="80">Plane, Vector…</text>
+<text fill="#2B2F33" font-size="8.4" text-anchor="middle" x="532" y="94"></text>
+<text fill="#2B2F33" font-size="8.4" text-anchor="middle" x="532" y="108">NotSupported-</text>
+<text fill="#2B2F33" font-size="8.4" text-anchor="middle" x="532" y="122">Exception</text>
+<text fill="#2B2F33" font-size="8.4" text-anchor="middle" x="532" y="136">→ octets</text>
+<text fill="#2B2F33" font-size="8.4" text-anchor="middle" x="532" y="150">comparés tels quels</text>
+<text fill="#2B2F33" font-size="8.8" text-anchor="start" x="16" y="188">Courbes converties en NurbsCurve, ArcCurve ou PolylineCurve ; Box, Extrusion, Surface converties en Brep.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">GeometryFingerprint.cs · 62–86, condensé</span>object raw = goo is IGH_GeometricGoo geometric ? geometric.ScriptVariable() : goo;
+switch (raw)
+{
+    case Point3d point:  return FromPoint(point);
+    case Circle circle:  return FromCurve(new ArcCurve(circle));
+    case Curve curve:    return FromCurve(curve);
+    case Mesh mesh:      return FromMesh(mesh);
+    case Box box:        return FromBrep(box.ToBrep());
+    …
+    default: throw new NotSupportedException($"Aucune empreinte géométrique définie pour …");
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le filtrage par motif</h3>
+<p><code>case Circle circle:</code> teste le type et, s'il convient, nomme la variable dans la foulée. L'ordre des <code>case</code> compte : le premier qui convient gagne. Les types précis (Line, Arc…) passent avant <code>Curve</code>, qui ramasse le reste.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Ce que l'empreinte ignore</h3>
+<p>Le sens de parcours, la couture, le paramétrage UV, l'ordre des sommets, le nombre de faces (commentaire des lignes 22–26). Un exercice qui porte sur l'un d'eux se corrige par un mode numérique, pas par celui-ci.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Une réponse d'un type sans empreinte (un plan, par exemple). <code>Compute</code> lève <code>NotSupportedException</code> ; <code>ComparaisonGeometrie</code> retombe alors sur la comparaison <b>stricte</b> des octets sérialisés (cours 24), sans aucune tolérance, et le dit dans son message.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 28 · Comparer deux géométries</div>
+</section>
+<!-- ============ PAGE 3 · ÉCHANTILLONNER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 28</b></div>
+<p class="rubrique">Schéma 2 · Échantillonner</p>
+<h2>D'une surface à un nuage régulier</h2>
+<p style="max-width:165mm">Une courbe reçoit 200 points à <b>longueur d'arc</b> égale (<code>DivideByCount</code>). Une surface est d'abord maillée, puis chaque triangle est quadrillé au pas visé, et une grille ne garde qu'un point par case.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 216" width="100%">
+<rect fill="#EFE9E1" height="216" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="12" font-weight="700" text-anchor="start" x="16" y="22">Une plaque carrée de 6 × 6, pas visé 1 (calcul réel de l'algorithme)</text>
+<text fill="#1F5F7A" font-size="9.6" font-weight="700" text-anchor="middle" x="106.0" y="46">1 · maillé</text>
+<text fill="#2B2F33" font-size="8.6" text-anchor="middle" x="106.0" y="200">2 triangles</text>
+<rect fill="#fff" height="132.0" stroke="#6B7378" width="132.0" x="40" y="58"></rect>
+<line stroke="#6B7378" x1="40" x2="172.0" y1="190.0" y2="58"></line>
+<text fill="#1F5F7A" font-size="9.6" font-weight="700" text-anchor="middle" x="291.0" y="46">2 · quadrillé</text>
+<text fill="#2B2F33" font-size="8.6" text-anchor="middle" x="291.0" y="200">110 points candidats</text>
+<rect fill="#fff" height="132.0" stroke="#6B7378" width="132.0" x="225" y="58"></rect>
+<line stroke="#6B7378" x1="225" x2="357.0" y1="190.0" y2="58"></line>
+<circle cx="225.0" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="190.0" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="225.0" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="175.3" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="239.7" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="160.7" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="254.3" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="146.0" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="269.0" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="131.3" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="283.7" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="116.7" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="298.3" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="102.0" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="313.0" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="87.3" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="327.7" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="72.7" fill="#E65100" r="1.5"></circle>
+<circle cx="342.3" cy="58.0" fill="#E65100" r="1.5"></circle>
+<circle cx="357.0" cy="58.0" fill="#E65100" r="1.5"></circle>
+<text fill="#1F5F7A" font-size="9.6" font-weight="700" text-anchor="middle" x="476.0" y="46">3 · criblé</text>
+<text fill="#2B2F33" font-size="8.6" text-anchor="middle" x="476.0" y="200">49 points gardés</text>
+<rect fill="#fff" height="132.0" stroke="#6B7378" width="132.0" x="410" y="58"></rect>
+<line stroke="#E2DCD2" x1="432.0" x2="432.0" y1="58" y2="190.0"></line>
+<line stroke="#E2DCD2" x1="410" x2="542.0" y1="80.0" y2="80.0"></line>
+<line stroke="#E2DCD2" x1="454.0" x2="454.0" y1="58" y2="190.0"></line>
+<line stroke="#E2DCD2" x1="410" x2="542.0" y1="102.0" y2="102.0"></line>
+<line stroke="#E2DCD2" x1="476.0" x2="476.0" y1="58" y2="190.0"></line>
+<line stroke="#E2DCD2" x1="410" x2="542.0" y1="124.0" y2="124.0"></line>
+<line stroke="#E2DCD2" x1="498.0" x2="498.0" y1="58" y2="190.0"></line>
+<line stroke="#E2DCD2" x1="410" x2="542.0" y1="146.0" y2="146.0"></line>
+<line stroke="#E2DCD2" x1="520.0" x2="520.0" y1="58" y2="190.0"></line>
+<line stroke="#E2DCD2" x1="410" x2="542.0" y1="168.0" y2="168.0"></line>
+<circle cx="410.0" cy="190.0" fill="#2E7D32" r="2"></circle>
+<circle cx="439.3" cy="160.7" fill="#2E7D32" r="2"></circle>
+<circle cx="454.0" cy="146.0" fill="#2E7D32" r="2"></circle>
+<circle cx="483.3" cy="116.7" fill="#2E7D32" r="2"></circle>
+<circle cx="498.0" cy="102.0" fill="#2E7D32" r="2"></circle>
+<circle cx="527.3" cy="72.7" fill="#2E7D32" r="2"></circle>
+<circle cx="542.0" cy="58.0" fill="#2E7D32" r="2"></circle>
+<circle cx="439.3" cy="175.3" fill="#2E7D32" r="2"></circle>
+<circle cx="454.0" cy="160.7" fill="#2E7D32" r="2"></circle>
+<circle cx="483.3" cy="131.3" fill="#2E7D32" r="2"></circle>
+<circle cx="498.0" cy="116.7" fill="#2E7D32" r="2"></circle>
+<circle cx="527.3" cy="87.3" fill="#2E7D32" r="2"></circle>
+<circle cx="542.0" cy="72.7" fill="#2E7D32" r="2"></circle>
+<circle cx="454.0" cy="175.3" fill="#2E7D32" r="2"></circle>
+<circle cx="498.0" cy="131.3" fill="#2E7D32" r="2"></circle>
+<circle cx="542.0" cy="87.3" fill="#2E7D32" r="2"></circle>
+<circle cx="483.3" cy="160.7" fill="#2E7D32" r="2"></circle>
+<circle cx="527.3" cy="116.7" fill="#2E7D32" r="2"></circle>
+<circle cx="483.3" cy="175.3" fill="#2E7D32" r="2"></circle>
+<circle cx="498.0" cy="160.7" fill="#2E7D32" r="2"></circle>
+<circle cx="527.3" cy="131.3" fill="#2E7D32" r="2"></circle>
+<circle cx="542.0" cy="116.7" fill="#2E7D32" r="2"></circle>
+<circle cx="498.0" cy="175.3" fill="#2E7D32" r="2"></circle>
+<circle cx="542.0" cy="131.3" fill="#2E7D32" r="2"></circle>
+<circle cx="527.3" cy="160.7" fill="#2E7D32" r="2"></circle>
+<circle cx="527.3" cy="175.3" fill="#2E7D32" r="2"></circle>
+<circle cx="542.0" cy="160.7" fill="#2E7D32" r="2"></circle>
+<circle cx="542.0" cy="175.3" fill="#2E7D32" r="2"></circle>
+<circle cx="410.0" cy="160.7" fill="#2E7D32" r="2"></circle>
+<circle cx="410.0" cy="146.0" fill="#2E7D32" r="2"></circle>
+<circle cx="410.0" cy="116.7" fill="#2E7D32" r="2"></circle>
+<circle cx="410.0" cy="102.0" fill="#2E7D32" r="2"></circle>
+<circle cx="410.0" cy="72.7" fill="#2E7D32" r="2"></circle>
+<circle cx="410.0" cy="58.0" fill="#2E7D32" r="2"></circle>
+<circle cx="439.3" cy="146.0" fill="#2E7D32" r="2"></circle>
+<circle cx="439.3" cy="116.7" fill="#2E7D32" r="2"></circle>
+<circle cx="439.3" cy="102.0" fill="#2E7D32" r="2"></circle>
+<circle cx="439.3" cy="72.7" fill="#2E7D32" r="2"></circle>
+<circle cx="439.3" cy="58.0" fill="#2E7D32" r="2"></circle>
+<circle cx="454.0" cy="116.7" fill="#2E7D32" r="2"></circle>
+<circle cx="454.0" cy="102.0" fill="#2E7D32" r="2"></circle>
+<circle cx="454.0" cy="72.7" fill="#2E7D32" r="2"></circle>
+<circle cx="454.0" cy="58.0" fill="#2E7D32" r="2"></circle>
+<circle cx="483.3" cy="102.0" fill="#2E7D32" r="2"></circle>
+<circle cx="483.3" cy="72.7" fill="#2E7D32" r="2"></circle>
+<circle cx="483.3" cy="58.0" fill="#2E7D32" r="2"></circle>
+<circle cx="498.0" cy="72.7" fill="#2E7D32" r="2"></circle>
+<circle cx="498.0" cy="58.0" fill="#2E7D32" r="2"></circle>
+<circle cx="527.3" cy="58.0" fill="#2E7D32" r="2"></circle>
+<line stroke="#6B7378" stroke-width="1.4" x1="178.0" x2="219" y1="124" y2="124"></line><polygon fill="#6B7378" points="219,124 212.6,126.7 212.6,121.3"></polygon>
+<line stroke="#6B7378" stroke-width="1.4" x1="363.0" x2="404" y1="124" y2="124"></line><polygon fill="#6B7378" points="404,124 397.6,126.7 397.6,121.3"></polygon>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">GeometrySampler.cs · 183–213, condensé</span>private static double Spacing(Mesh mesh)
+{
+    double area = AreaMassProperties.Compute(mesh).Area;          // repli : diagonale² de la boîte
+    double relative = area &gt; 0 ? Math.Sqrt(area / TargetCloudSize) : 0;   // TargetCloudSize = 2500
+    return Math.Max(AbsoluteSpacing(), relative);
+}
+internal static double AbsoluteSpacing()
+    =&gt; (tolérance du document, ou 0.001) * AbsoluteSpacingFactor;           // AbsoluteSpacingFactor = 100</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Deux régimes</h3>
+<p>Avec la tolérance par défaut (0,001), le pas absolu vaut 0,1. Le pas relatif le dépasse dès que l'aire dépasse 2500 × 0,1², soit 25 unités² : au-delà, le pas grandit avec l'objet pour tenir le budget de 2500 points.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le crible</h3>
+<p>Un sommet partagé par six faces tombait six fois dans le nuage. Il tombe six fois dans la même case et n'est retenu qu'une fois. Le point conservé est le point réel, jamais le centre de la case.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Laisser la tolérance à 0. Deux constructions ne se rejoignent jamais mieux que le pas : Magpie prend alors <b>2 × le pas</b> (<code>ToleranceDeRepli</code>). Sur un grand objet, ce pas suit la taille ; un exercice qui porte sur une grande surface doit fixer <code>Tolerance</code>.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 28 · Comparer deux géométries</div>
+</section>
+<!-- ============ PAGE 4 · HAUSDORFF ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 28</b></div>
+<p class="rubrique">Schéma 3 · L'écart maximal</p>
+<h2>La distance de Hausdorff, dans les deux sens</h2>
+<p style="max-width:165mm">Pour chaque point d'un nuage, on cherche le point le plus proche de l'autre. On garde la pire de ces distances. Puis on recommence dans l'autre sens, et on garde la plus grande des deux.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="12" font-weight="700" text-anchor="start" x="16" y="22">Réponse : un demi-cercle posé sur le cercle attendu (rayon 1)</text>
+<circle cx="150" cy="118" fill="none" r="62" stroke="#1565C0" stroke-dasharray="5 3" stroke-width="1.4"></circle>
+<path d="M 212 118 A 62 62 0 0 0 88 118" fill="none" stroke="#E65100" stroke-width="3"></path>
+<line stroke="#C62828" stroke-width="1.6" x1="150" x2="209" y1="180" y2="121"></line><polygon fill="#C62828" points="209,121 206.4,127.5 202.5,123.6"></polygon>
+<text fill="#C62828" font-size="10" font-weight="700" text-anchor="start" x="190" y="164">√2</text>
+<circle cx="150" cy="180" fill="#C62828" r="3"></circle>
+<text fill="#1565C0" font-size="8.8" font-weight="700" text-anchor="start" x="84" y="46">référence</text>
+<text fill="#E65100" font-size="8.8" font-weight="700" text-anchor="start" x="190" y="46">réponse</text>
+<text fill="#E65100" font-size="9.6" font-weight="700" text-anchor="start" x="300" y="70">réponse → référence</text>
+<text fill="#2B2F33" font-size="9" text-anchor="start" x="300" y="86">chaque point est SUR la référence : 0.00</text>
+<text fill="#1565C0" font-size="9.6" font-weight="700" text-anchor="start" x="300" y="116">référence → réponse</text>
+<text fill="#2B2F33" font-size="9" text-anchor="start" x="300" y="132">le bas du cercle est loin du demi-cercle :</text>
+<text fill="#2B2F33" font-size="9" text-anchor="start" x="300" y="146">son plus proche voisin est une extrémité, à √2 ≈ 1.41</text>
+<rect fill="#fff" height="30" rx="5" stroke="#C62828" stroke-width="1.3" width="288" x="296" y="160"></rect>
+<text fill="#C62828" font-size="9.6" font-weight="700" text-anchor="start" x="306" y="180">Hausdorff = max(0.00, 1.41) = 1.41 : refusé</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">GeometrySampler.cs · 259–291, simplifié (l'original sort de la boucle dès une distance nulle)</span>public static double Hausdorff(Point3d[] a, Point3d[] b) =&gt; Math.Max(Directed(a, b), Directed(b, a));
+
+private static double Directed(Point3d[] from, Point3d[] to)
+{
+    double worst = 0;
+    foreach (Point3d p in from)
+    {
+        double nearest = double.MaxValue;
+        foreach (Point3d q in to)
+            nearest = Math.Min(nearest, (p - q).SquareLength);   // pas de racine dans la boucle
+        if (nearest &gt; worst) worst = nearest;
+    }
+    return Math.Sqrt(worst);
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi les deux sens</h3>
+<p>Un demi-cercle posé sur le cercle attendu : chacun de ses points est sur la référence, l'écart de lui vers elle est nul. Mais la moitié manquante est loin de lui : c'est le sens inverse qui le révèle.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le coût</h3>
+<p>Chaque point est confronté à tous ceux de l'autre nuage : 2500 × 2500 × 2, environ 12 millions d'opérations, moins de 200 ms d'après le journal. Comparer les carrés évite 12 millions de racines : une seule suffit, à la fin.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    La courbe qui repasse au même endroit. Un aller-retour donne le même nuage que l'aller seul : Hausdorff ne voit rien. D'où un dernier contrôle sur la <b>longueur</b>, avec un seuil à 2 × tolérance : une approximation diffère un peu en longueur, un aller-retour du double.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 28 · Comparer deux géométries</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 28</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>GeometryFingerprint.Compare : des filtres en cascade</h2>
+<p style="max-width:165mm">Chaque contrôle peut arrêter la comparaison avec son propre message. L'ordre va du plus lisible au plus fin : « ce n'est pas le bon type » aide plus qu'un « écart de 12.4 ».</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">136</span><span class="kw">public static</span> <span class="ty">GeometryComparison</span> Compare(</div>
+<div class="l"><span class="n">137</span> <span class="ty">GeometryFingerprint</span> answer,</div>
+<div class="l"><span class="n"> </span> <span class="ty">GeometryFingerprint</span> expected, <span class="kw">double</span> tolerance)</div>
+<div class="l"><span class="n">138</span>{</div>
+<div class="l k1"><span class="n">139</span> <span class="kw">if</span> (answer.Family != expected.Family)<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n">140</span> <span class="kw">return</span> Failed(<span class="st">"Ce n'est pas le bon type…"</span>);</div>
+<div class="l k2"><span class="n">144</span> <span class="kw">if</span> (answer.IsClosed != expected.IsClosed)<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">145</span> <span class="kw">return</span> Failed(<span class="st">"… FERMÉ est attendu…"</span>);</div>
+<div class="l k3"><span class="n">151</span> <span class="kw">if</span> (answer.Cloud.Length == 0)<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">152</span> <span class="kw">return</span> Failed(<span class="st">"… aucune géométrie exploitable."</span>);</div>
+<div class="l k4"><span class="n">156</span> <span class="kw">double</span> deviation =<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n"> </span> <span class="ty">GeometrySampler</span>.Hausdorff(answer.Cloud, expected.Cloud);</div>
+<div class="l k5"><span class="n">158</span> <span class="kw">if</span> (deviation &gt; tolerance)<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">159</span> <span class="kw">return</span> Failed(<span class="st">$"Écart maximal de {deviation:F3}…"</span>,</div>
+<div class="l k5"><span class="n">162</span>      deviation);</div>
+<div class="l k6"><span class="n">168</span> <span class="kw">if</span> (answer.Family == <span class="ty">GeometryFamily</span>.Curve &amp;&amp;<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">169</span> <span class="ty">Math</span>.Abs(answer.Length - expected.Length) &gt; 2 * tolerance)</div>
+<div class="l k6"><span class="n">170</span> <span class="kw">return</span> Failed(<span class="st">"… repasse sans doute…"</span>, deviation);</div>
+<div class="l k7"><span class="n">175</span> <span class="kw">return</span> <span class="ty">GeometryComparison</span>.Passed(<span class="rep r7">7</span></div>
+<div class="l k7"><span class="n">176</span> <span class="st">$"Bravo, la géométrie est correcte (…{deviation:F3}) !"</span>,</div>
+<div class="l k7"><span class="n">177</span>    deviation);</div>
+<div class="l"><span class="n">178</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>La famille</b>Une courbe n'est pas une surface, quel que soit l'écart.</li>
+<li><span class="rep r2">2</span><b>La fermeture</b>Un arc de 359° passe partout où passe le cercle.</li>
+<li><span class="rep r3">3</span><b>Le vide</b>Un message clair plutôt qu'une exception.</li>
+<li><span class="rep r4">4</span><b>L'écart</b>Hausdorff bilatérale, en unités du modèle.</li>
+<li><span class="rep r5">5</span><b>La tolérance</b>Au-delà, refus ; l'écart est gardé pour le message.</li>
+<li><span class="rep r6">6</span><b>La longueur</b>Pour les courbes seulement.</li>
+<li><span class="rep r7">7</span><b>Réussi</b>Avec l'écart mesuré, que le web remplace par un message générique.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Un seul code pour deux verdicts</span>
+<code>ComparaisonGeometrie.Comparer</code> sert sur le poste de l'apprenant (<code>GenericChecker</code>) et dans <code>MagpieServeur.gha</code>, que le web fait calculer par Rhino Compute. Le jour où le web avait sa propre version de <code>SetEquality</code>, un même exercice recevait deux verdicts différents (en-tête du fichier).
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 28 · Comparer deux géométries</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 28</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">GeometryFingerprint.Compute(goo)</td><td>famille, fermeture, nuage</td><td>GeometryFingerprint:56</td></tr>
+<tr><td class="c">case Circle circle:</td><td>tester un type et le nommer</td><td>GeometryFingerprint:71</td></tr>
+<tr><td class="c">curve.DivideByCount(200, true)</td><td>points à longueur d'arc égale</td><td>GeometrySampler:85</td></tr>
+<tr><td class="c">occupied.Add(cell)</td><td>un point par case de la grille</td><td>GeometrySampler:241</td></tr>
+<tr><td class="c">GeometrySampler.Hausdorff(a, b)</td><td>l'écart maximal, dans les deux sens</td><td>GeometrySampler:259</td></tr>
+<tr><td class="c">ToleranceDeRepli(expected)</td><td>2 × le pas si Tolerance = 0</td><td>ComparaisonGeometrie:92</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Empreinte</dt><dd>Ce qu'on retient d'une géométrie pour la comparer : famille, fermeture, longueur, nuage.</dd>
+<dt>Nuage de points</dt><dd>Un ensemble de points sans ordre, posés sur la géométrie.</dd>
+<dt>Pas (spacing)</dt><dd>L'écart visé entre deux points du nuage ; le plancher de mesure.</dd>
+<dt>Hausdorff</dt><dd>La plus grande distance d'un point d'un nuage au plus proche de l'autre, dans les deux sens.</dd>
+<dt>Tolérance</dt><dd>L'écart maximal admis, en unités du modèle.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 42</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 28 · Comparer deux géométries</div>
+</section>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>54 · Intersections : rayon, plan, triangle</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 54</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Intersections : rayon, plan, triangle</h1>
+<p class="chapeau">Cliquer sur un objet dans une vue 3D, savoir si un point est dans une forme, couper une hachure au bord d'une cellule : tout cela revient à lancer une <b>droite</b> et à chercher où elle rencontre la géométrie. La réponse est presque toujours un <b>paramètre t</b>.</p>
+<div class="meta">
+<span class="pastille"><b>55 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>10</b>, <b>17</b> et <b>50</b></span>
+<span class="pastille">Exemples · <b>Hatch</b>, <b>Voronoi</b> (Cuttlefish)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 186" width="100%">
+<circle cx="40" cy="96" fill="#2B2F33" r="5"></circle>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="middle" x="40" y="116">œil</text>
+<line stroke="#6B7378" stroke-width="1" x1="120" x2="120" y1="40" y2="56"></line>
+<line stroke="#6B7378" stroke-width="1" x1="120" x2="120" y1="56" y2="72"></line>
+<line stroke="#6B7378" stroke-width="1" x1="120" x2="120" y1="72" y2="88"></line>
+<line stroke="#6B7378" stroke-width="3" x1="120" x2="120" y1="88" y2="104"></line>
+<line stroke="#6B7378" stroke-width="1" x1="120" x2="120" y1="104" y2="120"></line>
+<line stroke="#6B7378" stroke-width="1" x1="120" x2="120" y1="120" y2="136"></line>
+<line stroke="#6B7378" stroke-width="1" x1="120" x2="120" y1="136" y2="152"></line>
+<text fill="#6B7378" font-size="7.8" font-weight="700" text-anchor="middle" x="120" y="30">pixel cliqué</text>
+<polygon fill="#1565C0" fill-opacity=".18" points="250,40 300,150 330,60" stroke="#1565C0" stroke-width="1.4"></polygon>
+<polygon fill="#7B1FA2" fill-opacity=".18" points="400,30 430,160 470,50" stroke="#7B1FA2" stroke-width="1.4"></polygon>
+<line stroke="#C62828" stroke-width="1.6" x1="40" x2="560" y1="96" y2="100"></line>
+<line stroke="#C62828" stroke-width="1.8" x1="40" x2="100" y1="96" y2="96.5"></line><polygon fill="#C62828" points="100,96.5 93.5,99.2 93.6,93.7"></polygon>
+<circle cx="277.0" cy="97.8" fill="#2E7D32" r="4.5" stroke="#2E7D32" stroke-width="1.2"></circle>
+<circle cx="417.0" cy="98.9" fill="#fff" r="4" stroke="#6B7378" stroke-width="1.2"></circle>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="middle" x="277" y="178">t = 2,7 : gardé</text>
+<text fill="#6B7378" font-size="8.4" font-weight="700" text-anchor="middle" x="417" y="178">t = 4,3 : derrière</text>
+<text class="mono" fill="#C62828" font-size="9.4" font-weight="700" style="font-size:9.4px" text-anchor="start" x="140" y="150">P(t) = O + t × D</text>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="middle" x="500" y="30">on garde le plus petit t positif</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un rayon est une origine plus t fois une direction ; l'intersecter avec une forme, c'est résoudre une équation en t, puis garder la plus petite solution positive.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un pointeur laser dans une pièce. Le point rouge se pose sur le premier objet rencontré ; tout ce qui est derrière, sur la même ligne, reste dans l'ombre du premier.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>écrire un rayon et lire son paramètre t ;</li>
+<li>intersecter un rayon et un plan, et repérer les cas sans réponse ;</li>
+<li>dire si un point est dans un triangle (coordonnées barycentriques) ;</li>
+<li>écarter vite les objets avec leur boîte englobante.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    t mesure le chemin parcouru le long du rayon. <b>t &lt; 0</b> : l'intersection est derrière l'origine. Plusieurs intersections : on les <b>trie par t</b>, et l'ordre donne ce qui est devant, ce qui est derrière, ou ce qui est dedans (pair-impair, cours 10).
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 54 · Intersections : rayon, plan, triangle</div>
+</section>
+<!-- ============ PAGE 2 · RAYON ET PLAN ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 54</b></div>
+<p class="rubrique">Schéma 1 · Rayon et plan</p>
+<h2>Une seule équation, deux cas à écarter</h2>
+<p style="max-width:165mm">Un plan est l'ensemble des points P tels que n · (P − P0) = 0 : le vecteur qui va de P0 à P est perpendiculaire à la normale n (cours 50). En remplaçant P par O + t D, il ne reste qu'une inconnue, t.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="182" rx="6" stroke="#CFC6B8" width="352" x="16" y="12"></rect>
+<line stroke="#1565C0" stroke-width="2.4" x1="200" x2="330" y1="186" y2="26"></line>
+<text fill="#1565C0" font-size="8.6" font-weight="700" text-anchor="start" x="334" y="40">plan</text>
+<line stroke="#2E7D32" stroke-width="1.8" x1="297.5" x2="336.3349514563107" y1="66" y2="97.55339805825243"></line><polygon fill="#2E7D32" points="336.3349514563107,97.55339805825243 329.6,95.6 333.0,91.4"></polygon>
+<text fill="#2E7D32" font-size="9.4" font-weight="700" text-anchor="start" x="340.3349514563107" y="109.55339805825243">n</text>
+<circle cx="297.5" cy="66.0" fill="#1565C0" r="3" stroke="#1565C0" stroke-width="1.2"></circle>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="start" x="305.5" y="62">P0</text>
+<line stroke="#C62828" stroke-width="1.6" x1="50" x2="254.5" y1="170" y2="118.9"></line>
+<line stroke="#C62828" stroke-width="1.8" x1="50" x2="100" y1="170" y2="157.5"></line><polygon fill="#C62828" points="100,157.5 94.4,161.7 93.1,156.4"></polygon>
+<circle cx="50.0" cy="170.0" fill="#C62828" r="3.4" stroke="#C62828" stroke-width="1.2"></circle>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="start" x="46" y="186">O</text>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="start" x="104" y="144">D</text>
+<circle cx="254.5" cy="118.9" fill="#E65100" r="4.5" stroke="#E65100" stroke-width="1.2"></circle>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="end" x="246.54901960784315" y="110.86274509803921">P(t)</text>
+<text class="mono" fill="#2B2F33" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="28" y="32">t = n · (P0 − O) / (n · D)</text>
+<rect fill="#fff" height="54" rx="5" stroke="#C62828" stroke-width="1.3" width="200" x="384" y="12"></rect>
+<text class="mono" fill="#C62828" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="396" y="34">n · D ≈ 0</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="396" y="52">rayon parallèle : pas de point</text>
+<rect fill="#fff" height="54" rx="5" stroke="#E65100" stroke-width="1.3" width="200" x="384" y="74"></rect>
+<text class="mono" fill="#E65100" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="396" y="96">t &lt; 0</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="396" y="114">le plan est derrière l'origine</text>
+<rect fill="#fff" height="54" rx="5" stroke="#2E7D32" stroke-width="1.3" width="200" x="384" y="136"></rect>
+<text class="mono" fill="#2E7D32" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="396" y="158">t ≥ 0</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="396" y="176">point = O + t × D</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · RhinoCommon</span>static bool RayonPlan(Point3d o, Vector3d d, Plane plan, out double t) {
+    t = double.NaN;
+    double den = plan.Normal * d;                    // produit scalaire
+    if (Math.Abs(den) &lt; 1e-12) return false;       // parallèle
+    t = plan.Normal * (plan.Origin - o) / den;
+    return t &gt;= 0;                                   // devant l'origine seulement
+}
+// RhinoCommon le fait aussi : Intersection.LinePlane(line, plan, out double t)</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Rayon, segment ou droite</h3>
+<p>Même équation, trois lectures de t : une droite accepte tout t, un rayon t ≥ 0, un segment de A à B (D = B − A) seulement 0 ≤ t ≤ 1. <code>LinePlane</code> rend le t de la droite infinie : c'est à toi de le borner.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le dénominateur</h3>
+<p>n · D dit sous quel angle le rayon arrive. Proche de 0, le rayon frôle le plan : t devient énorme et très sensible aux arrondis. On compare à une tolérance, jamais à zéro exact (cours 49).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Beaucoup de fonctions d'intersection rendent un <b>booléen</b> et passent le résultat par <code>out</code>. Si le booléen vaut <code>false</code>, la valeur sortie n'a pas de sens. L'ignorer, c'est utiliser un point au hasard le jour où les deux droites sont parallèles.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 54 · Intersections : rayon, plan, triangle</div>
+</section>
+<!-- ============ PAGE 3 · TRIANGLE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 54</b></div>
+<p class="rubrique">Schéma 2 · Rayon et triangle</p>
+<h2>Dans le plan, puis dans le triangle</h2>
+<p style="max-width:165mm">Un maillage n'est qu'une liste de triangles. Un point du plan d'un triangle s'écrit comme un mélange de ses trois sommets : les <b>coordonnées barycentriques</b>. Il est dans le triangle si les trois parts sont positives. L'algorithme de Möller et Trumbore trouve t, u et v d'un seul coup.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<polygon fill="#2E7D32" fill-opacity=".12" points="90,190 330,170 190,30" stroke="#2E7D32" stroke-width="1.6"></polygon>
+<circle cx="90.0" cy="190.0" fill="#2B2F33" r="3.4" stroke="#2B2F33" stroke-width="1.2"></circle>
+<text fill="#2B2F33" font-size="9.4" font-weight="700" text-anchor="middle" x="80" y="196">A</text>
+<circle cx="330.0" cy="170.0" fill="#2B2F33" r="3.4" stroke="#2B2F33" stroke-width="1.2"></circle>
+<text fill="#2B2F33" font-size="9.4" font-weight="700" text-anchor="middle" x="340" y="176">B</text>
+<circle cx="190.0" cy="30.0" fill="#2B2F33" r="3.4" stroke="#2B2F33" stroke-width="1.2"></circle>
+<text fill="#2B2F33" font-size="9.4" font-weight="700" text-anchor="middle" x="190" y="22">C</text>
+<line stroke="#E65100" stroke-dasharray="3 2" x1="197.0" x2="90" y1="128.0" y2="190"></line>
+<line stroke="#1565C0" stroke-dasharray="3 2" x1="197.0" x2="330" y1="128.0" y2="170"></line>
+<line stroke="#7B1FA2" stroke-dasharray="3 2" x1="197.0" x2="190" y1="128.0" y2="30"></line>
+<circle cx="197.0" cy="128.0" fill="#C62828" r="4.5" stroke="#C62828" stroke-width="1.2"></circle>
+<text fill="#C62828" font-size="9.4" font-weight="700" text-anchor="start" x="205.0" y="122.0">P</text>
+<circle cx="330.0" cy="70.0" fill="#fff" r="4" stroke="#6B7378" stroke-width="1.2"></circle>
+<text fill="#6B7378" font-size="7.8" font-weight="700" text-anchor="start" x="338" y="74">Q : v &gt; 0 mais u + v &gt; 1</text>
+<text class="mono" fill="#2B2F33" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="360" y="40">P = (1 − u − v) A + u B + v C</text>
+<text fill="#2B2F33" font-size="8.6" font-weight="700" text-anchor="start" x="360" y="96">P est dans le triangle si</text>
+<text class="mono" fill="#2E7D32" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="372" y="114">u ≥ 0,  v ≥ 0,  u + v ≤ 1</text>
+<text class="mono" fill="#C62828" font-size="8.4" style="font-size:8.4px" text-anchor="start" x="360" y="140">ici : u = 0,30  v = 0,35</text>
+<text class="mono" fill="#C62828" font-size="8.4" style="font-size:8.4px" text-anchor="start" x="360" y="156">et 1 − u − v = 0,35</text>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="start" x="360" y="184">u, v : la part de B et de C ; le reste va à A</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · Möller–Trumbore en RhinoCommon</span>Vector3d e1 = b - a, e2 = c - a;
+Vector3d p = Vector3d.CrossProduct(d, e2);
+double det = e1 * p;
+if (Math.Abs(det) &lt; 1e-12) return false;          // rayon parallèle au triangle
+Vector3d s = o - a;
+double u = (s * p) / det;           if (u &lt; 0 || u &gt; 1) return false;
+Vector3d q = Vector3d.CrossProduct(s, e1);
+double v = (d * q) / det;           if (v &lt; 0 || u + v &gt; 1) return false;
+double t = (e2 * q) / det;          return t &gt; 1e-9;   // devant, pas sur l'origine</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Les parts servent ailleurs</h3>
+<p>u et v ne font pas que trancher dedans ou dehors : ils mélangent ce que portent les sommets. Couleur, normale ou coordonnée de texture au point touché valent (1 − u − v) × celle de A + u × celle de B + v × celle de C.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Dans RhinoCommon</h3>
+<p><code>Intersection.MeshRay(maillage, rayon)</code> rend le t du premier triangle touché (négatif s'il n'y en a pas), et <code>RayShoot</code> fait rebondir un rayon sur des surfaces. Côté web, le <code>Raycaster</code> de three.js fait le même travail au clic.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Un rayon qui passe exactement sur l'arête commune à deux triangles peut être compté <b>deux fois</b>, ou <b>zéro</b>, selon les arrondis. Pour un simple clic, peu importe ; pour compter les traversées (pair-impair), le résultat bascule. On change alors un peu la direction du rayon et on recommence.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 54 · Intersections : rayon, plan, triangle</div>
+</section>
+<!-- ============ PAGE 4 · BOÎTE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 54</b></div>
+<p class="rubrique">Schéma 3 · La boîte englobante d'abord</p>
+<h2>Écarter vite, calculer ensuite</h2>
+<p style="max-width:165mm">Tester un rayon contre cent mille triangles coûte cher. On teste d'abord la boîte englobante alignée sur les axes : si le rayon la rate, il rate tout ce qu'elle contient. Le test des <b>tranches</b> ne demande que six divisions.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<rect fill="#1565C0" fill-opacity=".10" height="90" stroke="#1565C0" stroke-width="1.6" width="150" x="230" y="60"></rect>
+<line stroke="#E65100" stroke-dasharray="4 3" x1="230" x2="230" y1="16" y2="200"></line>
+<line stroke="#E65100" stroke-dasharray="4 3" x1="380" x2="380" y1="16" y2="200"></line>
+<line stroke="#7B1FA2" stroke-dasharray="4 3" x1="40" x2="580" y1="60" y2="60"></line>
+<line stroke="#7B1FA2" stroke-dasharray="4 3" x1="40" x2="580" y1="150" y2="150"></line>
+<line stroke="#2B2F33" stroke-width="1.6" x1="60" x2="534.2" y1="186" y2="-27.4"></line>
+<circle cx="230.0" cy="109.5" fill="#E65100" r="3" stroke="#E65100" stroke-width="1.2"></circle>
+<circle cx="380.0" cy="42.0" fill="#E65100" r="3" stroke="#E65100" stroke-width="1.2"></circle>
+<circle cx="140.0" cy="150.0" fill="#7B1FA2" r="3" stroke="#7B1FA2" stroke-width="1.2"></circle>
+<circle cx="340.0" cy="60.0" fill="#7B1FA2" r="3" stroke="#7B1FA2" stroke-width="1.2"></circle>
+<line stroke="#2E7D32" stroke-width="4.5" x1="230.0" x2="340.0" y1="109.5" y2="60.0"></line>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="end" x="56" y="190">touche</text>
+<line stroke="#C62828" stroke-width="1.6" x1="60" x2="578.3" y1="30" y2="71.5"></line>
+<circle cx="230.0" cy="43.6" fill="#E65100" r="3" stroke="#E65100" stroke-width="1.2"></circle>
+<circle cx="380.0" cy="55.6" fill="#E65100" r="3" stroke="#E65100" stroke-width="1.2"></circle>
+<circle cx="435.0" cy="60.0" fill="#7B1FA2" r="3" stroke="#7B1FA2" stroke-width="1.2"></circle>
+<circle cx="1560.0" cy="150.0" fill="#7B1FA2" r="3" stroke="#7B1FA2" stroke-width="1.2"></circle>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="end" x="56" y="34">rate</text>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="middle" x="306" y="210">X entre les orange, Y entre les violets</text>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="start" x="470" y="176">vert : là où le rayon est</text>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="start" x="470" y="188">dans les deux tranches à la fois</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · test des tranches, en 2D</span>double tx1 = (min.X - o.X) / d.X, tx2 = (max.X - o.X) / d.X;   // entrée et sortie en X
+double ty1 = (min.Y - o.Y) / d.Y, ty2 = (max.Y - o.Y) / d.Y;   // entrée et sortie en Y
+double tEntree = Math.Max(Math.Min(tx1, tx2), Math.Min(ty1, ty2));
+double tSortie = Math.Min(Math.Max(tx1, tx2), Math.Max(ty1, ty2));
+bool touche = tEntree &lt;= tSortie &amp;&amp; tSortie &gt;= 0;          // en 3D : même chose avec Z</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Dans les deux tranches à la fois</h3>
+<p>Le rayon est dans la tranche des X entre deux valeurs de t, dans celle des Y entre deux autres. Il est dans la boîte là où les deux intervalles se recouvrent : du plus grand des débuts au plus petit des fins.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Des boîtes dans des boîtes</h3>
+<p>En rangeant les triangles dans des boîtes de plus en plus petites (un arbre, comme le R-tree du cours 17), un rayon n'ouvre que les boîtes qu'il traverse. Rhino et three.js s'appuient sur ce genre d'arbre pour garder le clic instantané.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Un rayon parallèle à un axe a une composante nulle : <code>d.X = 0</code>. La division donne alors ±∞ (cours 49), et le test marche encore… sauf si l'origine est pile sur le bord de la boîte, où 0 / 0 donne NaN et fausse les Max et Min. On traite ce cas à part.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 54 · Intersections : rayon, plan, triangle</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 54</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Couper des hachures, rogner des cellules</h2>
+<p style="max-width:165mm">Cuttlefish lance des droites à travers ses cellules : Hatch pour poser des hachures à l'intérieur, Voronoi pour couper une cellule par une médiatrice.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Hatch.cs</span></div>
+<div class="l k1"><span class="n">90</span><span class="kw">var</span> events = <span class="ty">Intersection</span>.CurveCurve(line, cell,<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n"> </span>                  tolerance, tolerance);</div>
+<div class="l k1"><span class="n">91</span><span class="kw">if</span> (events == <span class="kw">null</span> || events.Count &lt; <span class="nb">2</span>) <span class="kw">continue</span>;</div>
+<div class="l k2"><span class="n">94</span><span class="ty">List</span>&lt;<span class="kw">double</span>&gt; ts = events.Select(e =&gt; e.ParameterA)<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n"> </span>                    .OrderBy(x =&gt; x).ToList();</div>
+<div class="l k3"><span class="n">95</span><span class="kw">for</span> (<span class="kw">int</span> k = <span class="nb">0</span>; k + <span class="nb">1</span> &lt; ts.Count; k += <span class="nb">2</span>)<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">98</span> <span class="kw">if</span> (a.DistanceTo(b) &gt; tolerance)<span class="rep r4">4</span></div>
+<div class="l"><span class="cm">cuttlefish/Voronoi.cs</span></div>
+<div class="l k5"><span class="n">166</span><span class="ty">Intersection</span>.LineLine(bisector, line,<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n"> </span> <span class="kw">out double</span> aPoint, <span class="kw">out double</span> bPoint);</div>
+<div class="l k5"><span class="n">167</span>intersection = bisector.PointAt(aPoint);</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Droite contre contour</b>Moins de deux points : la ligne passe à côté.</li>
+<li><span class="rep r2">2</span><b>Trier par t</b>ParameterA : le paramètre sur la ligne de hachure.</li>
+<li><span class="rep r3">3</span><b>Pair-impair</b>Entre le 1er et le 2e point, dedans ; entre le 2e et le 3e, dehors…</li>
+<li><span class="rep r4">4</span><b>Morceaux trop courts</b>Une ligne qui frôle un sommet donne deux points confondus.</li>
+<li><span class="rep r5">5</span><b>Deux droites infinies</b>aPoint est le t sur la médiatrice.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Le booléen ignoré, à raison</span>
+<code>LineLine</code> rend <code>false</code> si les droites sont parallèles, et la ligne 166 ne le teste pas. C'est sans danger ici : <code>ClipPolygon</code> n'appelle <code>Intersection</code> (lignes 187–189 et 196–198) que pour un côté dont les deux sommets sont de part et d'autre de la médiatrice, donc qui la coupe forcément.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 54 · Intersections : rayon, plan, triangle</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 54</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">Intersection.CurveCurve(a, b, tol, tol)</td><td>points communs de deux courbes</td><td>Hatch.cs:90</td></tr>
+<tr><td class="c">events.Select(e =&gt; e.ParameterA)</td><td>les t sur la première courbe</td><td>Hatch.cs:94</td></tr>
+<tr><td class="c">k += 2</td><td>pair-impair : dedans, dehors…</td><td>Hatch.cs:95</td></tr>
+<tr><td class="c">Intersection.LineLine(a, b, out ta, out tb)</td><td>croisement de deux droites</td><td>Voronoi.cs:166</td></tr>
+<tr><td class="c">Intersection.LinePlane(l, plan, out t)</td><td>droite et plan</td><td>exemple page 2</td></tr>
+<tr><td class="c">Intersection.MeshRay(m, rayon)</td><td>premier triangle touché</td><td>page 3</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Rayon</dt><dd>Une demi-droite : une origine et une direction, parcourue pour t ≥ 0.</dd>
+<dt>Lancer de rayon</dt><dd>Chercher ce que touche un rayon : clic, ombres, test d'intérieur.</dd>
+<dt>Barycentrique</dt><dd>Les trois parts (somme 1) qui écrivent un point comme mélange des sommets.</dd>
+<dt>Test des tranches</dt><dd>Le test rayon-boîte par recouvrement des intervalles de t sur chaque axe.</dd>
+<dt>Pair-impair</dt><dd>Compter les traversées : un nombre impair veut dire que l'on est dedans.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 139</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 54 · Intersections : rayon, plan, triangle</div>
+</section>
+</body>
+</html>

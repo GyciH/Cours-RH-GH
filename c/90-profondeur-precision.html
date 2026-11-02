@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>90 · Profondeur et précision</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-7">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 90</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Profondeur et précision</h1>
+<p class="chapeau">Pour savoir quelle face est devant, la carte graphique garde pour chaque pixel la <b>profondeur</b> de ce qui y est déjà peint. Ce nombre a une précision finie, et elle se concentre près de la caméra. Au loin, deux surfaces trop proches se disputent les pixels : c'est le <b>z-fighting</b>. Les positions elles-mêmes, en flottants de 32 bits, ont leur propre limite.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>87</b> et <b>88</b></span>
+<span class="pastille">Exemples · <b>Viewer3D.jsx</b> et <b>apercu.mjs</b> (Magpie web), <b>Three.js</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 200" width="100%">
+<line stroke="#6B7378" stroke-width="1.2" x1="40" x2="560" y1="70" y2="70"></line>
+<circle cx="26" cy="70" fill="#1D6FB8" r="7"></circle>
+<text fill="#1D6FB8" font-size="7.8" font-weight="700" text-anchor="middle" x="26" y="56">caméra</text>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="40.3" x2="40.3" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="40.6" x2="40.6" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="40.9" x2="40.9" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="41.3" x2="41.3" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="41.7" x2="41.7" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="42.2" x2="42.2" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="42.8" x2="42.8" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="43.4" x2="43.4" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="44.2" x2="44.2" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="45.1" x2="45.1" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="46.3" x2="46.3" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="47.7" x2="47.7" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="49.5" x2="49.5" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="51.9" x2="51.9" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="55.1" x2="55.1" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="60.0" x2="60.0" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="67.9" x2="67.9" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="82.9" x2="82.9" y1="56" y2="84"></line>
+<line stroke="#1D6FB8" stroke-width="1.4" x1="123.0" x2="123.0" y1="56" y2="84"></line>
+<text class="mono" fill="#2B2F33" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="40" y="100">near</text>
+<text class="mono" fill="#2B2F33" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="560" y="100">far</text>
+<text fill="#2B2F33" font-size="8.2" font-weight="700" text-anchor="middle" x="300" y="30">19 crans régulièrement répartis dans le tampon de profondeur, placés à la distance qu'ils représentent</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="middle" x="300" y="44">(near = 1, far = 100) : presque tous se serrent près de la caméra.</text>
+<line stroke="#CFC6B8" x1="40" x2="560" y1="122" y2="122"></line>
+<text fill="#1D6FB8" font-size="8.4" font-weight="700" text-anchor="start" x="40" y="142">tampon de 24 bits</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="170" y="142">16 777 216 valeurs entre 0 et 1, une par pixel</text>
+<text fill="#1D6FB8" font-size="8.4" font-weight="700" text-anchor="start" x="40" y="160">test de profondeur</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="170" y="160">un fragment passe s'il est plus proche, ou à égalité (LessEqualDepth)</text>
+<text fill="#1D6FB8" font-size="8.4" font-weight="700" text-anchor="start" x="40" y="178">z-fighting</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="170" y="178">deux surfaces plus proches qu'un cran : le gagnant change d'un pixel à l'autre</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>La profondeur est fine près de la caméra et grossière au loin ; c'est le plan proche, <code>near</code>, qui décide de sa finesse.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Une règle graduée au millimètre sur ses premiers centimètres, puis au centimètre, puis au mètre. Deux objets qui tombent entre deux traits ont la même mesure.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>choisir near et far ;</li>
+<li>estimer une précision de profondeur ;</li>
+<li>éviter le z-fighting ;</li>
+<li>garder des positions précises.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    La profondeur stockée n'est pas la distance, mais une valeur en 1 / z, rangée entre 0 au plan proche et 1 au plan lointain. Le tampon mesuré dans Chromium a 24 bits (<code>DEPTH_BITS</code>), soit un peu moins de 17 millions de crans.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 90 · Profondeur et précision</div>
+</section>
+<!-- ============ PAGE 2 · NEAR ET FAR ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 90</b></div>
+<p class="rubrique">Schéma 1 · Le plan proche décide</p>
+<h2>Near compte, far presque pas</h2>
+<p style="max-width:165mm">Entre deux crans de profondeur, l'écart en distance grandit comme le carré de la distance, et il est inversement proportionnel à <code>near</code>. Diviser near par 10 rend la profondeur 10 fois plus grossière partout ; doubler far ne change presque rien.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 204" width="100%">
+<rect fill="#EFE9E1" height="204" width="600" x="0" y="0"></rect>
+<text fill="#1D6FB8" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="22">Plus petit écart de profondeur que le tampon distingue : Δz ≈ z² / (near × 2²⁴), en unités du modèle (calculé)</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="start" x="30" y="44">distance z</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="start" x="170" y="44">near = 0,01</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="start" x="300" y="44">near = 1</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="start" x="430" y="44">near = z / 1 100 (cadrage)</text>
+<rect fill="#E6F0FA" height="24" rx="3" width="568" x="16" y="52"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="68">1</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="170" y="68">6,0e−6</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="300" y="68">6,0e−8</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="430" y="68">6,6e−5</text>
+<rect fill="#fff" height="24" rx="3" width="568" x="16" y="80"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="96">10</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="170" y="96">6,0e−4</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="300" y="96">6,0e−6</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="430" y="96">6,6e−4</text>
+<rect fill="#E6F0FA" height="24" rx="3" width="568" x="16" y="108"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="124">100</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="170" y="124">6,0e−2</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="300" y="124">6,0e−4</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="430" y="124">6,6e−3</text>
+<rect fill="#fff" height="24" rx="3" width="568" x="16" y="136"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="152">1 000</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="170" y="152">6</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="300" y="152">6,0e−2</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="430" y="152">6,6e−2</text>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="180">En rouge : plus grossier que 0,001, l'écart des axes de Magpie au-dessus de la grille.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="196">Le cadrage de Magpie (near = distance / 1 000, caméra à 1,1 × distance) garde une précision proportionnelle à la distance.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">magpie/web/src/Viewer3D.jsx · lignes 96 puis 155 et 156</span>const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 10000);
+…
+    v.camera.near = distance / 1000;
+    v.camera.far = distance * 100;</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le départ, puis le cadrage</h3>
+<p>À l'ouverture, la caméra a near = 0,01 et far = 10 000 : un rapport d'un million. Dès que la géométrie arrive, <code>frame()</code> recale les deux plans sur la taille de la scène. Le rapport tombe à 100 000, et la précision suit l'échelle du modèle, qu'il soit en mètres ou en millimètres.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Et quand on zoome</h3>
+<p>La molette d'OrbitControls rapproche ou éloigne la caméra, sans toucher à near ni à far. Un zoom très avant passe sous le plan proche et coupe la géométrie ; un recul de plus de 100 fois la distance de cadrage la fait disparaître. Recadrer remet tout d'aplomb.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Mettre un near minuscule « pour ne jamais rien couper ». Le gain est invisible, la perte est partout : avec near = 0,01, deux surfaces à 100 unités doivent être à plus de 6 centièmes l'une de l'autre pour être départagées.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 90 · Profondeur et précision</div>
+</section>
+<!-- ============ PAGE 3 · Z-FIGHTING ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 90</b></div>
+<p class="rubrique">Schéma 2 · Le z-fighting</p>
+<h2>Deux surfaces dans le même cran</h2>
+<p style="max-width:165mm">Magpie dessine ses axes un millième d'unité au-dessus de la grille, pour qu'ils gagnent le test de profondeur. Tant que la caméra est proche, l'écart tient. En s'éloignant, il devient plus petit qu'un cran : les axes se hachurent.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1D6FB8" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="22">Les axes de Magpie (z = 0,001) sur la grille (z = 0) : part de l'axe encore visible, mesurée dans Chromium</text>
+<rect fill="#2E7D32" height="90.0" width="40" x="40" y="50.0"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="60" y="44.0">100 %</text>
+<text class="mono" fill="#1D6FB8" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="60" y="156">5</text>
+<rect fill="#2E7D32" height="90.0" width="40" x="116" y="50.0"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="136" y="44.0">100 %</text>
+<text class="mono" fill="#1D6FB8" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="136" y="156">10</text>
+<rect fill="#C62828" height="84.6" width="40" x="192" y="55.4"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="212" y="49.39999999999999">94 %</text>
+<text class="mono" fill="#1D6FB8" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="212" y="156">20</text>
+<rect fill="#C62828" height="78.3" width="40" x="268" y="61.7"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="288" y="55.7">87 %</text>
+<text class="mono" fill="#1D6FB8" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="288" y="156">40</text>
+<rect fill="#C62828" height="65.7" width="40" x="344" y="74.3"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="364" y="68.3">73 %</text>
+<text class="mono" fill="#1D6FB8" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="364" y="156">80</text>
+<rect fill="#C62828" height="73.8" width="40" x="420" y="66.2"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="440" y="60.2">82 %</text>
+<text class="mono" fill="#1D6FB8" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="440" y="156">160</text>
+<rect fill="#C62828" height="60.3" width="40" x="496" y="79.7"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="516" y="73.69999999999999">67 %</text>
+<text class="mono" fill="#1D6FB8" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="516" y="156">320</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="middle" x="300" y="172">distance de la caméra, en unités, avec near et far du cadrage (lignes 155–156)</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="16" y="192">Sous 100 %, l'axe rouge ou vert est haché : la grille gagne une partie des pixels. Un test de profondeur à 24 bits.</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="16" y="205">Avec logarithmicDepthBuffer ou reversedDepthBuffer, et near = 0,01 : 100 % à toutes ces distances (mesuré, plans de test).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">magpie/web/src/Viewer3D.jsx · lignes 91 à 93 (ligne 92 coupée)</span>for (const [to, color] of [[[50, 0, 0], 0xb40000], [[0, 50, 0], 0x009600]]) {
+  const geometry = new THREE.BufferGeometry().setFromPoints(
+    [new THREE.Vector3(0, 0, 0.001), new THREE.Vector3(...to)]);
+  scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ color })));</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Décaler, ou ne pas tester</h3>
+<p>Trois remèdes simples : un écart proportionnel à la taille de la scène ; <code>polygonOffset</code>, qui pousse les faces d'un matériau en profondeur (Material.js:375) ; ou, pour des repères qui doivent toujours se voir, <code>depthTest: false</code> avec un <code>renderOrder</code> plus grand.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Changer de tampon</h3>
+<p><code>logarithmicDepthBuffer</code> répartit les crans selon le logarithme de la distance. <code>reversedDepthBuffer</code> (WebGLRenderer.js:83) range le tampon à l'envers, de 1 près de la caméra à 0 au loin, et exige l'extension EXT_clip_control. Dans la mesure, les deux tiennent à toutes les distances ; à réserver aux scènes de très grande étendue.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Chercher un réglage de rendu pour deux faces qui scintillent dans un modèle Rhino. Deux surfaces exactement superposées, une copie collée sur place par exemple, ne seront jamais départagées : c'est le modèle qu'il faut corriger.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 90 · Profondeur et précision</div>
+</section>
+<!-- ============ PAGE 4 · FLOAT32 ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 90</b></div>
+<p class="rubrique">Schéma 3 · La précision des positions</p>
+<h2>Loin de l'origine, les sommets sautent</h2>
+<p style="max-width:165mm">Rhino calcule en nombres de 64 bits. La carte graphique, elle, reçoit des positions en 32 bits : sept chiffres significatifs environ. Près de l'origine, c'est bien plus fin qu'il ne faut ; à des millions d'unités, l'écart entre deux valeurs possibles devient visible.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1D6FB8" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="22">Écart entre deux Float32 voisins, selon la coordonnée (valeurs exactes du format, vérifiées avec Math.fround)</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="start" x="30" y="44">coordonnée</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="start" x="200" y="44">écart</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="start" x="340" y="44">exemple</text>
+<rect fill="#E6F0FA" height="22" rx="3" width="568" x="16" y="52"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="67">1</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="200" y="67">0,00000012</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="340" y="67">précision parfaite</text>
+<rect fill="#fff" height="22" rx="3" width="568" x="16" y="78"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="93">10 000</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="200" y="93">0,001</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="340" y="93">le millième</text>
+<rect fill="#E6F0FA" height="22" rx="3" width="568" x="16" y="104"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="119">1 000 000</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="200" y="119">0,0625</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="340" y="119">un seizième</text>
+<rect fill="#fff" height="22" rx="3" width="568" x="16" y="130"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="145">6 500 000</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="200" y="145">0,5</text>
+<text fill="#C62828" font-size="8.2" text-anchor="start" x="340" y="145">Lambert 93, en mètres</text>
+<rect fill="#E6F0FA" height="22" rx="3" width="568" x="16" y="156"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="30" y="171">6 500 000 000</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="200" y="171">512</text>
+<text fill="#C62828" font-size="8.2" text-anchor="start" x="340" y="171">Lambert 93, en millimètres</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="194">Un Float32 garde 24 bits de mantisse : environ 7 chiffres significatifs, où que soit la virgule.</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="16" y="207">Math.fround(6500000.25) rend 6500000 : le quart de mètre disparaît.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">magpie/web/apercu.mjs · lignes 202 puis 251 (extrait)</span>const b64 = (Typed, values) =&gt;
+  Buffer.from(new Typed(values).buffer).toString("base64");
+…
+meshes.push({ positions: b64(Float32Array, mesh.positions), … });</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le remède classique</h3>
+<p>Soustraire un point de référence, le centre de la boîte englobante par exemple, avant de passer en 32 bits ; puis poser le groupe d'objets à ce point dans la scène. Les sommets restent de petits nombres, précis ; seul le décalage est grand.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>La caméra aussi</h3>
+<p>Les matrices de Three.js sont calculées en 64 bits dans le JavaScript, mais transmises au shader en 32 bits. Une caméra placée à des millions d'unités tremble à son tour. Ramener le modèle près de l'origine règle les deux problèmes à la fois.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Accuser le tampon de profondeur de défauts qui viennent des positions. Des faces qui « vibrent » d'un rendu à l'autre, ou des sommets alignés en escalier, signalent des coordonnées trop grandes ; un z-fighting, lui, dessine des hachures entre deux surfaces.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 90 · Profondeur et précision</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 90</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>La caméra de Magpie et ses positions</h2>
+<p style="max-width:165mm">L'aperçu fait le plus important : il recale near et far sur la scène à chaque cadrage. Les deux limites qui restent tiennent à des valeurs fixes, l'écart des axes et le passage en 32 bits sans recentrage.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">magpie/web/src/Viewer3D.jsx</span></div>
+<div class="l k1"><span class="n">92</span>…<span class="kw">new</span> THREE.Vector3(0, 0, 0.001), …<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">96</span>…PerspectiveCamera(40, 1, 0.01, 10000);<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">154</span>…addScaledVector(direction, distance * 1.1);<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">155</span>v.camera.near = distance / 1000;</div>
+<div class="l k3"><span class="n">156</span>v.camera.far = distance * 100;</div>
+<div class="l k4"><span class="n">39</span>…decode(Float32Array, m.positions), 3));<span class="rep r4">4</span></div>
+<div class="l"><span class="cm">magpie/web/apercu.mjs</span></div>
+<div class="l k5"><span class="n">251</span>positions: b64(Float32Array, mesh.positions),<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Un millième</b>Écart fixe des axes.</li>
+<li><span class="rep r2">2</span><b>Le départ</b>Rapport d'un million.</li>
+<li><span class="rep r3">3</span><b>Le cadrage</b>Near suit la scène.</li>
+<li><span class="rep r4">4</span><b>Côté navigateur</b>Lu en 32 bits.</li>
+<li><span class="rep r5">5</span><b>Côté serveur</b>Écrit en 32 bits.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · des coordonnées géoréférencées</span>
+    Le serveur convertit les positions en Float32 telles que Rhino les donne, sans soustraire de centre. Un modèle placé en Lambert 93 et en millimètres, autour de 6 500 000 000 en Y, n'aurait plus que des pas de 512 mm (écart calculé du format) : l'aperçu serait déformé alors que le modèle est juste. Les modèles dessinés près de l'origine ne sont pas concernés. Recentrer dans <code>readMesh</code> et poser le groupe au centre corrigerait ce cas (déduit du code, non mesuré).
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 90 · Profondeur et précision</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 90</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">PerspectiveCamera(fov, ratio, near, far)</td><td>les deux plans de coupe</td><td>Viewer3D.jsx:96</td></tr>
+<tr><td class="c">camera.updateProjectionMatrix()</td><td>appliquer un near ou un far changé</td><td>Viewer3D.jsx:157</td></tr>
+<tr><td class="c">material.polygonOffset</td><td>décaler un matériau en profondeur</td><td>Material.js:375</td></tr>
+<tr><td class="c">material.depthTest: false</td><td>peindre sans tester la profondeur</td><td>Material.js:220</td></tr>
+<tr><td class="c">reversedDepthBuffer: true</td><td>tampon inversé (EXT_clip_control)</td><td>WebGLRenderer.js:83</td></tr>
+<tr><td class="c">new Float32Array(valeurs)</td><td>le passage en 32 bits</td><td>apercu.mjs:202</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Tampon de profondeur</dt><dd>Une valeur par pixel : la profondeur de ce qui y est peint.</dd>
+<dt>Near, far</dt><dd>Les plans avant et arrière au-delà desquels rien n'est dessiné.</dd>
+<dt>Z-fighting</dt><dd>Deux surfaces trop proches qui se disputent les pixels.</dd>
+<dt>Float32</dt><dd>Un nombre à virgule de 32 bits, environ 7 chiffres significatifs.</dd>
+<dt>Recentrage</dt><dd>Soustraire un point de référence pour garder de petites coordonnées.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : fiche récap de la partie 7</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 90 · Profondeur et précision</div>
+</section>
+</body>
+</html>

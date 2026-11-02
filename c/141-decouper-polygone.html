@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>141 · Découper un polygone</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 141</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Découper un polygone</h1>
+<p class="chapeau">Garder la partie d'un polygone qui se trouve d'un côté d'une droite : c'est l'opération de base du fenêtrage, du rendu, et du Voronoi de Cuttlefish. L'algorithme tient en quatre cas. Ses limites aussi sont nettes : il rend toujours un seul contour, et il coûte cher quand on le répète sans discernement.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>55</b>, <b>139</b>, <b>140</b></span>
+<span class="pastille">Exemples · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 204" width="100%">
+<rect fill="#fff" height="96" rx="4" stroke="#ddd" width="138" x="10" y="10"></rect>
+<rect fill="#2E7D32" height="48" opacity=".07" width="138" x="10" y="10"></rect>
+<line stroke="#00695C" stroke-dasharray="4 3" stroke-width="1.2" x1="10" x2="148" y1="58" y2="58"></line>
+<text fill="#2E7D32" font-size="6.8" font-style="italic" text-anchor="end" x="144" y="54">gardé</text>
+<line stroke="#2E7D32" stroke-width="1.3" x1="40" x2="118" y1="46" y2="26"></line><polygon fill="#2E7D32" points="118,26 112.4,30.2 111.1,25.0"></polygon>
+<circle cx="40" cy="46" fill="#2B2F33" r="3"></circle>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="79" y="122">dedans → dedans</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="79" y="136">garder l'arrivée</text>
+<rect fill="#fff" height="96" rx="4" stroke="#ddd" width="138" x="158" y="10"></rect>
+<rect fill="#2E7D32" height="48" opacity=".07" width="138" x="158" y="10"></rect>
+<line stroke="#00695C" stroke-dasharray="4 3" stroke-width="1.2" x1="158" x2="296" y1="58" y2="58"></line>
+<text fill="#2E7D32" font-size="6.8" font-style="italic" text-anchor="end" x="292" y="54">gardé</text>
+<line stroke="#1565C0" stroke-width="1.3" x1="188" x2="266" y1="86" y2="30"></line><polygon fill="#1565C0" points="266,30 262.4,36.0 259.2,31.5"></polygon>
+<circle cx="188" cy="86" fill="#2B2F33" r="3"></circle>
+<circle cx="227.0" cy="58" fill="none" r="4" stroke="#1565C0" stroke-width="1.6"></circle>
+<text fill="#1565C0" font-size="7.8" font-weight="700" text-anchor="middle" x="227" y="122">dehors → dedans</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="227" y="136">intersection, puis l'arrivée</text>
+<rect fill="#fff" height="96" rx="4" stroke="#ddd" width="138" x="306" y="10"></rect>
+<rect fill="#2E7D32" height="48" opacity=".07" width="138" x="306" y="10"></rect>
+<line stroke="#00695C" stroke-dasharray="4 3" stroke-width="1.2" x1="306" x2="444" y1="58" y2="58"></line>
+<text fill="#2E7D32" font-size="6.8" font-style="italic" text-anchor="end" x="440" y="54">gardé</text>
+<line stroke="#6B7378" stroke-width="1.3" x1="336" x2="414" y1="96" y2="76"></line><polygon fill="#6B7378" points="414,76 408.4,80.2 407.1,75.0"></polygon>
+<circle cx="336" cy="96" fill="#2B2F33" r="3"></circle>
+<text fill="#6B7378" font-size="7.8" font-weight="700" text-anchor="middle" x="375" y="122">dehors → dehors</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="375" y="136">rien</text>
+<rect fill="#fff" height="96" rx="4" stroke="#ddd" width="138" x="454" y="10"></rect>
+<rect fill="#2E7D32" height="48" opacity=".07" width="138" x="454" y="10"></rect>
+<line stroke="#00695C" stroke-dasharray="4 3" stroke-width="1.2" x1="454" x2="592" y1="58" y2="58"></line>
+<text fill="#2E7D32" font-size="6.8" font-style="italic" text-anchor="end" x="588" y="54">gardé</text>
+<line stroke="#E65100" stroke-width="1.3" x1="484" x2="562" y1="30" y2="88"></line><polygon fill="#E65100" points="562,88 555.2,86.3 558.5,82.0"></polygon>
+<circle cx="484" cy="30" fill="#2B2F33" r="3"></circle>
+<circle cx="521.7" cy="58" fill="none" r="4" stroke="#E65100" stroke-width="1.6"></circle>
+<text fill="#E65100" font-size="7.8" font-weight="700" text-anchor="middle" x="523" y="122">dedans → dehors</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="523" y="136">l'intersection seule</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="10" y="168">Sutherland-Hodgman : parcourir les arêtes du polygone, et pour chacune décider selon le côté de ses deux bouts.</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="10" y="184">Le résultat est le polygone coupé par une droite. Pour une fenêtre convexe, on recommence avec chacun de ses côtés.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="10" y="198">Exemple construit à la main.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>On parcourt les arêtes ; chaque arête, selon le côté de ses deux bouts, apporte zéro, un ou deux sommets au polygone découpé.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un emporte-pièce droit posé sur une pâte : tu longes le bord, tu gardes ce qui est du bon côté, et tu marques un point chaque fois que tu franchis la lame.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>écrire Sutherland-Hodgman ;</li>
+<li>construire un Voronoi par découpes ;</li>
+<li>estimer ce que coûtent n découpes ;</li>
+<li>reconnaître quand l'algorithme ne suffit pas.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Découper un convexe par un demi-plan donne un convexe. C'est pourquoi des découpes successives construisent exactement une cellule de Voronoi.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 141 · Découper un polygone</div>
+</section>
+<!-- ============ PAGE 2 · VORONOI ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 141</b></div>
+<p class="rubrique">Schéma 1 · Voronoi par découpes</p>
+<h2>Chaque autre site retire un demi-plan</h2>
+<p style="max-width:165mm">La cellule d'un site est l'ensemble des points plus proches de lui que de tout autre. Pour chaque autre site, la médiatrice sépare ces deux mondes : on garde le côté du site. On a recopié l'algorithme de Cuttlefish hors de Rhino pour le mesurer.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Une cellule de Voronoi = le rectangle, coupé par la médiatrice de chaque autre site (recopie hors Rhino, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">sites</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="120" y="40">durée, séries 2 et 3</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="260" y="40">sommets par cellule</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="400" y="40">somme des aires</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">100</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="120" y="61">2,0 ms</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="260" y="61">5,63 à 5,64</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="61">16,000000 sur 16</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">200</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="120" y="79">7,2 à 8,4 ms</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="260" y="79">5,75</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="79">16,000000 sur 16</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">400</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="120" y="97">29,5 à 33,0 ms</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="260" y="97">5,82</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="97">16,000000 sur 16</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">800</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="120" y="115">80,1 à 91,8 ms</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="260" y="115">5,86 à 5,87</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="115">16,000000 sur 16</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="120"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="133">1 600</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="120" y="133">336 à 410 ms</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="260" y="133">5,91 à 5,92</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="133">16,000000 sur 16</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="158">Deux fois plus de sites, environ quatre fois plus de temps : n cellules, chacune coupée n fois, soit n².</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="174">Or une cellule n'a qu'environ 6 côtés : presque toutes les découpes ne retirent rien.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="198">Sites tirés au hasard dans un rectangle 4 × 4. La première série, compilation comprise, est écartée.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, une cellule de Voronoi par découpes successives</span>var cellule = new List&lt;Point3d&gt;(coinsDuRectangle);
+foreach (var autre in sites)
+    if (autre != site) cellule = Decouper(cellule, Mediatrice(site, autre), site);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi n²</h3>
+<p>Chaque cellule teste tous les autres sites, même ceux qui sont à l'autre bout du rectangle. Seuls les voisins, six en moyenne, la modifient vraiment.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Comment faire mieux</h3>
+<p>Les voisins d'un site sont ceux que relie la triangulation de Delaunay (cours 142). En ne coupant que par eux, le travail devient presque linéaire.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Juger un algorithme en n² sur une centaine de points. 100 sites : 2 ms ; 1 600 sites : 336 à 410 ms (mesuré sur recopie). Seize fois plus de points, environ deux cents fois plus de temps.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 141 · Découper un polygone</div>
+</section>
+<!-- ============ PAGE 3 · LE DERNIER SITE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 141</b></div>
+<p class="rubrique">Schéma 2 · Les bornes d'une boucle</p>
+<h2>Un site oublié ne laisse pas de trou</h2>
+<p style="max-width:165mm">Une boucle qui s'arrête un tour trop tôt n'échoue pas : elle rend un résultat plausible. Ici, la somme des aires reste juste, et seule une cellule trop grande trahit l'oubli.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Grille de 4 × 4 sites : la boucle de Voronoi.cs, puis la même boucle jusqu'à Count (recopie, mesuré)</text>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="30" y="132"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="62" y="132"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="94" y="132"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="126" y="132"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="30" y="100"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="62" y="100"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="94" y="100"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="126" y="100"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="30" y="68"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="62" y="68"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="94" y="68"></rect>
+<rect fill="#FCE4D6" height="32" stroke="#00695C" stroke-width=".8" width="32" x="126" y="68"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="30" y="36"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="62" y="36"></rect>
+<rect fill="#FCE4D6" height="32" stroke="#00695C" stroke-width=".8" width="32" x="94" y="36"></rect>
+<polygon fill="#FCE4D6" fill-opacity="1" points="126.0,68.0 158.0,68.0 158.0,36.0" stroke="#E65100" stroke-width="0.8"></polygon>
+<polygon fill="#FCE4D6" fill-opacity="1" points="126.0,68.0 158.0,36.0 126.0,36.0" stroke="#E65100" stroke-width="0.8"></polygon>
+<circle cx="46.0" cy="148.0" fill="#00695C" r="2.4"></circle>
+<circle cx="78.0" cy="148.0" fill="#00695C" r="2.4"></circle>
+<circle cx="110.0" cy="148.0" fill="#00695C" r="2.4"></circle>
+<circle cx="142.0" cy="148.0" fill="#00695C" r="2.4"></circle>
+<circle cx="46.0" cy="116.0" fill="#00695C" r="2.4"></circle>
+<circle cx="78.0" cy="116.0" fill="#00695C" r="2.4"></circle>
+<circle cx="110.0" cy="116.0" fill="#00695C" r="2.4"></circle>
+<circle cx="142.0" cy="116.0" fill="#00695C" r="2.4"></circle>
+<circle cx="46.0" cy="84.0" fill="#00695C" r="2.4"></circle>
+<circle cx="78.0" cy="84.0" fill="#00695C" r="2.4"></circle>
+<circle cx="110.0" cy="84.0" fill="#00695C" r="2.4"></circle>
+<circle cx="142.0" cy="84.0" fill="#00695C" r="2.4"></circle>
+<circle cx="46.0" cy="52.0" fill="#00695C" r="2.4"></circle>
+<circle cx="78.0" cy="52.0" fill="#00695C" r="2.4"></circle>
+<circle cx="110.0" cy="52.0" fill="#00695C" r="2.4"></circle>
+<circle cx="142.0" cy="52.0" fill="#C62828" r="3.4"></circle>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="330" y="132"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="362" y="132"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="394" y="132"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="426" y="132"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="330" y="100"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="362" y="100"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="394" y="100"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="426" y="100"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="330" y="68"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="362" y="68"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="394" y="68"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="426" y="68"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="330" y="36"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="362" y="36"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="394" y="36"></rect>
+<rect fill="#E0F2F1" height="32" stroke="#00695C" stroke-width=".8" width="32" x="426" y="36"></rect>
+<circle cx="346.0" cy="148.0" fill="#00695C" r="2.4"></circle>
+<circle cx="378.0" cy="148.0" fill="#00695C" r="2.4"></circle>
+<circle cx="410.0" cy="148.0" fill="#00695C" r="2.4"></circle>
+<circle cx="442.0" cy="148.0" fill="#00695C" r="2.4"></circle>
+<circle cx="346.0" cy="116.0" fill="#00695C" r="2.4"></circle>
+<circle cx="378.0" cy="116.0" fill="#00695C" r="2.4"></circle>
+<circle cx="410.0" cy="116.0" fill="#00695C" r="2.4"></circle>
+<circle cx="442.0" cy="116.0" fill="#00695C" r="2.4"></circle>
+<circle cx="346.0" cy="84.0" fill="#00695C" r="2.4"></circle>
+<circle cx="378.0" cy="84.0" fill="#00695C" r="2.4"></circle>
+<circle cx="410.0" cy="84.0" fill="#00695C" r="2.4"></circle>
+<circle cx="442.0" cy="84.0" fill="#00695C" r="2.4"></circle>
+<circle cx="346.0" cy="52.0" fill="#00695C" r="2.4"></circle>
+<circle cx="378.0" cy="52.0" fill="#00695C" r="2.4"></circle>
+<circle cx="410.0" cy="52.0" fill="#00695C" r="2.4"></circle>
+<circle cx="442.0" cy="52.0" fill="#00695C" r="2.4"></circle>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="30" y="182">i &lt; Count − 1 : 15 cellules ; les sites 11 et 14</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="30" y="196">se partagent la case du site 15 (aire 1,5 chacun).</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="182">i &lt; Count : 16 cellules d'aire 1.</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="330" y="196">Somme des aires : 16 dans les deux cas.</text>
+<text fill="#C62828" font-size="7.4" font-weight="700" text-anchor="start" x="170" y="70">le site 15 (rouge)</text>
+<text fill="#C62828" font-size="7.4" text-anchor="start" x="170" y="84">n'a pas de cellule,</text>
+<text fill="#C62828" font-size="7.4" text-anchor="start" x="170" y="98">et ne coupe celle</text>
+<text fill="#C62828" font-size="7.4" text-anchor="start" x="170" y="112">d'aucun autre.</text>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="start" x="470" y="70">attendu</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, un contrôle qui aurait vu l'oubli</span>Debug.Assert(cellules.Count == sites.Count, "un site sans cellule");
+Debug.Assert(cellules.All(c =&gt; Contient(c, sites[cellules.IndexOf(c)])));   // chaque site dans la sienne</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi rien ne se voit</h3>
+<p>Le site oublié ne coupe plus les cellules voisines : elles s'étendent sur sa place, et le rectangle reste couvert. Sans compter les cellules, on ne remarque rien.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Les tests qui le trouvent</h3>
+<p>Autant de cellules que de sites ; chaque site dans sa cellule ; sur une grille régulière, toutes les aires égales. Trois invariants, chacun l'aurait signalé.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Vérifier seulement la somme des aires. Avec un site oublié, elle valait 16 sur 16, exactement comme le résultat correct (mesuré sur recopie).
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 141 · Découper un polygone</div>
+</section>
+<!-- ============ PAGE 4 · CONCAVE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 141</b></div>
+<p class="rubrique">Schéma 3 · Les limites</p>
+<h2>Un seul contour, même quand il en faudrait deux</h2>
+<p style="max-width:165mm">Sutherland-Hodgman n'a qu'une liste de sortie : quand la droite coupe un polygone concave en plusieurs morceaux, il les relie par des arêtes posées sur la droite.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Un U coupé par la droite y = 1 : on garde le haut (Sutherland-Hodgman, recopie, mesuré)</text>
+<polygon fill="none" fill-opacity="1" points="30.0,150.0 150.0,150.0 150.0,70.0 110.0,70.0 110.0,130.0 70.0,130.0 70.0,70.0 30.0,70.0" stroke="#6B7378" stroke-width="0.9"></polygon>
+<polygon fill="#00695C" fill-opacity="0.25" points="150.0,110.0 150.0,70.0 110.0,70.0 110.0,110.0 70.0,110.0 70.0,70.0 30.0,70.0 30.0,110.0" stroke="#00695C" stroke-width="1.4"></polygon>
+<line stroke="#C62828" stroke-width="1.6" x1="18.0" x2="162.0" y1="110" y2="110"></line>
+<text fill="#C62828" font-size="7.2" font-weight="700" text-anchor="middle" x="90.0" y="122">y = 1</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="210" y="50">Résultat : un seul contour de 8 sommets, aire 2,000 (juste).</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="210" y="66">Mais ce sont deux morceaux, reliés par des arêtes posées sur la droite</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="210" y="82">de coupe, en rouge : un pont d'épaisseur nulle.</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="210" y="106">Sutherland-Hodgman rend toujours un seul polygone. Avec une fenêtre</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="210" y="122">convexe et un sujet convexe, c'est juste ; dès que l'un est concave,</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="210" y="138">il faut un autre algorithme (Weiler-Atherton, Greiner-Hormann).</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="210" y="162">Les cellules de Voronoi sont convexes : la méthode y est sûre.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, découper avec Rhino, qui sépare les morceaux</span>var morceaux = Curve.CreateBooleanIntersection(contour, demiPlan, tolerance);   // Curve[]
+foreach (var m in morceaux) Ajouter(m);                // un contour par morceau</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Ce que rend le pont</h3>
+<p>L'aire est juste, le dessin aussi, à un trait près sur la droite. Mais un décalage, un remplissage ou un test « dedans » traiteront le tout comme une seule pièce.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Quand c'est sûr</h3>
+<p>Si le polygone découpé est convexe, chaque découpe le laisse convexe et d'un seul tenant. C'est le cas des cellules de Voronoi, rectangle compris.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Réutiliser une fonction de découpe écrite pour Voronoi sur une forme dessinée à la main. Concave, elle sortira des ponts d'épaisseur nulle, sans erreur ni message.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 141 · Découper un polygone</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 141</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Le Voronoi de Cuttlefish, découpe par découpe</h2>
+<p style="max-width:165mm">Voronoi.cs part des quatre coins du rectangle et le découpe par la médiatrice de chaque autre site. ClipPolygon, lignes 171 à 204, est un Sutherland-Hodgman fidèle.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Voronoi.cs</span></div>
+<div class="l k1"><span class="n">98</span>for (int i = 0; i &lt; currentPoints.Count - 1; i++)<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">101</span>for (int j = 0; j &lt; currentPoints.Count - 1; j++)<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">110</span>currentCell = ClipPolygon(currentCell, …);<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">187</span>else if (!currentInside &amp;&amp; nextInside)<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">131</span>DA.SetDataList(0, poliCells);<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Cellules</b>Sauf la dernière.</li>
+<li><span class="rep r2">2</span><b>Découpes</b>Sauf par la dernière.</li>
+<li><span class="rep r3">3</span><b>Une découpe</b>Par médiatrice.</li>
+<li><span class="rep r4">4</span><b>Un des 4 cas</b>On entre.</li>
+<li><span class="rep r5">5</span><b>Sortie</b>Une liste plate.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · le dernier site de chaque groupe n'a pas de cellule</span>
+    Les deux boucles (lignes 98 et 101) s'arrêtent à Count − 1 : le dernier point n'a pas de cellule et ne coupe celle d'aucun voisin. Sur une recopie hors Rhino, une grille de 4 × 4 sites a donné 15 cellules, dont deux d'aire 1,5 (mesuré sur recopie). Par ailleurs, poliCells (ligne 53) n'est jamais vidée entre deux groupes et sort en liste plate (ligne 131), alors que la sortie est déclarée en arbre (ligne 41) : les groupes se mélangent à la sortie (déduit, non exécuté dans Grasshopper). Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 141 · Découper un polygone</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 141</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">ClipPolygon(poly, droite, côté)</td><td>Sutherland-Hodgman, une droite</td><td>Voronoi.cs:171</td></tr>
+<tr><td class="c">CreateBisector(a, b)</td><td>la médiatrice de deux sites</td><td>Voronoi.cs:147</td></tr>
+<tr><td class="c">Intersection.LineLine(…)</td><td>où l'arête franchit la droite</td><td>Voronoi.cs:166</td></tr>
+<tr><td class="c">Curve.CreateBooleanIntersection</td><td>découper en gardant les morceaux séparés</td><td>page 4</td></tr>
+<tr><td class="c">Debug.Assert(…)</td><td>vérifier un invariant pendant le développement</td><td>page 3</td></tr>
+<tr><td class="c">i &lt; Count</td><td>parcourir tous les éléments, sans en oublier</td><td>Voronoi.cs:98</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Demi-plan</dt><dd>Tout ce qui se trouve d'un côté d'une droite.</dd>
+<dt>Médiatrice</dt><dd>La droite des points à égale distance de deux sites.</dd>
+<dt>Cellule de Voronoi</dt><dd>La région plus proche d'un site que de tous les autres.</dd>
+<dt>Sutherland-Hodgman</dt><dd>Découper un polygone par une droite en suivant ses arêtes.</dd>
+<dt>Invariant</dt><dd>Une propriété que le résultat doit toujours vérifier.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 16</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 141 · Découper un polygone</div>
+</section>
+</body>
+</html>

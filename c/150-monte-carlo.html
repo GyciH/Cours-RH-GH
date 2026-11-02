@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>150 · La méthode de Monte-Carlo</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-5">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 150</b></div>
+<p class="rubrique">Le concept</p>
+<h1>La méthode de Monte-Carlo</h1>
+<p class="chapeau">Quand une quantité est trop compliquée à calculer, on peut la mesurer en tirant au hasard : l'aire d'une forme, la probabilité qu'un assemblage échoue, la lumière reçue par une façade. Le hasard ne donne pas la valeur exacte, mais il dit aussi de combien il se trompe.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>145</b>, <b>148</b>, <b>149</b></span>
+<span class="pastille">Exemples · <b>SnapSet</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 222" width="100%">
+<rect fill="#fff" height="160" stroke="#6B7378" stroke-width=".8" width="160" x="20" y="20"></rect>
+<path d="M20,180 L180,180 A160,160 0 0,0 20,20 Z" fill="#FCE4EC" stroke="#AD1457" stroke-width="1"></path>
+<circle cx="151.8" cy="36.8" fill="#C62828" r="1.6"></circle>
+<circle cx="50.1" cy="131.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="96.5" cy="153.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="34.7" cy="60.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="73.3" cy="61.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="168.9" cy="109.1" fill="#C62828" r="1.6"></circle>
+<circle cx="140.0" cy="171.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="152.1" cy="157.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="153.0" cy="101.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="171.7" cy="71.2" fill="#C62828" r="1.6"></circle>
+<circle cx="97.0" cy="159.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="29.0" cy="51.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="111.0" cy="147.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="63.5" cy="80.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="99.1" cy="93.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="108.3" cy="43.2" fill="#C62828" r="1.6"></circle>
+<circle cx="24.6" cy="41.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="123.0" cy="25.9" fill="#C62828" r="1.6"></circle>
+<circle cx="47.3" cy="174.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="67.8" cy="148.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="109.2" cy="133.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="22.9" cy="136.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="170.9" cy="28.7" fill="#C62828" r="1.6"></circle>
+<circle cx="126.8" cy="133.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="41.0" cy="47.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="39.9" cy="137.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="112.1" cy="152.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="92.5" cy="169.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="76.7" cy="55.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="157.3" cy="48.1" fill="#C62828" r="1.6"></circle>
+<circle cx="125.9" cy="23.4" fill="#C62828" r="1.6"></circle>
+<circle cx="35.4" cy="151.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="63.4" cy="47.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="151.8" cy="87.7" fill="#C62828" r="1.6"></circle>
+<circle cx="80.2" cy="121.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="167.8" cy="83.7" fill="#C62828" r="1.6"></circle>
+<circle cx="52.5" cy="177.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="33.7" cy="172.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="83.6" cy="133.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="126.5" cy="176.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="76.6" cy="151.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="166.5" cy="53.7" fill="#C62828" r="1.6"></circle>
+<circle cx="112.1" cy="20.8" fill="#C62828" r="1.6"></circle>
+<circle cx="67.6" cy="46.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="60.0" cy="25.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="96.4" cy="36.5" fill="#C62828" r="1.6"></circle>
+<circle cx="119.2" cy="156.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="146.7" cy="136.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="86.6" cy="77.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="167.4" cy="148.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="76.6" cy="154.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="173.6" cy="73.5" fill="#C62828" r="1.6"></circle>
+<circle cx="22.2" cy="136.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="161.8" cy="175.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="108.6" cy="105.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="57.6" cy="41.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="45.8" cy="161.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="49.0" cy="76.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="63.5" cy="133.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="162.1" cy="68.2" fill="#C62828" r="1.6"></circle>
+<circle cx="152.1" cy="154.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="36.2" cy="168.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="92.3" cy="126.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="97.8" cy="106.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="130.9" cy="119.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="60.8" cy="167.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="151.8" cy="36.6" fill="#C62828" r="1.6"></circle>
+<circle cx="71.2" cy="165.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="88.3" cy="112.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="121.6" cy="161.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="52.2" cy="145.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="109.2" cy="148.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="90.0" cy="80.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="179.9" cy="158.5" fill="#C62828" r="1.6"></circle>
+<circle cx="44.4" cy="46.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="93.3" cy="92.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="108.1" cy="148.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="38.7" cy="136.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="169.4" cy="138.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="53.0" cy="149.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="48.4" cy="35.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="152.5" cy="64.9" fill="#C62828" r="1.6"></circle>
+<circle cx="53.8" cy="147.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="84.8" cy="175.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="107.2" cy="91.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="69.0" cy="134.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="93.2" cy="65.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="89.7" cy="48.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="144.2" cy="125.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="156.7" cy="70.8" fill="#C62828" r="1.6"></circle>
+<circle cx="121.0" cy="150.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="71.4" cy="33.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="110.9" cy="107.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="73.2" cy="71.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="71.0" cy="57.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="137.6" cy="85.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="113.1" cy="24.1" fill="#C62828" r="1.6"></circle>
+<circle cx="178.9" cy="130.4" fill="#C62828" r="1.6"></circle>
+<circle cx="75.1" cy="93.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="149.9" cy="165.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="106.6" cy="90.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="110.3" cy="130.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="33.4" cy="56.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="28.0" cy="169.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="57.3" cy="114.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="75.3" cy="94.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="68.8" cy="155.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="78.0" cy="80.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="172.7" cy="114.6" fill="#C62828" r="1.6"></circle>
+<circle cx="102.5" cy="110.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="118.9" cy="111.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="88.1" cy="177.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="136.6" cy="36.1" fill="#C62828" r="1.6"></circle>
+<circle cx="176.5" cy="56.1" fill="#C62828" r="1.6"></circle>
+<circle cx="104.0" cy="60.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="46.8" cy="132.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="81.0" cy="122.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="74.3" cy="69.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="161.0" cy="74.8" fill="#C62828" r="1.6"></circle>
+<circle cx="79.4" cy="127.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="155.3" cy="64.2" fill="#C62828" r="1.6"></circle>
+<circle cx="84.6" cy="122.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="48.1" cy="86.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="89.9" cy="29.0" fill="#C62828" r="1.6"></circle>
+<circle cx="21.9" cy="124.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="135.0" cy="31.2" fill="#C62828" r="1.6"></circle>
+<circle cx="125.7" cy="107.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="141.3" cy="56.0" fill="#C62828" r="1.6"></circle>
+<circle cx="92.8" cy="104.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="120.5" cy="86.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="158.9" cy="114.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="87.7" cy="36.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="67.4" cy="55.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="91.0" cy="108.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="163.2" cy="179.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="26.2" cy="33.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="87.9" cy="126.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="121.7" cy="141.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="161.9" cy="128.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="62.7" cy="75.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="69.1" cy="41.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="65.4" cy="151.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="117.8" cy="148.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="41.3" cy="28.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="85.3" cy="100.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="24.8" cy="56.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="61.2" cy="79.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="87.7" cy="151.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="165.7" cy="80.6" fill="#C62828" r="1.6"></circle>
+<circle cx="40.8" cy="106.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="87.8" cy="57.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="173.7" cy="135.4" fill="#C62828" r="1.6"></circle>
+<circle cx="68.1" cy="146.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="108.8" cy="146.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="74.4" cy="152.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="83.9" cy="85.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="94.2" cy="111.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="160.9" cy="121.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="72.0" cy="83.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="164.4" cy="55.9" fill="#C62828" r="1.6"></circle>
+<circle cx="105.4" cy="95.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="141.6" cy="97.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="59.9" cy="133.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="67.9" cy="104.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="94.8" cy="152.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="115.4" cy="164.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="83.3" cy="121.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="62.2" cy="114.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="54.5" cy="26.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="80.0" cy="113.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="41.0" cy="98.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="170.0" cy="175.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="175.2" cy="20.4" fill="#C62828" r="1.6"></circle>
+<circle cx="178.8" cy="72.9" fill="#C62828" r="1.6"></circle>
+<circle cx="158.7" cy="40.7" fill="#C62828" r="1.6"></circle>
+<circle cx="42.7" cy="40.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="67.1" cy="165.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="57.5" cy="108.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="109.5" cy="84.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="56.5" cy="135.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="41.2" cy="90.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="158.0" cy="146.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="113.6" cy="45.5" fill="#C62828" r="1.6"></circle>
+<circle cx="64.6" cy="168.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="32.1" cy="21.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="170.4" cy="28.3" fill="#C62828" r="1.6"></circle>
+<circle cx="165.7" cy="111.3" fill="#C62828" r="1.6"></circle>
+<circle cx="129.1" cy="168.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="50.0" cy="172.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="120.1" cy="61.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="83.2" cy="135.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="143.7" cy="83.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="63.0" cy="30.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="175.9" cy="50.0" fill="#C62828" r="1.6"></circle>
+<circle cx="89.5" cy="122.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="53.4" cy="97.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="22.0" cy="42.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="69.3" cy="119.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="168.4" cy="39.7" fill="#C62828" r="1.6"></circle>
+<circle cx="32.1" cy="140.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="84.4" cy="127.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="125.7" cy="168.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="63.1" cy="141.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="98.5" cy="150.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="43.0" cy="56.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="61.5" cy="168.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="165.5" cy="109.7" fill="#C62828" r="1.6"></circle>
+<circle cx="128.7" cy="158.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="60.5" cy="162.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="177.3" cy="21.1" fill="#C62828" r="1.6"></circle>
+<circle cx="163.6" cy="155.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="114.9" cy="179.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="33.5" cy="128.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="162.3" cy="114.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="154.4" cy="23.2" fill="#C62828" r="1.6"></circle>
+<circle cx="93.7" cy="113.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="151.9" cy="27.9" fill="#C62828" r="1.6"></circle>
+<circle cx="164.7" cy="26.5" fill="#C62828" r="1.6"></circle>
+<circle cx="55.9" cy="172.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="78.8" cy="173.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="114.8" cy="126.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="36.9" cy="153.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="136.5" cy="45.7" fill="#C62828" r="1.6"></circle>
+<circle cx="119.9" cy="49.5" fill="#C62828" r="1.6"></circle>
+<circle cx="90.1" cy="64.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="127.6" cy="61.3" fill="#C62828" r="1.6"></circle>
+<circle cx="48.5" cy="66.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="110.7" cy="82.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="134.4" cy="27.6" fill="#C62828" r="1.6"></circle>
+<circle cx="56.3" cy="133.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="169.7" cy="21.4" fill="#C62828" r="1.6"></circle>
+<circle cx="40.4" cy="53.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="152.7" cy="21.2" fill="#C62828" r="1.6"></circle>
+<circle cx="162.6" cy="104.5" fill="#C62828" r="1.6"></circle>
+<circle cx="55.3" cy="55.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="176.3" cy="48.5" fill="#C62828" r="1.6"></circle>
+<circle cx="96.0" cy="27.0" fill="#C62828" r="1.6"></circle>
+<circle cx="44.4" cy="94.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="83.8" cy="117.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="128.7" cy="138.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="129.0" cy="125.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="165.4" cy="100.4" fill="#C62828" r="1.6"></circle>
+<circle cx="172.7" cy="120.2" fill="#C62828" r="1.6"></circle>
+<circle cx="27.1" cy="116.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="28.0" cy="23.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="166.5" cy="148.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="88.7" cy="100.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="128.9" cy="127.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="62.0" cy="164.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="179.1" cy="47.5" fill="#C62828" r="1.6"></circle>
+<circle cx="42.5" cy="49.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="110.3" cy="103.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="119.7" cy="114.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="112.3" cy="124.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="138.5" cy="94.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="119.3" cy="40.7" fill="#C62828" r="1.6"></circle>
+<circle cx="45.3" cy="174.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="107.5" cy="166.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="78.9" cy="73.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="121.0" cy="151.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="153.6" cy="28.0" fill="#C62828" r="1.6"></circle>
+<circle cx="57.4" cy="90.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="83.6" cy="78.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="67.2" cy="104.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="96.0" cy="137.0" fill="#2E7D32" r="1.6"></circle>
+<circle cx="50.1" cy="87.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="133.4" cy="107.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="54.5" cy="63.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="133.8" cy="30.7" fill="#C62828" r="1.6"></circle>
+<circle cx="50.6" cy="47.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="20.7" cy="33.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="140.4" cy="37.8" fill="#C62828" r="1.6"></circle>
+<circle cx="33.4" cy="120.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="27.6" cy="60.3" fill="#2E7D32" r="1.6"></circle>
+<circle cx="103.4" cy="113.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="130.3" cy="170.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="63.8" cy="117.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="55.9" cy="62.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="107.8" cy="20.2" fill="#C62828" r="1.6"></circle>
+<circle cx="29.7" cy="29.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="145.8" cy="22.8" fill="#C62828" r="1.6"></circle>
+<circle cx="167.8" cy="96.6" fill="#C62828" r="1.6"></circle>
+<circle cx="173.9" cy="105.9" fill="#C62828" r="1.6"></circle>
+<circle cx="28.9" cy="125.8" fill="#2E7D32" r="1.6"></circle>
+<circle cx="140.1" cy="136.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="157.8" cy="152.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="37.5" cy="169.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="76.1" cy="75.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="109.8" cy="173.5" fill="#2E7D32" r="1.6"></circle>
+<circle cx="55.2" cy="58.9" fill="#2E7D32" r="1.6"></circle>
+<circle cx="70.2" cy="116.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="174.9" cy="155.1" fill="#2E7D32" r="1.6"></circle>
+<circle cx="161.7" cy="44.5" fill="#C62828" r="1.6"></circle>
+<circle cx="25.4" cy="127.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="104.0" cy="109.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="40.7" cy="59.2" fill="#2E7D32" r="1.6"></circle>
+<circle cx="131.6" cy="111.7" fill="#2E7D32" r="1.6"></circle>
+<circle cx="68.5" cy="119.4" fill="#2E7D32" r="1.6"></circle>
+<circle cx="21.8" cy="79.6" fill="#2E7D32" r="1.6"></circle>
+<circle cx="37.9" cy="167.7" fill="#2E7D32" r="1.6"></circle>
+<text fill="#AD1457" font-size="8.4" font-weight="700" text-anchor="start" x="220" y="40">300 fléchettes au hasard dans le carré de côté 1</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="220" y="62">234 tombent dans le quart de disque (vert).</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="220" y="80">La part tombée dedans approche l'aire du quart de disque, π / 4.</text>
+<text class="mono" fill="#1565C0" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="220" y="104">Estimation : 4 × 234 / 300 = 3,12</text>
+<text fill="#6B7378" font-size="8" text-anchor="start" x="220" y="122">Vraie valeur : 3,14159…</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="220" y="152">Aucune formule d'aire n'a servi : seulement « dedans ou dehors ? ».</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="220" y="168">C'est tout l'intérêt pour une forme dont on ne sait pas calculer l'aire.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="10" y="206">Tirage et dessin en Python, graine 150 : un exemple, pas une mesure de précision.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Une moyenne de tirages au hasard tend vers la vraie valeur, et son erreur diminue comme 1 / √n : on achète de la précision avec des tirages.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un sondage : interroger mille personnes au hasard renseigne sur un pays entier, avec une marge d'erreur annoncée, sans recenser personne d'autre.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>estimer une aire ou une probabilité ;</li>
+<li>prévoir l'erreur d'une estimation ;</li>
+<li>lire un intervalle de confiance ;</li>
+<li>stratifier pour gagner en précision.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Monte-Carlo ne demande qu'une question à oui ou non par tirage. La difficulté de la forme ne change pas l'erreur : seul le nombre de tirages la fixe.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 150 · La méthode de Monte-Carlo</div>
+</section>
+<!-- ============ PAGE 2 · L'ERREUR ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 150</b></div>
+<p class="rubrique">Schéma 1 · L'erreur en 1 / √n</p>
+<h2>Une décimale de plus coûte cent fois plus</h2>
+<p style="max-width:165mm">On estime π en comptant les fléchettes tombées dans un quart de disque, et l'on répète pour mesurer l'erreur typique. Elle suit la même loi que l'éloignement d'une marche aléatoire.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Estimer π par les fléchettes, erreur moyenne sur des centaines de répétitions (.NET 8, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">fléchettes n</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="150" y="40">répétitions</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="270" y="40">erreur moyenne</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="400" y="40">erreur × √n</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">100</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="150" y="61">400</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="270" y="61">0,127</text>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="61">1,27</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">10 000</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="150" y="79">400</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="270" y="79">0,0131</text>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="79">1,31</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">1 000 000</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="150" y="97">100</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="270" y="97">0,00142</text>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="97">1,42</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="122">Cent fois plus de fléchettes, dix fois moins d'erreur : la dernière colonne reste à peu près constante.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="138">L'aiguille de Buffon, un million de lancers, vingt fois : 3,1388 à 3,1464, moyenne 3,14181.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="160">C'est la loi en √n du cours 149 : l'erreur est une somme de petits écarts indépendants.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="174">Aiguille de longueur égale à l'écart des lignes : elle en touche une avec la probabilité 2 / π.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, estimer π</span>int dedans = 0;
+for (int i = 0; i &lt; n; i++) { double x = r.NextDouble(), y = r.NextDouble(); if (x * x + y * y &lt; 1) dedans++; }
+double pi = 4.0 * dedans / n;                          // erreur typique : 1,6 / √n (déduit)</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi 1 / √n</h3>
+<p>Chaque fléchette est un tirage oui ou non, de variance p (1 − p). La moyenne de n tirages a une variance divisée par n, donc un écart-type divisé par √n.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Indépendant de la dimension</h3>
+<p>Une grille régulière demande k points par dimension, soit k³ en volume. Monte-Carlo garde son erreur en 1 / √n quelle que soit la dimension : il gagne quand elles sont nombreuses.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Lancer dix fois plus de tirages pour gagner une décimale. Dix fois plus ne divise l'erreur que par 3,2 ; il faut cent fois plus, comme de 10 000 à 1 000 000 fléchettes (mesuré).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 150 · La méthode de Monte-Carlo</div>
+</section>
+<!-- ============ PAGE 3 · CONFIANCE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 150</b></div>
+<p class="rubrique">Schéma 2 · Ce que prouve un tirage</p>
+<h2>Un résultat, sa marge, et ses silences</h2>
+<p style="max-width:165mm">Une estimation sans marge ne vaut rien. La marge se calcule à partir des tirages eux-mêmes ; et quand aucun tirage n'échoue, la même logique borne ce qu'on a pu manquer.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Ce que dit, et ne dit pas, un résultat aléatoire (mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">situation</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="330" y="40">mesuré</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="460" y="40">théorie</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="61">intervalle à 95 %, 1 000 fléchettes, 10 000 fois : contient π / 4</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="61">95,0 %</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="460" y="61">95 %</text>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="79">1 500 essais, défaut qui touche 1 cas sur 100 : trouvé</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="79">100 %</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="460" y="79">100 %</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="97">1 500 essais, défaut qui touche 1 cas sur 1 000 : trouvé</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="97">77,9 %</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="460" y="97">77,7 %</text>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="115">1 500 essais, défaut qui touche 1 cas sur 10 000 : trouvé</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="115">13,7 %</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="460" y="115">13,9 %</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="140">Un intervalle à 95 % se trompe une fois sur vingt, et c'est prévu. Aucun défaut en n essais ne prouve pas</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="156">l'absence de défaut : seulement que sa fréquence est sans doute inférieure à 3 / n (la règle de trois).</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="178">Théorie : 1 − (1 − p)ⁿ pour la détection ; 3 / n vient de (1 − p)ⁿ = 5 % (déduit).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, l'intervalle de confiance à 95 %</span>double p = (double)dedans / n;
+double marge = 1.96 * Math.Sqrt(p * (1 - p) / n);                // 1,96 : le quantile de 95 %
+Console.WriteLine($"{p:F4} ± {marge:F4}");                       // à n = 1 000 : environ ± 0,025</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>La règle de trois</h3>
+<p>Si n essais n'ont rien trouvé, on peut dire avec 95 % de confiance que le défaut touche moins de 3 cas sur n. Pour 1 500 essais : moins de 0,2 % (déduit).</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Rejouer un échec</h3>
+<p>Avec une graine par essai, un échec se rejoue à l'identique : on corrige le défaut, puis on vérifie sur la même graine (cours 145).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Lire « 1 500 essais réussis » comme « aucun défaut ». Un défaut qui touche un cas sur 10 000 passait inaperçu 86 fois sur 100 (mesuré : détecté 13,7 % du temps).
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 150 · La méthode de Monte-Carlo</div>
+</section>
+<!-- ============ PAGE 4 · STRATIFIER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 150</b></div>
+<p class="rubrique">Schéma 3 · Stratifier</p>
+<h2>Un point par case, et l'erreur fond plus vite</h2>
+<p style="max-width:165mm">Les amas du hasard pur (cours 148) gaspillent des tirages : deux points collés renseignent presque autant qu'un seul. La grille secouée répartit les tirages et garde le hasard.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Même calcul de π, trois façons de poser les n points (mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">méthode</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="230" y="40">n = 100</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="350" y="40">n = 10 000</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="470" y="40">n = 1 000 000</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">hasard pur (erreur moyenne)</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="230" y="61">0,127</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="350" y="61">0,0131</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="470" y="61">0,00142</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">grille secouée (erreur moyenne)</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="230" y="79">0,051</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="350" y="79">0,00166</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="470" y="79">0,000049</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">grille régulière (erreur unique)</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="230" y="97">0,018</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="350" y="97">0,00121</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="470" y="97">0,000083</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="122">La grille secouée du cours 148 garde le hasard, mais un point par case : à un million de points,</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="138">elle se trompait 29 fois moins que le hasard pur. Son erreur décroît en n^(−3/4) au lieu de n^(−1/2).</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="160">La grille régulière n'a pas de hasard : une seule valeur, et aucun moyen d'estimer son erreur en répétant.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="174">Pente en n^(−3/4) : constante entre 1,5 et 1,7 en multipliant l'erreur par n^(3/4) (mesuré).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, Monte-Carlo stratifié</span>for (int a = 0; a &lt; k; a++) for (int b = 0; b &lt; k; b++) {
+    double x = (a + r.NextDouble()) / k, y = (b + r.NextDouble()) / k;   // un tirage par case
+    if (x * x + y * y &lt; 1) dedans++; }</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi ça marche</h3>
+<p>Seules les cases coupées par le bord du disque hésitent entre dedans et dehors. Les autres répondent sans erreur : le hasard ne joue plus que sur la frontière.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Garder le hasard</h3>
+<p>Répéter une estimation stratifiée avec d'autres graines donne encore une marge. La grille régulière, elle, rend toujours la même valeur : on ne sait pas de combien elle se trompe.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire la grille régulière toujours sûre. Si la forme a la même période que la grille, des motifs entiers tombent entre les points ; un tirage secoué ne peut pas s'aligner ainsi (déduit).
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 150 · La méthode de Monte-Carlo</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 150</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>SnapSet teste par Monte-Carlo</h2>
+<p style="max-width:165mm">Un test d'AplatTests tire 1 500 arbres de Colonnes et de Lignes, aux tailles et réglages au hasard, et vérifie à chaque fois qu'aucun enfant n'est rogné. Chaque arbre a sa graine, donc tout échec se rejoue.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">tests/ResolutionTests/AplatTests.cs</span></div>
+<div class="l k1"><span class="n">188</span>const int Essais = 1500;<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">192</span>var r = new Random(Graine + k);<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">197</span>nat.Width + (r.Next(3) == 0 ? 0f : …)<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">200</span>Verifier(…, "graine " + (Graine + k));<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">241</span>switch (r.Next(5)) { case 0: return 0f; …<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Essais</b>Le budget.</li>
+<li><span class="rep r2">2</span><b>Graine par essai</b>Rejouable.</li>
+<li><span class="rep r3">3</span><b>Bord</b>Boîte juste, 1 fois sur 3.</li>
+<li><span class="rep r4">4</span><b>Trace</b>La graine fautive.</li>
+<li><span class="rep r5">5</span><b>Bornes</b>0, 500, 1 : 3 fois sur 5.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · ce que 1 500 essais peuvent manquer</span>
+    Forcer les bornes (lignes 197 et 241) est le bon réflexe : les cas limites ne sont plus laissés au hasard. Pour le reste, 1 500 essais détectent un défaut qui touche un arbre sur 1 000 dans 77,9 % des cas, un sur 10 000 dans 13,7 % (mesuré hors SnapSet). Les graines se suivent : le premier tirage, le type de la racine (ligne 211), alterne strictement Colonne et Ligne d'une graine à l'autre, mais les 16 combinaisons des trois premiers réglages sont toutes atteintes, 59 à 127 fois (mesuré sur recopie). Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 150 · La méthode de Monte-Carlo</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 150</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">4.0 * dedans / n</td><td>estimer π par les fléchettes</td><td>page 2</td></tr>
+<tr><td class="c">1 / Math.Sqrt(n)</td><td>l'ordre de grandeur de l'erreur</td><td>page 2</td></tr>
+<tr><td class="c">1.96 * Math.Sqrt(p * (1 - p) / n)</td><td>la marge à 95 % d'une proportion</td><td>page 3</td></tr>
+<tr><td class="c">3.0 / n</td><td>la borne de la règle de trois</td><td>page 3</td></tr>
+<tr><td class="c">(a + r.NextDouble()) / k</td><td>un tirage par case, stratifié</td><td>page 4</td></tr>
+<tr><td class="c">new Random(Graine + k)</td><td>une graine rejouable par essai</td><td>AplatTests.cs:192</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Monte-Carlo</dt><dd>Estimer une quantité par la moyenne de tirages au hasard.</dd>
+<dt>Intervalle de confiance</dt><dd>Une marge autour d'une estimation, qui contient la vraie valeur dans 95 % des cas.</dd>
+<dt>Règle de trois</dt><dd>Zéro échec en n essais : fréquence sans doute inférieure à 3 / n.</dd>
+<dt>Stratification</dt><dd>Découper le domaine en cases et tirer dans chacune.</dd>
+<dt>Aiguille de Buffon</dt><dd>Estimer π en lançant une aiguille sur des lignes parallèles.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 14</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 150 · La méthode de Monte-Carlo</div>
+</section>
+</body>
+</html>

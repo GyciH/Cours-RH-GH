@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>144 · Décaler une courbe</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 144</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Décaler une courbe</h1>
+<p class="chapeau">Tracer une courbe parallèle à une autre, à distance constante : rien de plus banal en apparence, rien de plus délicat en réalité. Aux sommets, il faut inventer une forme ; vers l'intérieur, la courbe peut se retourner ou se couper en morceaux. Pebble, dans Cuttlefish, vit de cette opération.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>139</b>, <b>140</b>, <b>141</b></span>
+<span class="pastille">Exemples · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 204" width="100%">
+<polygon fill="#E0F2F1" fill-opacity="1" points="35.0,140.0 165.0,140.0 100.0,60.0" stroke="#00695C" stroke-width="1.2"></polygon>
+<polygon fill="none" fill-opacity="1" points="5.0,154.0 195.0,154.0 100.0,34.0" stroke="#1565C0" stroke-dasharray="4 3" stroke-width="1.2"></polygon>
+<text fill="#1565C0" font-size="7.8" font-weight="700" text-anchor="middle" x="100" y="178">vif : on prolonge les côtés</text>
+<polygon fill="#E0F2F1" fill-opacity="1" points="230.0,140.0 360.0,140.0 295.0,60.0" stroke="#00695C" stroke-width="1.2"></polygon>
+<path d="M 218 154 L 372 154 A 14 14 0 0 0 371 130 L 306 52 A 14 14 0 0 0 284 52 L 219 130 A 14 14 0 0 0 218 154 Z" fill="none" stroke="#1565C0" stroke-dasharray="4 3" stroke-width="1.2"></path>
+<text fill="#1565C0" font-size="7.8" font-weight="700" text-anchor="middle" x="295" y="178">rond : un arc à chaque sommet</text>
+<polygon fill="#E0F2F1" fill-opacity="1" points="425.0,140.0 555.0,140.0 490.0,60.0" stroke="#00695C" stroke-width="1.2"></polygon>
+<polygon fill="none" fill-opacity="1" points="419.0,154.0 561.0,154.0 568.0,136.0 499.0,48.0 481.0,48.0 412.0,136.0" stroke="#1565C0" stroke-dasharray="4 3" stroke-width="1.2"></polygon>
+<text fill="#1565C0" font-size="7.8" font-weight="700" text-anchor="middle" x="490" y="178">chanfrein : on coupe le coin</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="10" y="198">Décaler, c'est tracer la courbe à distance constante. Les côtés glissent ; aux sommets, il faut inventer. Exemple à la main.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Le vrai décalage est l'ensemble des points à distance d du contour ; glisser les côtés n'en donne une bonne approximation que loin des coins et des cols.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Une tondeuse qui longe une pelouse à distance fixe de la bordure : dans les angles saillants, elle tourne ; dans un passage étroit, elle ne passe plus.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>choisir un style de coin ;</li>
+<li>prévoir l'effet d'une pointe fine ;</li>
+<li>reconnaître un décalage retourné ;</li>
+<li>savoir de quel côté on décale.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Un décalage peut changer la topologie : une forme devient deux, ou disparaît. Un algorithme qui rend toujours un seul contour se trompe forcément quelque part.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 144 · Décaler une courbe</div>
+</section>
+<!-- ============ PAGE 2 · COINS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 144</b></div>
+<p class="rubrique">Schéma 1 · Les coins vers l'extérieur</p>
+<h2>Une pointe fine part loin</h2>
+<p style="max-width:165mm">Au coin vif, on prolonge les deux côtés décalés jusqu'à leur rencontre. On a mesuré où se retrouve le sommet, selon l'angle de la pointe.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Décalage extérieur de 1, coins vifs : de combien le sommet d'une pointe s'éloigne-t-il ? (mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">angle de la pointe</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="160" y="40">le sommet s'éloigne de</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="300" y="40">1 / sin(angle / 2)</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">90°</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="61">1,41</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="61">1,41</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">60°</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="79">2,00</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="79">2,00</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">30°</text>
+<text fill="#00695C" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="97">3,86</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="97">3,86</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">10°</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="115">11,47</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="300" y="115">11,47</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="140">Le coin vif prolonge les côtés jusqu'à leur rencontre : plus la pointe est fine, plus il part loin.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="156">À 10°, un décalage de 1 projette le sommet à 11,5. D'où les limites de « miter » des logiciels de dessin.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="178">Le rond, lui, reste exactement à la distance demandée : c'est le seul style qui soit un vrai décalage partout.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, le décalage vif d'un sommet</span>var n1 = Normale(a0, a1); var n2 = Normale(a1, b1);          // normales unitaires, à gauche
+var sommet = IntersectionDroites(a0 + n1 * d, a1 - a0, a1 + n2 * d, b1 - a1);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>La limite d'onglet</h3>
+<p>Les logiciels de dessin coupent le coin vif quand il dépasserait un multiple de d, souvent 4 : au-delà, ils passent au chanfrein. C'est un compromis, pas une règle géométrique.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le rond est exact</h3>
+<p>Un arc de rayon d centré sur le sommet : chaque point reste à la distance voulue. Pour fraiser, découper ou dégager un jeu, c'est le seul style sûr.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Décaler vers l'extérieur une forme à pointes fines en coins vifs. À 10°, un décalage de 1 envoie le sommet à 11,5 (mesuré) : la forme s'étire en épines.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 144 · Décaler une courbe</div>
+</section>
+<!-- ============ PAGE 3 · INTÉRIEUR ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 144</b></div>
+<p class="rubrique">Schéma 2 · Vers l'intérieur</p>
+<h2>Quand le contour se retourne</h2>
+<p style="max-width:165mm">Glisser chaque côté vers l'intérieur marche tant que la distance reste petite. On a comparé ce décalage naïf à la vraie zone, mesurée par échantillonnage, sur trois formes.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Décalage intérieur naïf (côtés glissés, coins vifs) contre la vraie zone à distance d du bord (mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">forme</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="140" y="40">d</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="280" y="40">aire, décalage naïf</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="420" y="40">aire vraie (échantillonnée)</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">carré de 10</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="140" y="61">1 ; 4</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="61">64,00 ; 4,00</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="61">64,00 ; 4,00</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">carré de 10</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="140" y="79">6 ; 8</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="79">4,00 ; 36,00</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="79">0 ; 0</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">étoile à 5 branches</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="140" y="97">0,5 ; 3</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="97">84,48 ; 0,88</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="97">84,59 ; 3,89</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">haltère, col de 2</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="140" y="115">1 ; 2</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="115">128,00 ; 56,00</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="115">128,86 ; 72,35</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="120"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="133">haltère, col de 2</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="140" y="133">3</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="133">−8,00</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="133">32,23</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="158">Au-delà du rayon inscrit, le carré se retourne : il ressort de l'autre côté, aire positive, sans erreur.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="174">Dès que d dépasse la moitié du col, l'haltère devrait se couper en deux ; le naïf garde un seul contour faux.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="196">Aire vraie : points d'une grille de pas 0,02 situés dedans et à au moins d du bord. Aux coins rentrants, la vraie zone est arrondie.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, refuser un décalage qui s'est retourné</span>bool memeSens = Math.Sign(AireSignee(decale)) == Math.Sign(AireSignee(contour));
+bool memeOrdre = TousLesCotesGardentLeurDirection(contour, decale);   // le carré retourné échoue ici</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi le signe ne suffit pas</h3>
+<p>Le carré décalé de 6 est le carré de 2 tourné d'un demi-tour : même sens de parcours, aire positive. Seule la direction inversée de chaque côté trahit le retournement.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Les coins rentrants</h3>
+<p>Vers l'intérieur, un coin rentrant devient saillant : la vraie zone y est arrondie, le naïf la coupe en pointe. Sur l'étoile, l'écart grandit avec d : 0,1 % puis 77 % (mesuré).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Juger un décalage à son aire. Le carré de 10 décalé de 8 donne un contour d'aire 36, propre et bien orienté, là où il ne devrait plus rien rester (mesuré).
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 144 · Décaler une courbe</div>
+</section>
+<!-- ============ PAGE 4 · LE SENS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 144</b></div>
+<p class="rubrique">Schéma 3 · De quel côté</p>
+<h2>Gauche, droite, dedans, dehors</h2>
+<p style="max-width:165mm">Une distance de décalage positive veut dire « à gauche » ou « à droite » de la courbe, selon les conventions. Dedans ou dehors dépend alors du sens de parcours.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">« À gauche de la courbe » : intérieur ou extérieur selon le sens de parcours (mesuré)</text>
+<rect fill="#E0F2F1" height="70" stroke="#00695C" stroke-width="1.2" width="70" x="40" y="40"></rect>
+<rect fill="none" height="54" stroke="#2E7D32" stroke-dasharray="4 3" stroke-width="1.2" width="54" x="48" y="48"></rect>
+<line stroke="#00695C" stroke-width="1.4" x1="63.0" x2="87.0" y1="110" y2="110"></line><polygon fill="#00695C" points="87.0,110 80.6,112.7 80.6,107.3"></polygon>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="middle" x="75.0" y="140">trigo : à gauche = dedans, 64</text>
+<rect fill="#E0F2F1" height="70" stroke="#00695C" stroke-width="1.2" width="70" x="200" y="40"></rect>
+<rect fill="none" height="86" stroke="#C62828" stroke-dasharray="4 3" stroke-width="1.2" width="86" x="192" y="32"></rect>
+<line stroke="#00695C" stroke-width="1.4" x1="247.0" x2="223.0" y1="110" y2="110"></line><polygon fill="#00695C" points="223.0,110 229.4,107.3 229.4,112.7"></polygon>
+<text fill="#C62828" font-size="7.4" font-weight="700" text-anchor="middle" x="235.0" y="140">horaire : à gauche = dehors, 144</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="340" y="50">Même carré de 10, même décalage de 1 « à gauche » :</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="340" y="66">aire 64 dans un sens, 144 dans l'autre (mesuré).</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="340" y="90">Rhino décale d'une distance signée dans un plan :</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="340" y="106">le côté dépend du sens de la courbe et de la</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="340" y="122">normale du plan. D'où les essais de Pebble.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="340" y="146">Le signe de l'aire (cours 140) dit le sens.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, décaler vers l'intérieur sans essai</span>var sens = courbe.ClosedCurveOrientation(plan.ZAxis);           // Clockwise ou CounterClockwise
+double d = sens == CurveOrientation.CounterClockwise ? distance : -distance;   // signe à vérifier une fois</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Une fois pour toutes</h3>
+<p>La convention de signe de Rhino se vérifie une fois, sur un carré dont on connaît le sens ; ensuite, l'orientation de chaque courbe suffit à choisir le signe.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Ce que Rhino fait de plus</h3>
+<p>Curve.Offset rend un tableau : plusieurs morceaux quand la forme se scinde, rien quand elle disparaît. C'est la vraie réponse topologique, que le naïf ne sait pas donner.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Supposer qu'une courbe dessinée tourne dans le sens trigonométrique. Le même décalage « à gauche » d'un carré de 10 a donné 64 dans un sens et 144 dans l'autre (mesuré).
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 144 · Décaler une courbe</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 144</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Pebble : rétrécir, puis arrondir</h2>
+<p style="max-width:165mm">Pebble transforme chaque cellule en galet : un décalage vers l'intérieur à coins vifs, puis des congés aux sommets. Le côté intérieur est trouvé par essais, l'échec compté et signalé.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Pebble.cs</span></div>
+<div class="l k1"><span class="n">71</span>Curve shrunk = offset &gt; 0 ? Inward(cell, …) : …;<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">74</span>… Curve.CreateFilletCornersCurve(shrunk, radius, …)<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">97</span>… cell.Offset(plane, d, tolerance, ….Sharp);<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">98</span>if (off == null || off.Length != 1 || …) continue;<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">100</span>if (a &gt; 0 &amp;&amp; a &lt; bestArea) { best = off[0]; … }<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Rétrécir</b>Si offset &gt; 0.</li>
+<li><span class="rep r2">2</span><b>Arrondir</b>Les congés.</li>
+<li><span class="rep r3">3</span><b>Coins vifs</b>Côtés glissés.</li>
+<li><span class="rep r4">4</span><b>Un morceau</b>Sinon rejet.</li>
+<li><span class="rep r5">5</span><b>Plus petit</b>Côté intérieur.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · un décalage retourné passerait le test de l'aire</span>
+    Ligne 100, le côté intérieur est celui dont l'aire est la plus petite. Si la distance dépasse le rayon inscrit de la cellule et que Rhino rendait un contour retourné, comme le décalage naïf du carré de 10 à d = 6 (aire 4 au lieu de 0, mesuré hors Rhino), il aurait une aire positive et plus petite que la cellule : il serait gardé. Que Rhino rende ce contour, rien, ou plusieurs morceaux dans ce cas n'a pas pu être observé ici (déduit). Pour des cellules de Voronoi, convexes, les coins vifs vers l'intérieur sont exacts. Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 144 · Décaler une courbe</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 144</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">curve.Offset(plan, d, tol, style)</td><td>décaler, en un ou plusieurs morceaux</td><td>Pebble.cs:97</td></tr>
+<tr><td class="c">CurveOffsetCornerStyle.Sharp</td><td>coins vifs ; aussi Round, Chamfer</td><td>Pebble.cs:97</td></tr>
+<tr><td class="c">Curve.CreateFilletCornersCurve</td><td>arrondir les sommets d'un contour</td><td>Pebble.cs:74</td></tr>
+<tr><td class="c">ClosedCurveOrientation(z)</td><td>le sens de parcours d'une courbe fermée</td><td>page 4</td></tr>
+<tr><td class="c">d / sin(angle / 2)</td><td>où part un coin vif</td><td>page 2</td></tr>
+<tr><td class="c">AreaMassProperties.Compute</td><td>aire d'une courbe fermée</td><td>Pebble.cs:107</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Décalage</dt><dd>La courbe des points à distance constante d'une autre.</dd>
+<dt>Coin vif</dt><dd>Le coin obtenu en prolongeant les côtés décalés jusqu'à leur rencontre.</dd>
+<dt>Rayon inscrit</dt><dd>Le rayon du plus grand cercle qui tient dans la forme.</dd>
+<dt>Congé</dt><dd>Un arc tangent qui remplace un angle vif.</dd>
+<dt>Retournement</dt><dd>Un décalage qui dépasse la forme et ressort de l'autre côté.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 17</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 144 · Décaler une courbe</div>
+</section>
+</body>
+</html>

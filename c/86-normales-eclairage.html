@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>86 · Normales et éclairage</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-7">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 86</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Normales et éclairage</h1>
+<p class="chapeau">Un maillage sans lumière n'est qu'une silhouette plate. Ce qui fait voir le relief, c'est que chaque face reçoit plus ou moins de lumière selon son <b>orientation</b>. Cette orientation, c'est la <b>normale</b> : un vecteur de longueur 1, perpendiculaire à la surface. Le moteur de rendu la compare à la direction de la lumière, sommet par sommet.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>50</b> et <b>85</b></span>
+<span class="pastille">Exemples · <b>Viewer3D.jsx</b>, <b>apercu.mjs</b> (Magpie web)</span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 200" width="100%">
+<line stroke="#2B2F33" stroke-width="2" x1="40" x2="260" y1="150" y2="150"></line>
+<line stroke="#1D6FB8" stroke-width="2" x1="150" x2="150" y1="150" y2="50"></line><polygon fill="#1D6FB8" points="150,50 152.7,56.4 147.3,56.4"></polygon>
+<text fill="#1D6FB8" font-size="8.6" font-weight="700" text-anchor="start" x="156" y="54">n (normale)</text>
+<line stroke="#E65100" stroke-width="2" x1="150" x2="220" y1="150" y2="80"></line><polygon fill="#E65100" points="220,80 217.4,86.5 213.5,82.6"></polygon>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="start" x="226" y="80">l (vers la lumière)</text>
+<path d="M 150 110 A 40 40 0 0 1 178.3 121.7" fill="none" stroke="#6B7378"></path>
+<text fill="#6B7378" font-size="10" font-weight="700" text-anchor="middle" x="166" y="104">θ</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="150" y="180">éclairement diffus ∝ max(0, n · l) = max(0, cos θ)</text>
+<rect fill="#F2F2F2" height="54" rx="4" stroke="#999" width="54" x="320" y="40"></rect>
+<text fill="#2B2F33" font-size="9" font-weight="700" text-anchor="middle" x="347" y="112">0°</text>
+<text class="mono" fill="#6B7378" font-size="8" style="font-size:8px" text-anchor="middle" x="347" y="128">cos = 1,00</text>
+<rect fill="#BEBEBE" height="54" rx="4" stroke="#999" width="54" x="386" y="40"></rect>
+<text fill="#2B2F33" font-size="9" font-weight="700" text-anchor="middle" x="413" y="112">45°</text>
+<text class="mono" fill="#6B7378" font-size="8" style="font-size:8px" text-anchor="middle" x="413" y="128">cos = 0,71</text>
+<rect fill="#999999" height="54" rx="4" stroke="#999" width="54" x="452" y="40"></rect>
+<text fill="#2B2F33" font-size="9" font-weight="700" text-anchor="middle" x="479" y="112">60°</text>
+<text class="mono" fill="#6B7378" font-size="8" style="font-size:8px" text-anchor="middle" x="479" y="128">cos = 0,50</text>
+<rect fill="#404040" height="54" rx="4" stroke="#999" width="54" x="518" y="40"></rect>
+<text fill="#2B2F33" font-size="9" font-weight="700" text-anchor="middle" x="545" y="112">90°</text>
+<text class="mono" fill="#6B7378" font-size="8" style="font-size:8px" text-anchor="middle" x="545" y="128">cos = 0,00</text>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="450" y="154">Une face qui se détourne de la lumière s'assombrit ;</text>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="450" y="168">à 90° et au-delà, elle ne reçoit plus que l'ambiante.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>La clarté d'un point vaut la lumière ambiante, plus celle du soleil multipliée par le cosinus de l'angle entre la normale et la direction du soleil.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un panneau solaire. Face au soleil, il donne le maximum ; incliné, moins ; tourné de dos, rien, sauf la lumière diffuse du ciel. Une face de maillage se comporte pareil.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>calculer une normale de face ;</li>
+<li>distinguer arête vive et surface lissée ;</li>
+<li>lire un éclairage de Lambert ;</li>
+<li>repérer une couture mal éclairée.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    La normale d'un triangle se calcule par un produit vectoriel de deux de ses côtés (cours 50), puis se ramène à une longueur de 1. Son sens dépend de l'ordre des trois sommets : inverser l'ordre retourne la normale.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 86 · Normales et éclairage</div>
+</section>
+<!-- ============ PAGE 2 · FACES ET SOMMETS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 86</b></div>
+<p class="rubrique">Schéma 1 · Normales de face, normales de sommet</p>
+<h2>Une arête vive se paie en sommets</h2>
+<p style="max-width:165mm">La carte graphique éclaire chaque <b>sommet</b>, puis mélange les teintes à l'intérieur du triangle. Un sommet partagé par plusieurs faces reçoit une seule normale, moyenne des faces voisines : la surface paraît lisse. Pour une arête vive, il faut dédoubler les sommets, chacun avec la normale de sa face.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1D6FB8" font-size="8.6" font-weight="700" text-anchor="start" x="16" y="22">Le coin d'un cube, vu en coupe : une normale par face, ou une seule moyennée</text>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="middle" x="170" y="46">sommets dédoublés (non indexé)</text>
+<polygon fill="#F0EDE6" points="110,80 260,80 260,160 110,160" stroke="none"></polygon>
+<polyline fill="none" points="110,160 110,80 260,80" stroke="#2B2F33" stroke-width="2"></polyline>
+<circle cx="107" cy="83" fill="#2E7D32" r="3.5"></circle>
+<circle cx="113" cy="77" fill="#2E7D32" r="3.5"></circle>
+<line stroke="#2E7D32" stroke-width="1.8" x1="107" x2="60" y1="83" y2="83"></line><polygon fill="#2E7D32" points="60,83 66.4,80.3 66.4,85.7"></polygon>
+<line stroke="#2E7D32" stroke-width="1.8" x1="113" x2="113" y1="77" y2="35"></line><polygon fill="#2E7D32" points="113,35 115.7,41.4 110.3,41.4"></polygon>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="middle" x="170" y="182">deux normales nettes : l'arête reste vive</text>
+<text fill="#C62828" font-size="8.6" font-weight="700" text-anchor="middle" x="460" y="46">sommet partagé (indexé)</text>
+<polygon fill="#F0EDE6" points="400,80 550,80 550,160 400,160" stroke="none"></polygon>
+<polyline fill="none" points="400,160 400,80 550,80" stroke="#2B2F33" stroke-width="2"></polyline>
+<circle cx="400" cy="80" fill="#C62828" r="4"></circle>
+<line stroke="#C62828" stroke-width="1.8" x1="400" x2="370" y1="80" y2="54"></line><polygon fill="#C62828" points="370,54 376.7,56.2 373.1,60.3"></polygon>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="middle" x="460" y="182">une normale de biais : le coin s'arrondit</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="170" y="198">coin (0,0,0) en 3D : (0,0,−1), (0,−1,0), (−1,0,0)</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="460" y="198">mesuré : (−0,33 ; −0,67 ; −0,67)</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">magpie/web/apercu.mjs · ligne 195 et src/Viewer3D.jsx · ligne 41 (ligne coupée)</span>return { positions: data.attributes.position.array,
+         indices: data.index?.array ?? [] };
+…
+geometry.computeVertexNormals();</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Comment Three.js moyenne</h3>
+<p><code>computeVertexNormals</code> additionne, pour chaque sommet, les produits vectoriels des triangles qui le touchent, sans les normaliser : un grand triangle pèse plus qu'un petit. Puis il ramène la somme à une longueur de 1.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Rhino fait déjà ce travail</h3>
+<p>Un maillage de rendu Rhino dédouble les sommets le long des arêtes vives d'un Brep et porte ses propres normales : <code>toThreejsJSON</code> en livre un attribut <code>normal</code> (constaté avec rhino3dm 8.35). Magpie n'en garde que les positions et les indices.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    « Souder » un maillage (fusionner les sommets confondus) pour l'alléger, puis recalculer les normales. Toutes les arêtes vives s'arrondissent : un cube ressemble à un galet. On soude seulement là où la surface doit rester lisse.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 86 · Normales et éclairage</div>
+</section>
+<!-- ============ PAGE 3 · LAMBERT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 86</b></div>
+<p class="rubrique">Schéma 2 · L'éclairage de Lambert</p>
+<h2>Ambiante plus soleil</h2>
+<p style="max-width:165mm">Le modèle de <b>Lambert</b> (1760) décrit une surface mate : elle renvoie la lumière également dans toutes les directions, donc sa clarté ne dépend que de l'angle de la lumière, pas de la position de l'œil. C'est le matériau de l'aperçu Magpie, <code>MeshLambertMaterial</code>.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1D6FB8" font-size="8.6" font-weight="700" text-anchor="start" x="16" y="22">Ambiante 1,6 + soleil 1,4 venant de (1, −2, 3) : l'éclairement relatif de chaque face (calculé)</text>
+<text fill="#2B2F33" font-size="8.6" font-weight="700" text-anchor="end" x="110" y="55">+Z, dessus</text>
+<rect fill="#E0E0E0" height="18" stroke="#888" width="244.8" x="120" y="42"></rect>
+<text class="mono" fill="#2B2F33" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="370.8" y="55">n·l = 0,802 → 2,72</text>
+<text fill="#2B2F33" font-size="8.6" font-weight="700" text-anchor="end" x="110" y="85">−Y, avant</text>
+<rect fill="#C9C9C9" height="18" stroke="#888" width="211.5" x="120" y="72"></rect>
+<text class="mono" fill="#2B2F33" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="337.5" y="85">n·l = 0,535 → 2,35</text>
+<text fill="#2B2F33" font-size="8.6" font-weight="700" text-anchor="end" x="110" y="115">+X, droite</text>
+<rect fill="#B1B1B1" height="18" stroke="#888" width="177.3" x="120" y="102"></rect>
+<text class="mono" fill="#2B2F33" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="303.3" y="115">n·l = 0,267 → 1,97</text>
+<text fill="#2B2F33" font-size="8.6" font-weight="700" text-anchor="end" x="110" y="145">−X, +Y, −Z</text>
+<rect fill="#999999" height="18" stroke="#888" width="144.0" x="120" y="132"></rect>
+<text class="mono" fill="#2B2F33" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="270.0" y="145">n·l = 0,000 → 1,60</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="16" y="172">La caméra part de (12, −18, 12) : elle voit d'abord les trois faces éclairées, toutes différentes.</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="16" y="190">Les trois faces à l'ombre reçoivent toutes 1,6 : vues ensemble, elles se confondent.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="206">Valeurs relatives (ambiante + soleil × n·l) ; le moteur les multiplie ensuite par la couleur du matériau.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">magpie/web/src/Viewer3D.jsx · lignes 80 à 83</span>scene.add(new THREE.AmbientLight(0xffffff, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.4);
+sun.position.set(1, -2, 3);
+scene.add(sun);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Une lumière directionnelle</h3>
+<p>Une <code>DirectionalLight</code> vient de l'infini : seule compte la direction de sa position vers sa cible (l'origine par défaut). Tous les points d'une même face reçoivent le même angle, comme sous le soleil.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Brillant ou mat</h3>
+<p>Un matériau brillant ajoute un reflet qui dépend de l'œil (modèles de Phong, ou physiques comme <code>MeshStandardMaterial</code>). Pour un aperçu de travail, le mat est un bon choix : pas de reflet qui masque la forme quand on tourne.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Trop d'ambiante. Elle éclaire tout également et aplatit la forme : le rapport entre la face la plus claire et la plus sombre tombe vers 1. Ici, 2,72 contre 1,60, soit 1,7 : assez pour lire le relief, sans faces noires.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 86 · Normales et éclairage</div>
+</section>
+<!-- ============ PAGE 4 · COUTURE ET TRANSFORMATIONS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 86</b></div>
+<p class="rubrique">Schéma 3 · Coutures et transformations</p>
+<h2>Là où les normales trichent</h2>
+<p style="max-width:165mm">Une sphère, un cylindre ou un tore maillés ont une <b>couture</b> : une ligne où la surface se referme et où les sommets sont dédoublés pour porter deux coordonnées de texture. Si l'on recalcule les normales à partir des triangles, chaque côté de la couture ne voit que ses voisins.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#1D6FB8" font-size="8.6" font-weight="700" text-anchor="start" x="16" y="22">Normales recalculées sur une sphère UV, comparées aux normales exactes (mesuré, Three.js 0.186)</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="middle" x="70" y="44">segments</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="middle" x="160" y="44">triangles</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="middle" x="260" y="44">écart moyen</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="middle" x="380" y="44">écart max hors couture</text>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="middle" x="510" y="44">écart max sur la couture</text>
+<rect fill="#E6F0FA" height="20" rx="3" width="568" x="16" y="52"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="70" y="66">8 × 4</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="160" y="66">48</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="260" y="66">5,8°</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="380" y="66">8,7°</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="510" y="66">23,2°</text>
+<rect fill="#fff" height="20" rx="3" width="568" x="16" y="76"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="70" y="90">16 × 8</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="160" y="90">224</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="260" y="90">2,1°</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="380" y="90">4,1°</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="510" y="90">11,8°</text>
+<rect fill="#E6F0FA" height="20" rx="3" width="568" x="16" y="100"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="70" y="114">32 × 16</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="160" y="114">960</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="260" y="114">0,7°</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="380" y="114">1,9°</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="510" y="114">5,9°</text>
+<rect fill="#fff" height="20" rx="3" width="568" x="16" y="124"></rect>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="70" y="138">64 × 32</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="160" y="138">3 968</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="260" y="138">0,2°</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="380" y="138">1,0°</text>
+<text class="mono" fill="#C62828" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="middle" x="510" y="138">3,0°</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="16" y="166">Sur la couture, les sommets sont dédoublés : chacun ne voit que les triangles d'un côté. L'erreur y est trois fois</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="16" y="180">plus forte qu'ailleurs, et dessine une ligne visible du pôle au pôle.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="198">Pôles exclus. Sphère THREE.SphereGeometry : normales exactes supprimées, puis computeVertexNormals().</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · Three.js, une normale sous une échelle (2, 1, 1)</span>const m = new THREE.Matrix4().makeScale(2, 1, 1);
+const n = new THREE.Vector3(1, 1, 0).normalize();
+n.clone().applyMatrix4(m).normalize();   // (0,894 ; 0,447 ; 0) faux
+const nm = new THREE.Matrix3().getNormalMatrix(m);
+n.clone().applyMatrix3(nm).normalize();  // (0,447 ; 0,894 ; 0) juste</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>La matrice des normales</h3>
+<p>Une échelle non uniforme déforme les angles. La normale transformée comme un point n'est plus perpendiculaire à la surface : son produit scalaire avec la tangente transformée vaut 1,342 au lieu de 0 (mesuré). Il faut l'inverse transposée de la matrice.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Normales exactes</h3>
+<p>Une surface NURBS connaît sa normale exacte en chaque point. Rhino s'en sert pour les normales de son maillage de rendu : elles n'ont pas d'erreur de couture. Les recalculer depuis les triangles, c'est perdre cette information.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier de renormaliser. Une normale interpolée au milieu d'un triangle, ou transformée par une matrice, n'a plus une longueur de 1. Le produit scalaire avec la lumière est alors trop petit ou trop grand, et la face trop sombre ou brûlée.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 86 · Normales et éclairage</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 86</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Un éclairage soigné, des normales recalculées</h2>
+<p style="max-width:165mm">L'aperçu 3D de Magpie imite celui de Grasshopper : matériau mat, lumière douce, soleil placé du côté de la caméra. Les normales, elles, sont jetées par le serveur et refaites par le navigateur.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">magpie/web/src/Viewer3D.jsx</span></div>
+<div class="l k1"><span class="n">28</span>mesh: <span class="kw">new</span> THREE.MeshLambertMaterial({ color, … }),<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">80</span>scene.add(<span class="kw">new</span> THREE.AmbientLight(0xffffff, 1.6));<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">82</span>sun.position.set(1, -2, 3);</div>
+<div class="l k3"><span class="n">98</span>camera.position.set(12, -18, 12);<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">41</span>geometry.computeVertexNormals();<span class="rep r4">4</span></div>
+<div class="l"><span class="cm">magpie/web/apercu.mjs</span></div>
+<div class="l k5"><span class="n">195</span><span class="kw">return</span> { positions: data.attributes.position.array, …<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Lambert</b>Mat, sans reflet.</li>
+<li><span class="rep r2">2</span><b>Deux lumières</b>1,6 et 1,4.</li>
+<li><span class="rep r3">3</span><b>Du côté du soleil</b>Faces vues, faces éclairées.</li>
+<li><span class="rep r4">4</span><b>Normales refaites</b>Depuis les triangles.</li>
+<li><span class="rep r5">5</span><b>Normales jetées</b>Seules positions et indices.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · des coutures visibles sur les surfaces fermées</span>
+    Le serveur ne transmet que les positions et les indices (apercu.mjs:195), puis le navigateur recalcule les normales (Viewer3D.jsx:41). Sur une sphère ou un cylindre, la couture risque de se voir : jusqu'à 11,8° d'écart sur une sphère 16 × 8 dans la mesure de la page 4, contre 4,1° ailleurs. À vérifier dans l'aperçu avec une sphère Grasshopper. Transmettre l'attribut <code>normal</code> de Rhino coûterait 12 octets par sommet, soit un tiers de plus environ.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 86 · Normales et éclairage</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 7A</b> · De la scène à l'image</span><b>Cours 86</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">geometry.computeVertexNormals()</td><td>normales moyennées depuis les triangles</td><td>Viewer3D.jsx:41</td></tr>
+<tr><td class="c">MeshLambertMaterial</td><td>un matériau mat</td><td>Viewer3D.jsx:28</td></tr>
+<tr><td class="c">AmbientLight(0xffffff, 1.6)</td><td>une lumière partout égale</td><td>Viewer3D.jsx:80</td></tr>
+<tr><td class="c">DirectionalLight + position</td><td>un soleil, une direction</td><td>Viewer3D.jsx:81–82</td></tr>
+<tr><td class="c">Matrix3().getNormalMatrix(m)</td><td>transformer une normale juste</td><td>exemple autonome, page 4</td></tr>
+<tr><td class="c">data.attributes.normal</td><td>les normales de Rhino, non transmises</td><td>apercu.mjs:194–195</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Normale</dt><dd>Un vecteur de longueur 1 perpendiculaire à la surface en un point.</dd>
+<dt>Lambert</dt><dd>Le modèle d'une surface mate : clarté proportionnelle au cosinus de l'angle de la lumière.</dd>
+<dt>Lumière ambiante</dt><dd>Une lumière sans direction, qui éclaire tout également.</dd>
+<dt>Couture</dt><dd>La ligne où une surface fermée se rejoint, avec des sommets dédoublés.</dd>
+<dt>Matrice des normales</dt><dd>L'inverse transposée qui garde les normales perpendiculaires.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 87</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 86 · Normales et éclairage</div>
+</section>
+</body>
+</html>

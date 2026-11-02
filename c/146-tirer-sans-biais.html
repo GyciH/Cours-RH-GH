@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>146 · Tirer sans biais</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-5">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 146</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Tirer sans biais</h1>
+<p class="chapeau">Un bon générateur ne suffit pas : il faut encore transformer ses nombres en indice, en ordre, en point. Chaque transformation peut favoriser certains résultats sans que rien ne se voie à l'œil. Une borne mal placée, un mélange trop naïf, un rayon tiré tout droit, et le hasard penche.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>137</b>, <b>145</b></span>
+<span class="pastille">Exemples · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 204" width="100%">
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="start" x="30" y="36">Dune.cs : ids[rand.Next(0, ids.Count - 1)]</text>
+<rect fill="#C62828" height="28.6" opacity=".8" width="34" x="30" y="81.4"></rect>
+<text fill="#C62828" font-size="7" font-weight="700" text-anchor="middle" x="47.0" y="77.38">33,4 %</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="47.0" y="122">−1</text>
+<rect fill="#C62828" height="57.1" opacity=".8" width="34" x="74" y="52.9"></rect>
+<text fill="#C62828" font-size="7" font-weight="700" text-anchor="middle" x="91.0" y="48.90571428571429">66,6 %</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="91.0" y="122">0</text>
+<rect fill="#C62828" height="0.0" opacity=".8" width="34" x="118" y="110.0"></rect>
+<text fill="#C62828" font-size="7" font-weight="700" text-anchor="middle" x="135.0" y="106.0">0,0 %</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="135.0" y="122">+1</text>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="start" x="330" y="36">Wander.cs : ids[rand.Next(0, ids.Count)]</text>
+<rect fill="#2E7D32" height="21.5" opacity=".8" width="34" x="330" y="88.5"></rect>
+<text fill="#2E7D32" font-size="7" font-weight="700" text-anchor="middle" x="347.0" y="84.54571428571428">25,0 %</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="347.0" y="122">−1</text>
+<rect fill="#2E7D32" height="42.9" opacity=".8" width="34" x="374" y="67.1"></rect>
+<text fill="#2E7D32" font-size="7" font-weight="700" text-anchor="middle" x="391.0" y="63.06571428571428">50,1 %</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="391.0" y="122">0</text>
+<rect fill="#2E7D32" height="21.3" opacity=".8" width="34" x="418" y="88.7"></rect>
+<text fill="#2E7D32" font-size="7" font-weight="700" text-anchor="middle" x="435.0" y="84.67428571428572">24,9 %</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="435.0" y="122">+1</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="10" y="150">ids = { −1, 0, 0, 1 }, un million de tirages (mesuré). Next(min, max) exclut max : Count − 1 ne tire jamais le dernier.</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="10" y="168">Next(n) rend 0 à n − 1 ; Next(a, b) rend a à b − 1 ; NextDouble rend [0, 1), jamais 1.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="10" y="186">Le −1 ajouté « par prudence » est un réflexe de boucle for, déplacé là où il n'a rien à faire.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un tirage est sans biais quand chaque résultat possible est atteint par autant de chemins ; tout le travail consiste à compter ces chemins.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un dé dont une face est un peu plus grande : il roule bien, il a l'air juste, et pourtant sur mille lancers, l'écart finit par apparaître.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>placer les bornes de Next ;</li>
+<li>mélanger avec Fisher-Yates ;</li>
+<li>tirer un point uniforme dans une forme ;</li>
+<li>éviter le biais du reste.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Un biais ne se voit pas sur un tirage : il se mesure sur des milliers. Compte les fréquences avant de faire confiance à une méthode.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 146 · Tirer sans biais</div>
+</section>
+<!-- ============ PAGE 2 · MÉLANGER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 146</b></div>
+<p class="rubrique">Schéma 1 · Mélanger</p>
+<h2>Six ordres, six chances égales</h2>
+<p style="max-width:165mm">Mélanger, c'est tirer une permutation. Quatre méthodes courantes ont mélangé trois lettres 600 000 fois ; on a compté chaque ordre obtenu.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Mélanger A, B, C : fréquence de chacun des 6 ordres sur 600 000 essais (attendu 16,7 %, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">méthode</text>
+<text class="mono" fill="#6B7378" font-size="7.4" font-weight="700" style="font-size:7.4px" text-anchor="start" x="196" y="40">ABC</text>
+<text class="mono" fill="#6B7378" font-size="7.4" font-weight="700" style="font-size:7.4px" text-anchor="start" x="266" y="40">ACB</text>
+<text class="mono" fill="#6B7378" font-size="7.4" font-weight="700" style="font-size:7.4px" text-anchor="start" x="336" y="40">BAC</text>
+<text class="mono" fill="#6B7378" font-size="7.4" font-weight="700" style="font-size:7.4px" text-anchor="start" x="406" y="40">BCA</text>
+<text class="mono" fill="#6B7378" font-size="7.4" font-weight="700" style="font-size:7.4px" text-anchor="start" x="476" y="40">CAB</text>
+<text class="mono" fill="#6B7378" font-size="7.4" font-weight="700" style="font-size:7.4px" text-anchor="start" x="546" y="40">CBA</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">Fisher-Yates (Worm.cs)</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="196" y="61">16,7</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="266" y="61">16,6</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="336" y="61">16,7</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="406" y="61">16,7</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="476" y="61">16,7</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="546" y="61">16,7</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">échanger avec n'importe qui</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="196" y="79">14,8</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="266" y="79">18,5</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="336" y="79">18,4</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="406" y="79">18,5</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="476" y="79">14,8</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="546" y="79">14,9</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">OrderBy(_ =&gt; rnd.Next())</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="196" y="97">16,7</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="266" y="97">16,7</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="336" y="97">16,6</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="406" y="97">16,6</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="476" y="97">16,7</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="546" y="97">16,7</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">Sort, comparateur au hasard</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="196" y="115">29,6</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="266" y="115">14,8</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="336" y="115">14,8</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="406" y="115">7,4</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="476" y="115">14,9</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="546" y="115">18,5</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="140">Échanger chaque case avec n'importe laquelle donne 3³ = 27 chemins pour 6 ordres : 27 n'est pas divisible par 6.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="156">Fisher-Yates n'échange qu'avec les cases pas encore fixées : 3 × 2 × 1 = 6 chemins, un par ordre.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="178">Sort au comparateur aléatoire, 100 éléments : 235 exceptions sur 20 000 tris, et l'élément 0 aux 10 premières</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="192">places dans 1,9 % des cas au lieu de 10 % (mesuré).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, Fisher-Yates</span>for (int n = liste.Count - 1; n &gt; 0; n--) {
+    int k = rand.Next(n + 1);                    // 0 à n : la case elle-même comprise
+    (liste[k], liste[n]) = (liste[n], liste[k]); }</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi OrderBy marche</h3>
+<p>Trier selon une clé tirée une fois par élément est juste, aux égalités de clés près, rarissimes avec des entiers de 31 bits. Mais c'est un tri : n log n au lieu de n.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Pourquoi le comparateur casse</h3>
+<p>Un comparateur qui répond au hasard n'est pas un ordre (cours 137). Le tri en tire des conclusions fausses, et .NET le détecte parfois : 235 exceptions sur 20 000 (mesuré).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Écrire k = rand.Next(liste.Count) dans la boucle de mélange. Le code est presque identique à Fisher-Yates, mais trois ordres sortaient à 18,5 % et trois à 14,8 % (mesuré).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 146 · Tirer sans biais</div>
+</section>
+<!-- ============ PAGE 3 · FORMES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 146</b></div>
+<p class="rubrique">Schéma 2 · Un point dans une forme</p>
+<h2>Corriger par l'aire</h2>
+<p style="max-width:165mm">Tirer un point au hasard dans un disque ou un triangle passe par des paramètres, un rayon, des coefficients. Les tirer uniformément ne répartit pas les points uniformément.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Un point au hasard dans une forme : la part tombée dans la zone centrale (un million de points, mesuré)</text>
+<circle cx="70" cy="92" fill="#fff" r="48" stroke="#6B7378"></circle>
+<circle cx="70" cy="92" fill="none" r="24.0" stroke="#6B7378" stroke-dasharray="3 2"></circle>
+<circle cx="59.0" cy="88.9" fill="#C62828" r="1.1"></circle>
+<circle cx="55.9" cy="81.2" fill="#C62828" r="1.1"></circle>
+<circle cx="97.5" cy="104.0" fill="#C62828" r="1.1"></circle>
+<circle cx="70.3" cy="91.5" fill="#C62828" r="1.1"></circle>
+<circle cx="71.2" cy="104.4" fill="#C62828" r="1.1"></circle>
+<circle cx="23.0" cy="100.9" fill="#C62828" r="1.1"></circle>
+<circle cx="30.3" cy="97.9" fill="#C62828" r="1.1"></circle>
+<circle cx="87.9" cy="116.9" fill="#C62828" r="1.1"></circle>
+<circle cx="90.6" cy="69.5" fill="#C62828" r="1.1"></circle>
+<circle cx="68.6" cy="66.9" fill="#C62828" r="1.1"></circle>
+<circle cx="99.7" cy="104.6" fill="#C62828" r="1.1"></circle>
+<circle cx="39.4" cy="72.3" fill="#C62828" r="1.1"></circle>
+<circle cx="84.2" cy="94.8" fill="#C62828" r="1.1"></circle>
+<circle cx="29.1" cy="99.1" fill="#C62828" r="1.1"></circle>
+<circle cx="95.0" cy="68.2" fill="#C62828" r="1.1"></circle>
+<circle cx="100.2" cy="75.7" fill="#C62828" r="1.1"></circle>
+<circle cx="76.0" cy="74.0" fill="#C62828" r="1.1"></circle>
+<circle cx="89.6" cy="83.6" fill="#C62828" r="1.1"></circle>
+<circle cx="104.5" cy="116.2" fill="#C62828" r="1.1"></circle>
+<circle cx="71.3" cy="98.4" fill="#C62828" r="1.1"></circle>
+<circle cx="27.3" cy="110.1" fill="#C62828" r="1.1"></circle>
+<circle cx="60.5" cy="120.5" fill="#C62828" r="1.1"></circle>
+<circle cx="51.6" cy="108.0" fill="#C62828" r="1.1"></circle>
+<circle cx="55.5" cy="83.4" fill="#C62828" r="1.1"></circle>
+<circle cx="93.1" cy="76.1" fill="#C62828" r="1.1"></circle>
+<circle cx="99.5" cy="77.9" fill="#C62828" r="1.1"></circle>
+<circle cx="111.0" cy="89.7" fill="#C62828" r="1.1"></circle>
+<circle cx="86.7" cy="119.5" fill="#C62828" r="1.1"></circle>
+<circle cx="110.3" cy="82.9" fill="#C62828" r="1.1"></circle>
+<circle cx="30.6" cy="73.7" fill="#C62828" r="1.1"></circle>
+<circle cx="78.3" cy="125.2" fill="#C62828" r="1.1"></circle>
+<circle cx="34.3" cy="74.2" fill="#C62828" r="1.1"></circle>
+<circle cx="82.6" cy="97.3" fill="#C62828" r="1.1"></circle>
+<circle cx="110.9" cy="89.4" fill="#C62828" r="1.1"></circle>
+<circle cx="71.3" cy="88.0" fill="#C62828" r="1.1"></circle>
+<circle cx="81.5" cy="108.0" fill="#C62828" r="1.1"></circle>
+<circle cx="71.7" cy="78.0" fill="#C62828" r="1.1"></circle>
+<circle cx="110.3" cy="103.5" fill="#C62828" r="1.1"></circle>
+<circle cx="98.3" cy="100.2" fill="#C62828" r="1.1"></circle>
+<circle cx="53.2" cy="122.1" fill="#C62828" r="1.1"></circle>
+<circle cx="112.0" cy="86.9" fill="#C62828" r="1.1"></circle>
+<circle cx="94.3" cy="91.8" fill="#C62828" r="1.1"></circle>
+<circle cx="83.2" cy="98.9" fill="#C62828" r="1.1"></circle>
+<circle cx="98.2" cy="97.6" fill="#C62828" r="1.1"></circle>
+<circle cx="62.1" cy="97.2" fill="#C62828" r="1.1"></circle>
+<circle cx="86.3" cy="116.4" fill="#C62828" r="1.1"></circle>
+<circle cx="71.4" cy="90.5" fill="#C62828" r="1.1"></circle>
+<circle cx="84.6" cy="88.1" fill="#C62828" r="1.1"></circle>
+<circle cx="39.0" cy="121.9" fill="#C62828" r="1.1"></circle>
+<circle cx="48.1" cy="89.2" fill="#C62828" r="1.1"></circle>
+<circle cx="44.5" cy="74.5" fill="#C62828" r="1.1"></circle>
+<circle cx="50.4" cy="73.6" fill="#C62828" r="1.1"></circle>
+<circle cx="24.9" cy="90.0" fill="#C62828" r="1.1"></circle>
+<circle cx="66.2" cy="71.7" fill="#C62828" r="1.1"></circle>
+<circle cx="66.4" cy="102.8" fill="#C62828" r="1.1"></circle>
+<circle cx="23.5" cy="85.8" fill="#C62828" r="1.1"></circle>
+<circle cx="96.3" cy="93.9" fill="#C62828" r="1.1"></circle>
+<circle cx="52.5" cy="82.4" fill="#C62828" r="1.1"></circle>
+<circle cx="69.3" cy="91.4" fill="#C62828" r="1.1"></circle>
+<circle cx="98.2" cy="103.2" fill="#C62828" r="1.1"></circle>
+<circle cx="40.6" cy="98.3" fill="#C62828" r="1.1"></circle>
+<circle cx="50.4" cy="118.1" fill="#C62828" r="1.1"></circle>
+<circle cx="67.5" cy="58.2" fill="#C62828" r="1.1"></circle>
+<circle cx="71.0" cy="92.4" fill="#C62828" r="1.1"></circle>
+<circle cx="101.6" cy="84.6" fill="#C62828" r="1.1"></circle>
+<circle cx="58.4" cy="95.3" fill="#C62828" r="1.1"></circle>
+<circle cx="57.9" cy="117.7" fill="#C62828" r="1.1"></circle>
+<circle cx="63.3" cy="108.1" fill="#C62828" r="1.1"></circle>
+<circle cx="55.4" cy="82.0" fill="#C62828" r="1.1"></circle>
+<circle cx="59.7" cy="102.1" fill="#C62828" r="1.1"></circle>
+<circle cx="106.5" cy="98.2" fill="#C62828" r="1.1"></circle>
+<circle cx="67.5" cy="64.8" fill="#C62828" r="1.1"></circle>
+<circle cx="72.6" cy="106.7" fill="#C62828" r="1.1"></circle>
+<circle cx="72.7" cy="130.5" fill="#C62828" r="1.1"></circle>
+<circle cx="61.7" cy="95.6" fill="#C62828" r="1.1"></circle>
+<circle cx="96.9" cy="112.0" fill="#C62828" r="1.1"></circle>
+<circle cx="62.2" cy="105.4" fill="#C62828" r="1.1"></circle>
+<circle cx="32.9" cy="107.1" fill="#C62828" r="1.1"></circle>
+<circle cx="89.9" cy="127.9" fill="#C62828" r="1.1"></circle>
+<circle cx="60.5" cy="78.9" fill="#C62828" r="1.1"></circle>
+<circle cx="29.5" cy="104.8" fill="#C62828" r="1.1"></circle>
+<circle cx="77.8" cy="99.4" fill="#C62828" r="1.1"></circle>
+<circle cx="79.2" cy="115.7" fill="#C62828" r="1.1"></circle>
+<circle cx="90.4" cy="59.1" fill="#C62828" r="1.1"></circle>
+<circle cx="68.4" cy="100.7" fill="#C62828" r="1.1"></circle>
+<circle cx="45.7" cy="61.8" fill="#C62828" r="1.1"></circle>
+<circle cx="48.2" cy="124.0" fill="#C62828" r="1.1"></circle>
+<circle cx="68.4" cy="98.0" fill="#C62828" r="1.1"></circle>
+<circle cx="64.9" cy="129.8" fill="#C62828" r="1.1"></circle>
+<circle cx="55.6" cy="100.3" fill="#C62828" r="1.1"></circle>
+<circle cx="53.0" cy="102.8" fill="#C62828" r="1.1"></circle>
+<circle cx="94.6" cy="128.7" fill="#C62828" r="1.1"></circle>
+<circle cx="70.2" cy="91.9" fill="#C62828" r="1.1"></circle>
+<circle cx="112.1" cy="88.5" fill="#C62828" r="1.1"></circle>
+<circle cx="89.8" cy="85.6" fill="#C62828" r="1.1"></circle>
+<circle cx="77.8" cy="135.8" fill="#C62828" r="1.1"></circle>
+<circle cx="88.5" cy="61.4" fill="#C62828" r="1.1"></circle>
+<circle cx="38.4" cy="88.2" fill="#C62828" r="1.1"></circle>
+<circle cx="62.5" cy="103.7" fill="#C62828" r="1.1"></circle>
+<circle cx="79.9" cy="96.5" fill="#C62828" r="1.1"></circle>
+<circle cx="63.5" cy="119.5" fill="#C62828" r="1.1"></circle>
+<circle cx="107.3" cy="102.9" fill="#C62828" r="1.1"></circle>
+<circle cx="55.0" cy="51.3" fill="#C62828" r="1.1"></circle>
+<circle cx="105.3" cy="65.2" fill="#C62828" r="1.1"></circle>
+<circle cx="31.8" cy="71.9" fill="#C62828" r="1.1"></circle>
+<circle cx="70.0" cy="91.4" fill="#C62828" r="1.1"></circle>
+<circle cx="67.5" cy="99.8" fill="#C62828" r="1.1"></circle>
+<circle cx="38.6" cy="87.0" fill="#C62828" r="1.1"></circle>
+<circle cx="88.4" cy="84.6" fill="#C62828" r="1.1"></circle>
+<circle cx="54.0" cy="116.7" fill="#C62828" r="1.1"></circle>
+<circle cx="77.8" cy="82.7" fill="#C62828" r="1.1"></circle>
+<circle cx="74.6" cy="69.6" fill="#C62828" r="1.1"></circle>
+<circle cx="75.5" cy="108.0" fill="#C62828" r="1.1"></circle>
+<circle cx="80.5" cy="68.6" fill="#C62828" r="1.1"></circle>
+<circle cx="72.1" cy="84.1" fill="#C62828" r="1.1"></circle>
+<circle cx="85.3" cy="50.5" fill="#C62828" r="1.1"></circle>
+<circle cx="109.5" cy="93.9" fill="#C62828" r="1.1"></circle>
+<circle cx="89.6" cy="69.1" fill="#C62828" r="1.1"></circle>
+<circle cx="69.7" cy="94.4" fill="#C62828" r="1.1"></circle>
+<circle cx="57.3" cy="89.8" fill="#C62828" r="1.1"></circle>
+<circle cx="50.0" cy="95.4" fill="#C62828" r="1.1"></circle>
+<circle cx="107.3" cy="92.4" fill="#C62828" r="1.1"></circle>
+<circle cx="71.8" cy="93.9" fill="#C62828" r="1.1"></circle>
+<circle cx="75.4" cy="94.5" fill="#C62828" r="1.1"></circle>
+<circle cx="98.5" cy="54.9" fill="#C62828" r="1.1"></circle>
+<circle cx="65.9" cy="91.9" fill="#C62828" r="1.1"></circle>
+<circle cx="64.0" cy="105.9" fill="#C62828" r="1.1"></circle>
+<circle cx="59.8" cy="78.6" fill="#C62828" r="1.1"></circle>
+<circle cx="51.9" cy="113.6" fill="#C62828" r="1.1"></circle>
+<circle cx="65.6" cy="100.1" fill="#C62828" r="1.1"></circle>
+<circle cx="64.4" cy="90.0" fill="#C62828" r="1.1"></circle>
+<circle cx="44.9" cy="115.5" fill="#C62828" r="1.1"></circle>
+<circle cx="71.7" cy="95.5" fill="#C62828" r="1.1"></circle>
+<circle cx="55.8" cy="81.1" fill="#C62828" r="1.1"></circle>
+<circle cx="42.6" cy="117.7" fill="#C62828" r="1.1"></circle>
+<circle cx="42.5" cy="65.2" fill="#C62828" r="1.1"></circle>
+<circle cx="55.6" cy="106.9" fill="#C62828" r="1.1"></circle>
+<circle cx="63.1" cy="69.2" fill="#C62828" r="1.1"></circle>
+<circle cx="63.1" cy="73.0" fill="#C62828" r="1.1"></circle>
+<circle cx="70.7" cy="114.1" fill="#C62828" r="1.1"></circle>
+<circle cx="61.3" cy="67.8" fill="#C62828" r="1.1"></circle>
+<circle cx="66.9" cy="93.6" fill="#C62828" r="1.1"></circle>
+<circle cx="84.9" cy="78.0" fill="#C62828" r="1.1"></circle>
+<circle cx="38.4" cy="123.9" fill="#C62828" r="1.1"></circle>
+<circle cx="81.0" cy="50.3" fill="#C62828" r="1.1"></circle>
+<circle cx="57.7" cy="94.8" fill="#C62828" r="1.1"></circle>
+<circle cx="72.3" cy="86.5" fill="#C62828" r="1.1"></circle>
+<circle cx="94.2" cy="71.3" fill="#C62828" r="1.1"></circle>
+<circle cx="51.2" cy="59.0" fill="#C62828" r="1.1"></circle>
+<circle cx="37.6" cy="78.2" fill="#C62828" r="1.1"></circle>
+<circle cx="65.8" cy="89.4" fill="#C62828" r="1.1"></circle>
+<circle cx="70.1" cy="92.2" fill="#C62828" r="1.1"></circle>
+<circle cx="105.7" cy="102.2" fill="#C62828" r="1.1"></circle>
+<circle cx="73.6" cy="94.6" fill="#C62828" r="1.1"></circle>
+<circle cx="88.2" cy="130.1" fill="#C62828" r="1.1"></circle>
+<circle cx="70.6" cy="91.1" fill="#C62828" r="1.1"></circle>
+<circle cx="73.2" cy="87.2" fill="#C62828" r="1.1"></circle>
+<circle cx="86.7" cy="64.3" fill="#C62828" r="1.1"></circle>
+<circle cx="29.8" cy="70.2" fill="#C62828" r="1.1"></circle>
+<circle cx="107.3" cy="100.7" fill="#C62828" r="1.1"></circle>
+<circle cx="33.3" cy="89.4" fill="#C62828" r="1.1"></circle>
+<circle cx="96.9" cy="113.3" fill="#C62828" r="1.1"></circle>
+<circle cx="103.0" cy="77.6" fill="#C62828" r="1.1"></circle>
+<circle cx="68.7" cy="94.6" fill="#C62828" r="1.1"></circle>
+<circle cx="82.8" cy="68.1" fill="#C62828" r="1.1"></circle>
+<circle cx="75.0" cy="102.5" fill="#C62828" r="1.1"></circle>
+<circle cx="61.0" cy="84.0" fill="#C62828" r="1.1"></circle>
+<circle cx="41.6" cy="114.4" fill="#C62828" r="1.1"></circle>
+<circle cx="56.0" cy="102.7" fill="#C62828" r="1.1"></circle>
+<circle cx="55.4" cy="100.3" fill="#C62828" r="1.1"></circle>
+<circle cx="66.0" cy="92.0" fill="#C62828" r="1.1"></circle>
+<circle cx="30.1" cy="116.3" fill="#C62828" r="1.1"></circle>
+<circle cx="89.1" cy="122.4" fill="#C62828" r="1.1"></circle>
+<circle cx="71.3" cy="58.9" fill="#C62828" r="1.1"></circle>
+<circle cx="37.8" cy="88.5" fill="#C62828" r="1.1"></circle>
+<circle cx="55.5" cy="73.8" fill="#C62828" r="1.1"></circle>
+<circle cx="95.5" cy="126.7" fill="#C62828" r="1.1"></circle>
+<circle cx="69.9" cy="87.4" fill="#C62828" r="1.1"></circle>
+<circle cx="26.3" cy="87.2" fill="#C62828" r="1.1"></circle>
+<circle cx="65.9" cy="71.1" fill="#C62828" r="1.1"></circle>
+<circle cx="69.0" cy="100.9" fill="#C62828" r="1.1"></circle>
+<circle cx="61.8" cy="87.1" fill="#C62828" r="1.1"></circle>
+<circle cx="71.7" cy="107.0" fill="#C62828" r="1.1"></circle>
+<circle cx="101.8" cy="82.4" fill="#C62828" r="1.1"></circle>
+<circle cx="66.1" cy="78.4" fill="#C62828" r="1.1"></circle>
+<circle cx="82.0" cy="76.2" fill="#C62828" r="1.1"></circle>
+<circle cx="67.0" cy="119.9" fill="#C62828" r="1.1"></circle>
+<circle cx="80.3" cy="93.5" fill="#C62828" r="1.1"></circle>
+<circle cx="53.0" cy="107.5" fill="#C62828" r="1.1"></circle>
+<circle cx="64.7" cy="98.4" fill="#C62828" r="1.1"></circle>
+<circle cx="72.3" cy="76.7" fill="#C62828" r="1.1"></circle>
+<circle cx="76.9" cy="91.6" fill="#C62828" r="1.1"></circle>
+<circle cx="51.3" cy="78.6" fill="#C62828" r="1.1"></circle>
+<circle cx="81.4" cy="72.6" fill="#C62828" r="1.1"></circle>
+<circle cx="33.1" cy="78.1" fill="#C62828" r="1.1"></circle>
+<circle cx="65.8" cy="69.3" fill="#C62828" r="1.1"></circle>
+<circle cx="36.7" cy="116.1" fill="#C62828" r="1.1"></circle>
+<circle cx="104.1" cy="83.3" fill="#C62828" r="1.1"></circle>
+<circle cx="72.9" cy="114.3" fill="#C62828" r="1.1"></circle>
+<circle cx="67.7" cy="81.0" fill="#C62828" r="1.1"></circle>
+<circle cx="101.3" cy="83.7" fill="#C62828" r="1.1"></circle>
+<circle cx="72.0" cy="132.9" fill="#C62828" r="1.1"></circle>
+<circle cx="69.5" cy="101.1" fill="#C62828" r="1.1"></circle>
+<circle cx="67.5" cy="83.4" fill="#C62828" r="1.1"></circle>
+<circle cx="103.3" cy="67.7" fill="#C62828" r="1.1"></circle>
+<circle cx="78.1" cy="82.8" fill="#C62828" r="1.1"></circle>
+<circle cx="56.7" cy="99.0" fill="#C62828" r="1.1"></circle>
+<circle cx="100.0" cy="110.0" fill="#C62828" r="1.1"></circle>
+<circle cx="72.2" cy="88.2" fill="#C62828" r="1.1"></circle>
+<circle cx="61.3" cy="103.0" fill="#C62828" r="1.1"></circle>
+<circle cx="57.4" cy="67.1" fill="#C62828" r="1.1"></circle>
+<circle cx="69.8" cy="92.3" fill="#C62828" r="1.1"></circle>
+<circle cx="49.1" cy="93.9" fill="#C62828" r="1.1"></circle>
+<circle cx="61.3" cy="86.9" fill="#C62828" r="1.1"></circle>
+<circle cx="34.5" cy="121.0" fill="#C62828" r="1.1"></circle>
+<circle cx="89.1" cy="109.8" fill="#C62828" r="1.1"></circle>
+<circle cx="63.3" cy="80.6" fill="#C62828" r="1.1"></circle>
+<circle cx="74.1" cy="88.5" fill="#C62828" r="1.1"></circle>
+<circle cx="105.8" cy="116.9" fill="#C62828" r="1.1"></circle>
+<circle cx="38.2" cy="124.1" fill="#C62828" r="1.1"></circle>
+<circle cx="71.7" cy="55.0" fill="#C62828" r="1.1"></circle>
+<circle cx="63.6" cy="79.3" fill="#C62828" r="1.1"></circle>
+<circle cx="80.8" cy="62.5" fill="#C62828" r="1.1"></circle>
+<circle cx="70.3" cy="79.3" fill="#C62828" r="1.1"></circle>
+<circle cx="48.5" cy="51.2" fill="#C62828" r="1.1"></circle>
+<circle cx="89.5" cy="108.8" fill="#C62828" r="1.1"></circle>
+<circle cx="55.8" cy="111.0" fill="#C62828" r="1.1"></circle>
+<circle cx="55.0" cy="60.9" fill="#C62828" r="1.1"></circle>
+<circle cx="81.3" cy="116.7" fill="#C62828" r="1.1"></circle>
+<circle cx="48.9" cy="69.3" fill="#C62828" r="1.1"></circle>
+<circle cx="76.6" cy="86.5" fill="#C62828" r="1.1"></circle>
+<circle cx="92.5" cy="114.0" fill="#C62828" r="1.1"></circle>
+<circle cx="98.2" cy="126.7" fill="#C62828" r="1.1"></circle>
+<circle cx="67.1" cy="76.4" fill="#C62828" r="1.1"></circle>
+<circle cx="43.0" cy="82.3" fill="#C62828" r="1.1"></circle>
+<circle cx="40.0" cy="100.2" fill="#C62828" r="1.1"></circle>
+<circle cx="76.7" cy="105.4" fill="#C62828" r="1.1"></circle>
+<circle cx="69.3" cy="88.8" fill="#C62828" r="1.1"></circle>
+<circle cx="35.1" cy="82.3" fill="#C62828" r="1.1"></circle>
+<circle cx="47.5" cy="119.5" fill="#C62828" r="1.1"></circle>
+<circle cx="60.5" cy="100.5" fill="#C62828" r="1.1"></circle>
+<circle cx="110.4" cy="103.0" fill="#C62828" r="1.1"></circle>
+<circle cx="70.4" cy="116.2" fill="#C62828" r="1.1"></circle>
+<circle cx="47.5" cy="121.3" fill="#C62828" r="1.1"></circle>
+<circle cx="56.9" cy="101.1" fill="#C62828" r="1.1"></circle>
+<circle cx="73.5" cy="66.2" fill="#C62828" r="1.1"></circle>
+<circle cx="79.7" cy="78.1" fill="#C62828" r="1.1"></circle>
+<circle cx="69.3" cy="97.3" fill="#C62828" r="1.1"></circle>
+<circle cx="73.6" cy="95.1" fill="#C62828" r="1.1"></circle>
+<circle cx="64.7" cy="55.0" fill="#C62828" r="1.1"></circle>
+<circle cx="73.3" cy="100.2" fill="#C62828" r="1.1"></circle>
+<circle cx="69.2" cy="72.0" fill="#C62828" r="1.1"></circle>
+<circle cx="69.7" cy="52.8" fill="#C62828" r="1.1"></circle>
+<circle cx="87.2" cy="114.6" fill="#C62828" r="1.1"></circle>
+<circle cx="76.6" cy="109.9" fill="#C62828" r="1.1"></circle>
+<circle cx="47.0" cy="81.5" fill="#C62828" r="1.1"></circle>
+<circle cx="70.0" cy="101.7" fill="#C62828" r="1.1"></circle>
+<circle cx="106.9" cy="99.1" fill="#C62828" r="1.1"></circle>
+<circle cx="99.9" cy="67.7" fill="#C62828" r="1.1"></circle>
+<circle cx="36.2" cy="122.5" fill="#C62828" r="1.1"></circle>
+<circle cx="200" cy="92" fill="#fff" r="48" stroke="#6B7378"></circle>
+<circle cx="200" cy="92" fill="none" r="24.0" stroke="#6B7378" stroke-dasharray="3 2"></circle>
+<circle cx="169.1" cy="74.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="237.8" cy="86.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="187.9" cy="129.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="155.7" cy="96.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="194.6" cy="55.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="200.3" cy="89.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="161.0" cy="94.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="166.3" cy="100.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="179.3" cy="88.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="190.8" cy="92.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="163.8" cy="105.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="234.9" cy="82.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="229.9" cy="126.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="169.5" cy="62.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="193.1" cy="100.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="220.5" cy="102.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="231.9" cy="77.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="218.7" cy="72.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="226.6" cy="121.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="164.2" cy="65.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="190.2" cy="46.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="177.1" cy="126.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="239.2" cy="74.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="158.9" cy="109.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="158.4" cy="95.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="215.3" cy="96.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="204.1" cy="104.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="180.8" cy="92.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="161.0" cy="82.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="181.5" cy="66.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="174.2" cy="97.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="166.0" cy="116.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="216.5" cy="79.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="172.7" cy="122.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="171.3" cy="86.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="206.1" cy="128.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="200.6" cy="94.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="226.4" cy="125.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="211.0" cy="122.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="210.5" cy="111.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="215.0" cy="118.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="206.1" cy="97.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="180.3" cy="93.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="211.6" cy="93.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="173.1" cy="109.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="238.2" cy="104.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="175.7" cy="110.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="207.7" cy="90.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="218.6" cy="104.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="216.9" cy="120.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="178.4" cy="123.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="216.0" cy="97.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="193.6" cy="132.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="158.4" cy="101.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="185.5" cy="136.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="197.6" cy="115.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="170.2" cy="60.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="223.4" cy="107.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="238.9" cy="84.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="236.9" cy="92.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="207.0" cy="96.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="219.3" cy="96.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="193.7" cy="82.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="213.9" cy="135.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="153.1" cy="98.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="237.4" cy="70.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="245.5" cy="101.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="179.3" cy="75.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="239.8" cy="116.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="215.3" cy="71.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="187.5" cy="102.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="188.2" cy="66.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="221.1" cy="133.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="195.8" cy="50.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="158.6" cy="77.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="170.0" cy="127.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="204.0" cy="122.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="157.9" cy="97.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="212.0" cy="113.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="167.9" cy="66.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="169.3" cy="118.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="219.0" cy="119.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="240.0" cy="97.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="201.7" cy="59.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="232.4" cy="114.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="213.0" cy="72.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="227.8" cy="65.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="157.4" cy="105.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="195.1" cy="46.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="181.0" cy="112.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="189.6" cy="99.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="237.1" cy="120.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="227.9" cy="115.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="191.9" cy="81.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="222.4" cy="99.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="188.5" cy="77.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="236.6" cy="94.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="222.5" cy="87.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="179.2" cy="83.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="206.0" cy="61.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="209.0" cy="55.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="213.3" cy="124.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="217.8" cy="101.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="233.2" cy="120.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="207.3" cy="90.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="216.8" cy="78.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="186.3" cy="95.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="210.8" cy="72.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="176.3" cy="62.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="229.0" cy="61.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="177.5" cy="75.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="224.6" cy="112.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="163.6" cy="67.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="211.8" cy="133.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="165.6" cy="99.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="236.2" cy="111.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="171.9" cy="94.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="187.9" cy="87.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="163.6" cy="111.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="169.6" cy="68.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="186.9" cy="109.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="175.6" cy="133.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="227.2" cy="107.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="211.4" cy="111.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="193.1" cy="46.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="244.7" cy="88.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="234.1" cy="76.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="169.3" cy="109.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="238.3" cy="65.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="153.5" cy="96.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="164.8" cy="115.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="242.1" cy="69.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="223.8" cy="81.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="217.0" cy="103.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="188.8" cy="131.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="177.8" cy="65.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="199.7" cy="82.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="177.0" cy="102.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="198.6" cy="63.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="190.4" cy="132.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="195.3" cy="106.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="227.2" cy="106.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="201.5" cy="73.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="239.7" cy="86.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="233.8" cy="58.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="215.5" cy="116.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="173.9" cy="98.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="166.4" cy="82.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="217.3" cy="69.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="175.1" cy="97.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="215.9" cy="49.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="201.2" cy="118.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="243.0" cy="94.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="182.9" cy="88.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="217.7" cy="122.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="203.1" cy="102.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="158.9" cy="101.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="210.5" cy="45.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="246.3" cy="102.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="220.6" cy="93.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="183.4" cy="118.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="189.6" cy="88.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="194.4" cy="105.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="207.7" cy="69.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="198.0" cy="123.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="190.9" cy="96.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="182.8" cy="58.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="216.5" cy="49.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="215.7" cy="110.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="210.3" cy="51.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="216.7" cy="62.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="193.4" cy="127.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="219.6" cy="94.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="230.7" cy="68.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="155.3" cy="101.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="235.3" cy="75.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="165.4" cy="66.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="169.3" cy="88.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="208.1" cy="110.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="239.6" cy="90.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="170.2" cy="111.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="172.7" cy="100.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="158.9" cy="104.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="226.4" cy="130.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="173.3" cy="88.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="218.3" cy="67.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="239.7" cy="73.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="236.9" cy="99.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="165.4" cy="80.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="193.8" cy="124.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="234.4" cy="70.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="192.5" cy="78.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="170.9" cy="89.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="244.0" cy="80.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="213.0" cy="128.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="219.3" cy="133.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="214.0" cy="65.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="196.5" cy="118.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="243.9" cy="75.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="178.9" cy="108.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="217.3" cy="110.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="223.8" cy="89.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="201.7" cy="105.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="218.8" cy="102.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="198.5" cy="57.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="170.1" cy="59.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="243.4" cy="93.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="224.7" cy="85.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="198.6" cy="104.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="196.3" cy="125.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="233.9" cy="102.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="222.5" cy="85.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="215.1" cy="81.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="220.2" cy="91.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="176.2" cy="60.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="217.0" cy="98.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="218.7" cy="129.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="209.2" cy="73.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="242.8" cy="105.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="154.1" cy="81.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="223.2" cy="110.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="229.9" cy="89.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="217.3" cy="110.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="212.8" cy="105.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="224.5" cy="77.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="204.7" cy="104.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="246.5" cy="91.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="201.2" cy="139.5" fill="#2E7D32" r="1.1"></circle>
+<circle cx="227.2" cy="83.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="190.4" cy="60.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="226.6" cy="95.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="199.7" cy="63.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="161.5" cy="74.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="168.2" cy="84.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="168.8" cy="85.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="213.4" cy="133.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="233.8" cy="76.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="219.0" cy="131.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="225.3" cy="52.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="198.0" cy="111.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="220.4" cy="99.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="160.0" cy="117.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="233.7" cy="121.6" fill="#2E7D32" r="1.1"></circle>
+<circle cx="203.9" cy="87.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="242.7" cy="89.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="160.8" cy="85.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="235.1" cy="115.1" fill="#2E7D32" r="1.1"></circle>
+<circle cx="167.1" cy="104.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="185.2" cy="81.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="172.7" cy="90.9" fill="#2E7D32" r="1.1"></circle>
+<circle cx="187.8" cy="118.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="176.9" cy="75.0" fill="#2E7D32" r="1.1"></circle>
+<circle cx="243.8" cy="73.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="222.7" cy="53.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="225.4" cy="88.3" fill="#2E7D32" r="1.1"></circle>
+<circle cx="217.8" cy="109.4" fill="#2E7D32" r="1.1"></circle>
+<circle cx="196.2" cy="58.2" fill="#2E7D32" r="1.1"></circle>
+<circle cx="182.9" cy="69.8" fill="#2E7D32" r="1.1"></circle>
+<circle cx="225.0" cy="86.7" fill="#2E7D32" r="1.1"></circle>
+<circle cx="168.0" cy="96.5" fill="#2E7D32" r="1.1"></circle>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="middle" x="70" y="156">r = R · u : 50,0 %</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="middle" x="200" y="156">r = R · √u : 25,0 %</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="290" y="50">Le cercle pointillé couvre un quart de l'aire du disque.</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="290" y="66">Tirer le rayon uniformément met la moitié des points</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="290" y="80">dedans : il y a moins de place près du centre.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="290" y="104">Triangle, zone centrale d'un quart de l'aire :</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="290" y="120">trois nombres au hasard divisés par leur somme : 50,0 %</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="290" y="136">deux nombres, repliés si u + v &gt; 1 : 25,0 %</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="184">Uniforme sur les paramètres ne veut pas dire uniforme sur la forme : il faut corriger par l'aire que chaque paramètre balaie.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, un point uniforme dans un disque et dans un triangle</span>double r = R * Math.Sqrt(rand.NextDouble()), a = 2 * Math.PI * rand.NextDouble();   // disque
+double u = rand.NextDouble(), v = rand.NextDouble(); if (u + v &gt; 1) { u = 1 - u; v = 1 - v; }
+var p = A + u * (B - A) + v * (C - A);                                              // triangle</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>D'où vient la racine</h3>
+<p>L'aire à moins de r du centre croît comme r². Pour que chaque anneau reçoive des points selon sa surface, on tire r² uniformément, donc r comme la racine d'un tirage.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le rejet, toujours juste</h3>
+<p>Tirer dans le rectangle englobant et rejeter ce qui tombe dehors : uniforme pour toute forme, au prix des essais perdus, 21 % pour un disque (déduit : 1 − π/4).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Normaliser trois nombres au hasard pour obtenir des coordonnées barycentriques. La moitié des points tombe dans le quart central du triangle (mesuré) : un amas au milieu.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 146 · Tirer sans biais</div>
+</section>
+<!-- ============ PAGE 4 · LE RESTE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 146</b></div>
+<p class="rubrique">Schéma 3 · Le reste de la division</p>
+<h2>Quand la plage ne se divise pas</h2>
+<p style="max-width:165mm">Ramener un entier aléatoire dans 0 à n − 1 par le reste de la division est le réflexe de tout programmeur. Il est juste seulement si n divise le nombre de valeurs possibles.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#AD1457" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Réduire un tirage par le reste : un octet (0 à 255) modulo 100, puis modulo 6 (un million d'octets, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">calcul</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="240" y="40">valeurs favorisées</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="420" y="40">valeurs désavantagées</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="16" y="61">octet % 100</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="240" y="61">0 à 55 : 1,171 % chacune</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="61">56 à 99 : 0,782 %</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="16" y="79">octet % 6</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="240" y="79">0 à 3 : 16,76 à 16,82 %</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="79">4 et 5 : 16,42 à 16,43 %</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text class="mono" fill="#2B2F33" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="start" x="16" y="97">Next(6)</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="240" y="97">16,61 à 16,74 % pour toutes</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="97"></text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="122">256 = 2 × 100 + 56 : les 56 premières valeurs ont une chance de plus. 256 = 42 × 6 + 4 : léger, mais réel.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="138">Avec 32 bits, l'écart devient minuscule sans disparaître. Next(n) de .NET ne prend pas le reste brut : utilise-le.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="160">Rejeter : retirer tant que la valeur tombe dans la dernière tranche incomplète, ici 200 à 255.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, réduire sans biais, par rejet</span>int limite = 256 - 256 % n;                     // 200 pour n = 100
+int x; do x = octet(); while (x &gt;= limite);       // rejeter la tranche incomplète
+return x % n;</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>La version flottante</h3>
+<p>(int)(NextDouble() * n) a le même défaut, bien plus discret : les doubles de [0, 1) ne se répartissent pas exactement en n paquets égaux, sauf pour n puissance de deux.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Ce qu'il faut retenir</h3>
+<p>Pour un indice, Next(n) ; pour un intervalle, Next(a, b) avec b exclu ; pour un réel, NextDouble. N'écris le calcul toi-même que si tu sais compter ses chemins.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Tirer un pourcentage par octet % 100. Les valeurs 0 à 55 sont sorties 1,171 % du temps chacune, les autres 0,782 % : moitié plus souvent (mesuré).
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 146 · Tirer sans biais</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 146</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Dune et Wander, la même idée à une borne près</h2>
+<p style="max-width:165mm">Les deux composants tracent une ligne qui saute d'une rangée de points à sa voisine au hasard. Wander, plus récent, a corrigé ce que Dune avait de travers. Worm mélange ses arêtes avec un Fisher-Yates exact.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Dune.cs · Wander.cs · Worm.cs</span></div>
+<div class="l k1"><span class="n">63</span>int offset = ids[rand.Next(0, ids.Count - 1)];<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">64</span>pointList.Add(points.Branches[i + offset][j].Value);<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">76</span>int offset = ids[rand.Next(0, ids.Count)];<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">77</span>int row = Math.Max(0, Math.Min(rows.Count - 1, i + offset));<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">141</span>int k = rng.Next(n + 1);<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Dune</b>Jamais +1.</li>
+<li><span class="rep r2">2</span><b>Sans garde</b>i + 1 hors limite.</li>
+<li><span class="rep r3">3</span><b>Wander</b>Les quatre.</li>
+<li><span class="rep r4">4</span><b>Borné</b>Dans la grille.</li>
+<li><span class="rep r5">5</span><b>Worm</b>Fisher-Yates.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · Dune ne monte jamais vers la rangée suivante</span>
+    Dune.cs:63 tire dans { −1, 0, 0, 1 } avec Next(0, ids.Count − 1) : la dernière case n'est jamais atteinte. Sur un million de tirages, −1 est sorti 33,39 % du temps, 0 66,61 %, +1 jamais (mesuré). La ligne n'emprunte donc que sa rangée et celle d'avant. Attention : corriger la borne seule ferait lire, à la dernière rangée, points.Branches[i + 1], hors du tableau (ligne 64, déduit) ; Wander ajoute pour cela la garde de la ligne 77. Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 146 · Tirer sans biais</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 146</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">rand.Next(a, b)</td><td>un entier de a à b − 1</td><td>Wander.cs:76</td></tr>
+<tr><td class="c">rand.Next(n + 1)</td><td>Fisher-Yates : de 0 à n compris</td><td>Worm.cs:141</td></tr>
+<tr><td class="c">Math.Max(0, Math.Min(max, i))</td><td>borner un indice dans la grille</td><td>Wander.cs:77</td></tr>
+<tr><td class="c">R * Math.Sqrt(u)</td><td>un rayon uniforme en aire</td><td>page 3</td></tr>
+<tr><td class="c">if (u + v &gt; 1) { u = 1 - u; v = 1 - v; }</td><td>replier un point dans le triangle</td><td>page 3</td></tr>
+<tr><td class="c">while (x &gt;= limite)</td><td>rejeter pour réduire sans biais</td><td>page 4</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Biais</dt><dd>Un écart systématique entre les fréquences obtenues et celles attendues.</dd>
+<dt>Borne exclusive</dt><dd>Une limite qui n'est jamais atteinte par le tirage.</dd>
+<dt>Fisher-Yates</dt><dd>Le mélange qui échange chaque case avec une case non encore fixée.</dd>
+<dt>Échantillonnage par rejet</dt><dd>Tirer large et jeter ce qui sort du domaine voulu.</dd>
+<dt>Biais du modulo</dt><dd>L'inégalité créée par un reste quand n ne divise pas la plage.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 147</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 146 · Tirer sans biais</div>
+</section>
+</body>
+</html>

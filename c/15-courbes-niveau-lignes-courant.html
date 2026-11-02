@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>15 · Courbes de niveau et lignes de courant</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 15</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Courbes de niveau<br/>et lignes de courant</h1>
+<p class="chapeau">Deux façons de dessiner un champ. Contour cherche partout où il vaut une valeur donnée ; Flow part d'une graine et se laisse porter, pas à pas.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>14</b> champs · <b>09</b> vecteurs et courbes</span>
+<span class="pastille">Exemples · <b>Contour</b>, <b>Flow</b></span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 240" width="100%">
+<path d="M80.0 74.9 L74.9 80.0 M74.9 80.0 L70.2 90.0 M70.2 90.0 L70.2 100.0 M70.2 100.0 L74.9 110.0 M74.9 110.0 L80.0 115.1 M90.0 70.2 L80.0 74.9 M90.0 119.8 L80.0 115.1 M100.0 70.2 L90.0 70.2 M100.0 119.8 L90.0 119.8 M110.0 74.9 L100.0 70.2 M110.0 115.1 L100.0 119.8 M115.1 80.0 L110.0 74.9 M115.1 80.0 L119.8 90.0 M119.8 90.0 L119.8 100.0 M119.8 100.0 L115.1 110.0 M115.1 110.0 L110.0 115.1 M160.0 138.5 L159.7 140.0 M159.7 140.0 L160.0 141.5 M170.0 119.7 L169.6 120.0 M169.6 120.0 L161.8 130.0 M161.8 130.0 L160.0 138.5 M161.8 150.0 L160.0 141.5 M161.8 150.0 L169.6 160.0 M169.6 160.0 L170.0 160.3 M180.0 115.2 L170.0 119.7 M180.0 164.8 L170.0 160.3 M190.0 115.2 L180.0 115.2 M190.0 164.8 L180.0 164.8 M200.0 119.7 L190.0 115.2 M200.0 160.3 L190.0 164.8 M200.4 120.0 L200.0 119.7 M200.4 120.0 L208.2 130.0 M208.2 130.0 L210.0 138.5 M210.0 141.5 L208.2 150.0 M208.2 150.0 L200.4 160.0 M200.4 160.0 L200.0 160.3 M210.3 140.0 L210.0 138.5 M210.3 140.0 L210.0 141.5" fill="none" opacity="1.00" stroke="#00695C" stroke-linecap="round" stroke-width="1.5"></path>
+<path d="M50.0 88.6 L49.7 90.0 M49.7 90.0 L49.7 100.0 M49.7 100.0 L50.0 101.4 M60.0 66.0 L57.0 70.0 M57.0 70.0 L52.0 80.0 M52.0 80.0 L50.0 88.6 M52.0 110.0 L50.0 101.4 M52.0 110.0 L57.0 120.0 M57.0 120.0 L60.0 124.0 M70.0 57.0 L66.0 60.0 M66.0 60.0 L60.0 66.0 M66.0 130.0 L60.0 124.0 M66.0 130.0 L70.0 133.0 M80.0 52.0 L70.0 57.0 M80.0 138.0 L70.0 133.0 M90.0 49.7 L88.6 50.0 M88.6 50.0 L80.0 52.0 M88.6 140.0 L80.0 138.0 M88.6 140.0 L90.0 140.3 M100.0 49.7 L90.0 49.7 M100.0 140.3 L90.0 140.3 M101.4 50.0 L100.0 49.7 M101.4 50.0 L110.0 52.0 M110.0 138.0 L101.4 140.0 M101.4 140.0 L100.0 140.3 M120.0 57.0 L110.0 52.0 M120.0 133.0 L110.0 138.0 M124.0 60.0 L120.0 57.0 M124.0 60.0 L130.0 66.0 M130.0 124.0 L124.0 130.0 M124.0 130.0 L120.0 133.0 M133.0 70.0 L130.0 66.0 M133.0 70.0 L138.0 80.0 M138.0 80.0 L140.0 88.6 M140.0 101.4 L138.0 110.0 M138.0 110.0 L134.1 120.0 M134.1 120.0 L130.0 124.0 M140.0 134.7 L139.4 140.0 M139.4 140.0 L140.0 145.3 M140.3 90.0 L140.0 88.6 M140.3 90.0 L140.4 100.0 M140.4 100.0 L140.0 101.4 M150.0 110.9 L144.1 120.0 M144.1 120.0 L140.5 130.0 M140.5 130.0 L140.0 134.7 M140.5 150.0 L140.0 145.3 M140.5 150.0 L144.1 160.0 M144.1 160.0 L150.0 169.1 M160.0 101.9 L150.7 110.0 M150.7 110.0 L150.0 110.9 M150.7 170.0 L150.0 169.1 M150.7 170.0 L160.0 178.1 M170.0 97.0 L163.6 100.0 M163.6 100.0 L160.0 101.9 M163.6 180.0 L160.0 178.1 M163.6 180.0 L170.0 183.0 M180.0 94.7 L170.0 97.0 M180.0 185.3 L170.0 183.0 M190.0 94.7 L180.0 94.7 M190.0 185.3 L180.0 185.3 M200.0 97.0 L190.0 94.7 M200.0 183.0 L190.0 185.3 M206.4 100.0 L200.0 97.0 M206.4 100.0 L210.0 101.9 M210.0 178.1 L206.4 180.0 M206.4 180.0 L200.0 183.0 M219.3 110.0 L210.0 101.9 M219.3 110.0 L220.0 110.9 M220.0 169.1 L219.3 170.0 M219.3 170.0 L210.0 178.1 M225.9 120.0 L220.0 110.9 M225.9 120.0 L229.5 130.0 M229.5 130.0 L230.0 134.7 M230.0 145.3 L229.5 150.0 M229.5 150.0 L225.9 160.0 M225.9 160.0 L220.0 169.1 M230.6 140.0 L230.0 134.7 M230.6 140.0 L230.0 145.3" fill="none" opacity="0.90" stroke="#00695C" stroke-linecap="round" stroke-width="1.5"></path>
+<path d="M30.0 85.5 L29.3 90.0 M29.3 90.0 L29.3 100.0 M29.3 100.0 L30.0 104.5 M40.0 58.8 L39.2 60.0 M39.2 60.0 L34.1 70.0 M34.1 70.0 L30.9 80.0 M30.9 80.0 L30.0 85.5 M30.9 110.0 L30.0 104.5 M30.9 110.0 L34.1 120.0 M34.1 120.0 L39.2 130.0 M39.2 130.0 L40.0 131.2 M50.0 47.0 L47.0 50.0 M47.0 50.0 L40.0 58.8 M47.0 140.0 L40.0 131.2 M47.0 140.0 L50.0 143.0 M60.0 39.2 L58.8 40.0 M58.8 40.0 L50.0 47.0 M58.8 150.0 L50.0 143.0 M58.8 150.0 L60.0 150.8 M70.0 34.1 L60.0 39.2 M70.0 155.9 L60.0 150.8 M80.0 30.9 L70.0 34.1 M80.0 159.1 L70.0 155.9 M90.0 29.3 L85.5 30.0 M85.5 30.0 L80.0 30.9 M85.5 160.0 L80.0 159.1 M85.5 160.0 L90.0 160.7 M100.0 29.3 L90.0 29.3 M100.0 160.7 L90.0 160.7 M104.5 30.0 L100.0 29.3 M104.5 30.0 L110.0 30.9 M110.0 159.1 L104.5 160.0 M104.5 160.0 L100.0 160.7 M120.0 34.1 L110.0 30.9 M120.0 157.2 L110.0 159.1 M130.0 39.2 L120.0 34.1 M122.2 160.0 L120.0 157.2 M122.2 160.0 L126.4 170.0 M126.4 170.0 L130.0 176.0 M131.2 40.0 L130.0 39.2 M131.2 40.0 L140.0 47.0 M132.7 180.0 L130.0 176.0 M132.7 180.0 L140.0 188.0 M143.0 50.0 L140.0 47.0 M143.0 50.0 L150.0 58.8 M142.2 190.0 L140.0 188.0 M142.2 190.0 L150.0 195.8 M150.8 60.0 L150.0 58.8 M150.8 60.0 L155.9 70.0 M155.9 70.0 L160.0 78.1 M158.0 200.0 L150.0 195.8 M158.0 200.0 L160.0 200.9 M170.0 75.9 L160.0 78.1 M170.0 204.1 L160.0 200.9 M180.0 74.3 L170.0 75.9 M180.0 205.7 L170.0 204.1 M190.0 74.3 L180.0 74.3 M190.0 205.7 L180.0 205.7 M200.0 75.9 L190.0 74.3 M200.0 204.1 L190.0 205.7 M210.0 79.1 L200.0 75.9 M210.0 200.9 L200.0 204.1 M212.0 80.0 L210.0 79.1 M212.0 80.0 L220.0 84.2 M220.0 195.8 L212.0 200.0 M212.0 200.0 L210.0 200.9 M227.8 90.0 L220.0 84.2 M227.8 90.0 L230.0 92.0 M230.0 188.0 L227.8 190.0 M227.8 190.0 L220.0 195.8 M237.3 100.0 L230.0 92.0 M237.3 100.0 L240.0 104.0 M240.0 176.0 L237.3 180.0 M237.3 180.0 L230.0 188.0 M243.6 110.0 L240.0 104.0 M243.6 110.0 L247.8 120.0 M247.8 120.0 L250.0 129.5 M250.0 150.5 L247.8 160.0 M247.8 160.0 L243.6 170.0 M243.6 170.0 L240.0 176.0 M250.1 130.0 L250.0 129.5 M250.1 130.0 L250.9 140.0 M250.9 140.0 L250.1 150.0 M250.1 150.0 L250.0 150.5" fill="none" opacity="0.80" stroke="#00695C" stroke-linecap="round" stroke-width="1.5"></path>
+<path d="M30.0 38.5 L28.7 40.0 M28.7 40.0 L21.5 50.0 M21.5 50.0 L20.0 52.7 M21.5 140.0 L20.0 137.3 M21.5 140.0 L28.7 150.0 M28.7 150.0 L30.0 151.5 M40.0 28.7 L38.5 30.0 M38.5 30.0 L30.0 38.5 M38.5 160.0 L30.0 151.5 M38.5 160.0 L40.0 161.3 M50.0 21.5 L40.0 28.7 M50.0 168.5 L40.0 161.3 M52.7 20.0 L50.0 21.5 M52.7 170.0 L50.0 168.5 M52.7 170.0 L60.0 173.7 M70.0 177.5 L60.0 173.7 M80.0 179.9 L70.0 177.5 M81.2 180.0 L80.0 179.9 M81.2 180.0 L90.0 181.0 M100.0 181.0 L90.0 181.0 M110.0 182.3 L100.0 181.0 M114.9 190.0 L110.0 182.3 M114.9 190.0 L120.0 196.5 M123.2 200.0 L120.0 196.5 M123.2 200.0 L130.0 206.3 M137.3 20.0 L140.0 21.5 M134.9 210.0 L130.0 206.3 M150.0 28.7 L140.0 21.5 M151.5 30.0 L150.0 28.7 M151.5 30.0 L160.0 38.5 M161.3 40.0 L160.0 38.5 M161.3 40.0 L168.5 50.0 M168.5 50.0 L170.0 52.1 M180.0 54.0 L170.0 52.1 M190.0 54.0 L180.0 54.0 M200.0 55.1 L190.0 54.0 M210.0 57.5 L200.0 55.1 M216.7 60.0 L210.0 57.5 M216.7 60.0 L220.0 61.3 M230.0 66.5 L220.0 61.3 M235.1 70.0 L230.0 66.5 M235.1 70.0 L240.0 73.7 M240.0 206.3 L235.1 210.0 M246.8 80.0 L240.0 73.7 M246.8 80.0 L250.0 83.5 M250.0 196.5 L246.8 200.0 M246.8 200.0 L240.0 206.3 M255.1 90.0 L250.0 83.5 M255.1 90.0 L260.0 97.7 M260.0 182.3 L255.1 190.0 M255.1 190.0 L250.0 196.5 M261.3 100.0 L260.0 97.7 M261.3 100.0 L265.8 110.0 M265.8 110.0 L268.8 120.0 M268.8 120.0 L270.0 126.6 M270.0 153.4 L268.8 160.0 M268.8 160.0 L265.8 170.0 M265.8 170.0 L261.3 180.0 M261.3 180.0 L260.0 182.3" fill="none" opacity="0.70" stroke="#00695C" stroke-linecap="round" stroke-width="1.5"></path>
+<path d="M30.0 179.3 L20.0 170.6 M30.9 180.0 L30.0 179.3 M30.9 180.0 L40.0 186.1 M47.1 190.0 L40.0 186.1 M47.1 190.0 L50.0 191.5 M60.0 195.5 L50.0 191.5 M70.0 198.5 L60.0 195.5 M77.9 200.0 L70.0 198.5 M77.9 200.0 L80.0 200.4 M90.0 201.3 L80.0 200.4 M100.0 204.0 L90.0 201.3 M104.8 210.0 L100.0 204.0 M170.6 20.0 L179.3 30.0 M179.3 30.0 L180.0 30.8 M190.0 33.7 L180.0 30.8 M200.0 34.6 L190.0 33.7 M210.0 36.5 L200.0 34.6 M220.0 39.5 L210.0 36.5 M221.4 40.0 L220.0 39.5 M221.4 40.0 L230.0 43.5 M240.0 48.9 L230.0 43.5 M241.8 50.0 L240.0 48.9 M241.8 50.0 L250.0 55.7 M255.2 60.0 L250.0 55.7 M255.2 60.0 L260.0 64.5 M265.2 70.0 L260.0 64.5 M265.2 70.0 L270.0 76.0 M270.0 204.0 L265.2 210.0" fill="none" opacity="0.60" stroke="#00695C" stroke-linecap="round" stroke-width="1.5"></path>
+<path d="M24.1 200.0 L20.0 197.2 M24.1 200.0 L30.0 203.8 M40.0 209.2 L30.0 203.8 M41.8 210.0 L40.0 209.2 M225.6 20.0 L230.0 21.5 M240.0 25.8 L230.0 21.5 M247.9 30.0 L240.0 25.8 M247.9 30.0 L250.0 31.2 M260.0 37.8 L250.0 31.2 M262.8 40.0 L260.0 37.8 M262.8 40.0 L270.0 46.0" fill="none" opacity="0.50" stroke="#00695C" stroke-linecap="round" stroke-width="1.5"></path>
+<circle cx="95" cy="95" fill="#2B2F33" r="4"></circle>
+<circle cx="185" cy="140" fill="#2B2F33" r="4"></circle>
+<path d="M330.0 60.0 L332.0 60.9 L334.0 61.8 L336.0 62.7 L338.0 63.6 L340.0 64.5 L342.0 65.3 L344.0 66.2 L346.0 67.0 L348.0 67.8 L350.0 68.6 L352.0 69.4 L354.0 70.2 L356.0 70.9 L358.0 71.6 L360.0 72.3 L362.0 72.9 L364.0 73.5 L366.0 74.1 L368.0 74.6 L370.0 75.1 L372.0 75.6 L374.0 76.0 L376.0 76.4 L378.0 76.8 L380.0 77.1 L382.0 77.3 L384.0 77.6 L386.0 77.7 L388.0 77.9 L390.0 78.0 L392.0 78.0 L394.0 78.0 L396.0 77.9 L398.0 77.8 L400.0 77.7 L402.0 77.5 L404.0 77.3 L406.0 77.0 L408.0 76.7 L410.0 76.4 L412.0 76.0 L414.0 75.5 L416.0 75.1 L418.0 74.6 L420.0 74.0 L422.0 73.4 L424.0 72.8 L426.0 72.2 L428.0 71.5 L430.0 70.8 L432.0 70.0 L434.0 69.3 L436.0 68.5 L438.0 67.7 L440.0 66.9 L442.0 66.0 L444.0 65.2 L446.0 64.3 L448.0 63.4 L450.0 62.5 L452.0 61.6 L454.0 60.7 L456.0 59.8 L458.0 58.9 L460.0 58.1 L462.0 57.2 L464.0 56.3 L466.0 55.4 L468.0 54.5 L470.0 53.7 L472.0 52.9 L474.0 52.0 L476.0 51.2 L478.0 50.5 L480.0 49.7 L482.0 49.0 L484.0 48.3 L486.0 47.6 L488.0 47.0 L490.0 46.4 L492.0 45.8 L494.0 45.3 L496.0 44.8 L498.0 44.3 L500.0 43.9 L502.0 43.5 L504.0 43.2 L506.0 42.9 L508.0 42.6 L510.0 42.4 L512.0 42.2 L514.0 42.1 L516.0 42.0 L518.0 42.0 L520.0 42.0 L522.0 42.1 L524.0 42.2 L526.0 42.3 L528.0 42.5 L530.0 42.7 L532.0 43.0 L534.0 43.3 L536.0 43.7 L538.0 44.1 L540.0 44.5 L542.0 45.0 L544.0 45.5 L546.0 46.1 L548.0 46.7 L550.0 47.3 L552.0 48.0 L554.0 48.6 L556.0 49.3 L558.0 50.1 L560.0 50.9 L562.0 51.6 L564.0 52.4 L566.0 53.3 L568.0 54.1 L570.0 55.0" fill="none" stroke="#B5AEA5" stroke-width="3"></path>
+<path d="M330.0 163.2 L332.0 162.8 L334.0 162.4 L336.0 162.1 L338.0 161.8 L340.0 161.6 L342.0 161.4 L344.0 161.2 L346.0 161.1 L348.0 161.0 L350.0 161.0 L352.0 161.0 L354.0 161.1 L356.0 161.2 L358.0 161.4 L360.0 161.6 L362.0 161.8 L364.0 162.1 L366.0 162.4 L368.0 162.8 L370.0 163.2 L372.0 163.7 L374.0 164.2 L376.0 164.7 L378.0 165.3 L380.0 165.8 L382.0 166.5 L384.0 167.1 L386.0 167.8 L388.0 168.5 L390.0 169.2 L392.0 169.9 L394.0 170.7 L396.0 171.5 L398.0 172.2 L400.0 173.0 L402.0 173.8 L404.0 174.6 L406.0 175.4 L408.0 176.2 L410.0 177.0 L412.0 177.8 L414.0 178.6 L416.0 179.3 L418.0 180.1 L420.0 180.8 L422.0 181.6 L424.0 182.2 L426.0 182.9 L428.0 183.6 L430.0 184.2 L432.0 184.8 L434.0 185.3 L436.0 185.9 L438.0 186.3 L440.0 186.8 L442.0 187.2 L444.0 187.6 L446.0 187.9 L448.0 188.2 L450.0 188.4 L452.0 188.6 L454.0 188.8 L456.0 188.9 L458.0 189.0 L460.0 189.0 L462.0 189.0 L464.0 188.9 L466.0 188.8 L468.0 188.6 L470.0 188.4 L472.0 188.2 L474.0 187.9 L476.0 187.6 L478.0 187.2 L480.0 186.8 L482.0 186.3 L484.0 185.8 L486.0 185.3 L488.0 184.7 L490.0 184.1 L492.0 183.5 L494.0 182.9 L496.0 182.2 L498.0 181.5 L500.0 180.8 L502.0 180.0 L504.0 179.3 L506.0 178.5 L508.0 177.7 L510.0 177.0 L512.0 176.2 L514.0 175.4 L516.0 174.6 L518.0 173.8 L520.0 173.0 L522.0 172.2 L524.0 171.4 L526.0 170.6 L528.0 169.9 L530.0 169.1 L532.0 168.4 L534.0 167.7 L536.0 167.1 L538.0 166.4 L540.0 165.8 L542.0 165.2 L544.0 164.7 L546.0 164.1 L548.0 163.6 L550.0 163.2 L552.0 162.8 L554.0 162.4 L556.0 162.1 L558.0 161.8 L560.0 161.6 L562.0 161.4 L564.0 161.2 L566.0 161.1 L568.0 161.0 L570.0 161.0" fill="none" stroke="#B5AEA5" stroke-width="3"></path>
+<path d="M326.0 72.0 L331.5 74.4 L337.0 76.7 L342.6 79.0 L348.2 81.2 L353.8 83.1 L359.6 85.0 L365.3 86.6 L371.2 87.9 L377.1 88.9 L383.1 89.7 L389.0 90.2 L395.0 90.2 L401.0 89.9 L407.0 89.4 L412.9 88.5 L418.8 87.2 L424.6 85.7 L430.4 84.0 L436.0 82.1 L441.7 80.0 L447.2 77.7 L452.8 75.4 L458.3 73.0 L463.7 70.6 L469.2 68.2 L474.7 65.8 L480.3 63.5 L485.9 61.3 L491.6 59.4 L497.3 57.7 L503.2 56.4 L509.1 55.4 L515.1 55.0 L521.1 54.9 L527.1 55.4 L533.0 56.3 L538.9 57.5 L544.7 59.1 L550.4 61.0 L556.0 63.0 L561.6 65.3 L567.1 67.6 L572.6 69.9" fill="none" stroke="#00695C" stroke-width="1.5"></path>
+<circle cx="326.0" cy="72.0" fill="#2B2F33" r="2.6"></circle>
+<path d="M326.0 87.0 L331.6 89.1 L337.3 91.1 L343.0 93.0 L348.7 94.8 L354.4 96.5 L360.2 98.0 L366.1 99.3 L372.0 100.5 L377.9 101.4 L383.9 102.1 L389.9 102.6 L395.9 102.8 L401.9 102.7 L407.9 102.4 L413.8 101.9 L419.8 101.0 L425.7 100.0 L431.5 98.6 L437.3 97.1 L443.1 95.4 L448.8 93.5 L454.4 91.6 L460.1 89.5 L465.6 87.0 L471.0 84.6 L476.5 82.2 L482.1 79.8 L487.6 77.6 L493.2 75.5 L499.0 73.7 L504.8 72.2 L510.7 71.1 L516.6 70.5 L522.6 70.5 L528.6 71.0 L534.5 72.0 L540.4 73.4 L546.1 75.0 L551.8 76.9 L557.5 79.0 L563.1 81.1 L568.7 83.2 L574.4 85.2" fill="none" stroke="#00695C" stroke-width="1.5"></path>
+<circle cx="326.0" cy="87.0" fill="#2B2F33" r="2.6"></circle>
+<path d="M326.0 102.0 L331.8 103.4 L337.7 104.8 L343.5 106.1 L349.4 107.4 L355.2 108.7 L361.1 109.8 L367.0 110.9 L373.0 111.9 L378.9 112.8 L384.8 113.6 L390.8 114.2 L396.8 114.7 L402.8 115.1 L408.8 115.3 L414.8 115.3 L420.8 115.2 L426.8 114.9 L432.7 114.5 L438.7 113.8 L444.6 112.9 L450.5 111.9 L456.4 110.6 L462.2 109.0 L467.8 106.8 L473.3 104.4 L478.8 102.1 L484.3 99.7 L489.8 97.3 L495.4 95.1 L501.1 93.1 L506.8 91.3 L512.6 89.9 L518.6 89.2 L524.6 89.0 L530.6 89.5 L536.5 90.4 L542.4 91.5 L548.2 92.9 L554.0 94.4 L559.8 96.0 L565.6 97.6 L571.4 99.2" fill="none" stroke="#00695C" stroke-width="1.5"></path>
+<circle cx="326.0" cy="102.0" fill="#2B2F33" r="2.6"></circle>
+<path d="M326.0 117.0 L332.0 117.4 L338.0 118.0 L343.9 118.6 L349.9 119.3 L355.8 120.1 L361.8 120.9 L367.7 121.8 L373.6 122.8 L379.6 123.7 L385.5 124.7 L391.4 125.7 L397.3 126.7 L403.2 127.7 L409.1 128.7 L415.1 129.6 L421.0 130.4 L427.0 131.2 L432.9 131.9 L438.9 132.5 L444.9 132.9 L450.9 133.0 L456.9 132.8 L462.8 131.9 L468.6 130.3 L474.3 128.3 L479.9 126.2 L485.4 123.9 L491.0 121.6 L496.5 119.3 L502.1 117.1 L507.7 115.0 L513.4 113.1 L519.2 111.7 L525.2 111.1 L531.2 110.8 L537.2 110.9 L543.2 111.1 L549.2 111.5 L555.2 112.0 L561.1 112.7 L567.1 113.5 L573.0 114.4" fill="none" stroke="#00695C" stroke-width="1.5"></path>
+<circle cx="326.0" cy="117.0" fill="#2B2F33" r="2.6"></circle>
+<path d="M326.0 132.0 L332.0 131.5 L338.0 131.2 L344.0 131.3 L350.0 131.5 L356.0 131.9 L361.9 132.5 L367.9 133.4 L373.8 134.4 L379.7 135.5 L385.5 136.9 L391.3 138.3 L397.1 139.8 L402.9 141.4 L408.7 143.1 L414.4 144.8 L420.2 146.5 L425.9 148.2 L431.7 149.8 L437.6 151.3 L443.4 152.5 L449.3 153.4 L455.3 153.9 L461.3 153.7 L467.3 152.9 L473.2 151.7 L478.9 150.1 L484.6 148.2 L490.2 146.1 L495.8 143.9 L501.4 141.6 L506.9 139.4 L512.5 137.2 L518.2 135.1 L524.0 133.6 L529.8 132.3 L535.7 131.2 L541.7 130.3 L547.6 129.6 L553.6 129.2 L559.6 129.0 L565.6 129.1 L571.6 129.3" fill="none" stroke="#00695C" stroke-width="1.5"></path>
+<circle cx="326.0" cy="132.0" fill="#2B2F33" r="2.6"></circle>
+<path d="M326.0 147.0 L331.9 146.0 L337.9 145.3 L343.9 144.8 L349.9 144.8 L355.9 145.0 L361.8 145.6 L367.8 146.4 L373.7 147.5 L379.5 148.9 L385.3 150.5 L391.0 152.3 L396.7 154.2 L402.3 156.2 L408.0 158.3 L413.6 160.4 L419.2 162.5 L424.8 164.6 L430.5 166.5 L436.3 168.2 L442.1 169.7 L448.0 170.8 L454.0 171.5 L460.0 171.7 L465.9 171.4 L471.9 170.5 L477.8 169.3 L483.6 167.8 L489.3 165.9 L494.9 163.9 L500.5 161.8 L506.1 159.6 L511.7 157.3 L517.2 155.1 L522.9 153.1 L528.6 151.2 L534.3 149.4 L540.1 147.9 L546.0 146.6 L551.9 145.6 L557.8 144.9 L563.8 144.4 L569.8 144.4" fill="none" stroke="#00695C" stroke-width="1.5"></path>
+<circle cx="326.0" cy="147.0" fill="#2B2F33" r="2.6"></circle>
+<path d="M326.0 162.0 L331.9 160.8 L337.8 159.9 L343.8 159.3 L349.8 159.0 L355.8 159.1 L361.7 159.7 L367.7 160.6 L373.5 161.9 L379.3 163.4 L385.1 165.2 L390.7 167.2 L396.3 169.3 L401.9 171.5 L407.5 173.7 L413.1 176.0 L418.7 178.1 L424.3 180.1 L430.0 182.0 L435.8 183.7 L441.6 185.0 L447.5 186.1 L453.5 186.7 L459.5 187.0 L465.5 186.9 L471.5 186.3 L477.4 185.4 L483.3 184.1 L489.1 182.5 L494.8 180.7 L500.4 178.7 L506.0 176.6 L511.6 174.4 L517.2 172.2 L522.8 170.0 L528.4 167.8 L534.0 165.8 L539.8 164.0 L545.5 162.5 L551.4 161.1 L557.3 160.1 L563.3 159.4 L569.3 159.1" fill="none" stroke="#00695C" stroke-width="1.5"></path>
+<circle cx="326.0" cy="162.0" fill="#2B2F33" r="2.6"></circle>
+<text fill="#2B2F33" font-size="10.5" text-anchor="middle" x="145" y="232"><tspan fill="#00695C" font-weight="700">Contour</tspan> · distance à deux points</text>
+<text fill="#2B2F33" font-size="10.5" text-anchor="middle" x="450" y="232"><tspan fill="#00695C" font-weight="700">Flow</tspan> · deux guides, sept graines</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Une <b>courbe de niveau</b> relie les points où un champ scalaire vaut la même valeur ; une <b>ligne de courant</b> suit, depuis une graine, la direction que donne un champ de vecteurs.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>La carte de randonnée et la rivière. Les courbes de niveau de la carte relient les points de même altitude ; une feuille posée sur l'eau dessine, en dérivant, une ligne de courant.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>dérouler l'algorithme des <i>marching squares</i> sur une case, et compter ses points de passage ;</li>
+<li>calculer par interpolation où le niveau traverse une arête ;</li>
+<li>intégrer une ligne de courant pas à pas, et dire pourquoi le point milieu bat la méthode d'Euler.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Une courbe de niveau se <b>trouve</b> : on teste toutes les cases de la grille, dans n'importe quel ordre. Une ligne de courant se <b>construit</b> : chaque pas dépend du précédent, et une petite erreur se reporte sur toute la suite.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 15 · Courbes de niveau et lignes de courant</div>
+</section>
+<!-- ============ PAGE 2 · UNE CASE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 15</b></div>
+<p class="rubrique">Schéma 1 · Marching squares</p>
+<h2>Une case, quatre arêtes, un test</h2>
+<p style="max-width:165mm">Contour a échantillonné le champ en chaque point de la grille (cours 14). Pour un niveau donné, il regarde chaque case séparément : où le champ franchit-il le niveau ?</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 290" width="100%">
+<rect fill="#EFE9E1" height="290" width="292" x="0" y="0"></rect><rect fill="#EFE9E1" height="290" width="292" x="308" y="0"></rect>
+<text fill="#00695C" font-size="12" font-weight="800" x="14" y="24">Une case, niveau = 4</text>
+<text fill="#00695C" font-size="12" font-weight="800" x="322" y="24">Les cas possibles</text>
+<!-- grande case -->
+<rect fill="#fff" height="140" stroke="#2B2F33" stroke-width="1.2" width="160" x="70" y="56"></rect>
+<line stroke="#00695C" stroke-width="3" x1="150" x2="190" y1="56" y2="196"></line>
+<circle cx="150" cy="56" fill="#00695C" r="4.5"></circle><circle cx="190" cy="196" fill="#00695C" r="4.5"></circle>
+<circle cx="70" cy="56" fill="#2B2F33" r="7"></circle><circle cx="230" cy="56" fill="#fff" r="7" stroke="#2B2F33" stroke-width="1.6"></circle>
+<circle cx="230" cy="196" fill="#fff" r="7" stroke="#2B2F33" stroke-width="1.6"></circle><circle cx="70" cy="196" fill="#2B2F33" r="7"></circle>
+<g fill="#2B2F33" font-size="11" font-weight="700">
+<text text-anchor="end" x="54" y="52">2</text><text x="246" y="52">6</text>
+<text x="246" y="208">5</text><text text-anchor="end" x="54" y="208">1</text>
+</g>
+<g class="mono" fill="#6B7378">
+<text class="mono" style="font-size:8.5px" text-anchor="end" x="54" y="40">(i, j)</text>
+<text class="mono" style="font-size:8.5px" x="246" y="40">(i+1, j)</text>
+<text class="mono" style="font-size:8.5px" x="246" y="222">(i+1, j+1)</text>
+<text class="mono" style="font-size:8.5px" text-anchor="end" x="54" y="222">(i, j+1)</text>
+</g>
+<g class="mono" fill="#00695C">
+<text class="mono" style="font-size:9px" text-anchor="middle" x="110" y="50">e0</text>
+<text class="mono" style="font-size:9px" x="240" y="130">e1</text>
+<text class="mono" style="font-size:9px" text-anchor="middle" x="120" y="212">e2</text>
+<text class="mono" style="font-size:9px" text-anchor="end" x="58" y="130">e3</text>
+</g>
+<g fill="#2B2F33" font-size="9.5">
+<text x="14" y="244">coin plein : sous le niveau · coin vide : au-dessus</text>
+<text x="14" y="260">e0 : t = (4 − 2) / (6 − 2) = 0,5</text>
+<text x="14" y="276">e2 : t = (4 − 5) / (1 − 5) = 0,25 · e1 et e3 : rien</text>
+</g>
+<!-- quatre petits cas -->
+<g fill="#fff" stroke="#2B2F33">
+<rect height="70" width="70" x="345" y="48"></rect><rect height="70" width="70" x="490" y="48"></rect>
+<rect height="70" width="70" x="345" y="168"></rect><rect height="70" width="70" x="490" y="168"></rect>
+</g>
+<g stroke="#00695C" stroke-width="2.6">
+<line x1="525" x2="560" y1="48" y2="83"></line>
+<line x1="345" x2="415" y1="203" y2="203"></line>
+<line x1="525" x2="560" y1="168" y2="203"></line><line x1="525" x2="490" y1="238" y2="203"></line>
+</g>
+<g fill="#2B2F33">
+<circle cx="345" cy="48" r="5"></circle><circle cx="415" cy="48" r="5"></circle><circle cx="415" cy="118" r="5"></circle><circle cx="345" cy="118" r="5"></circle>
+<circle cx="490" cy="48" r="5"></circle><circle cx="560" cy="118" r="5"></circle><circle cx="490" cy="118" r="5"></circle>
+<circle cx="415" cy="238" r="5"></circle><circle cx="345" cy="238" r="5"></circle>
+<circle cx="560" cy="168" r="5"></circle><circle cx="490" cy="238" r="5"></circle>
+</g>
+<g fill="#fff" stroke="#2B2F33" stroke-width="1.4">
+<circle cx="560" cy="48" r="5"></circle>
+<circle cx="345" cy="168" r="5"></circle><circle cx="415" cy="168" r="5"></circle>
+<circle cx="490" cy="168" r="5"></circle><circle cx="560" cy="238" r="5"></circle>
+</g>
+<g fill="#2B2F33" font-size="9.5" text-anchor="middle">
+<text x="380" y="138">0 passage</text>
+<text x="525" y="138">2 passages : un coin isolé</text>
+<text x="380" y="258">2 passages : case coupée</text>
+<text x="525" y="258">4 passages : un col</text>
+<text class="mono" fill="#6B7378" style="font-size:8.5px" x="525" y="272">e0 avec e1, e2 avec e3</text>
+</g>
+</svg>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi toujours un nombre pair ?</h3>
+<p>Fais le tour de la case. Chaque passage change de côté du niveau ; pour revenir au coin de départ, du même côté qu'au début, il faut traverser un nombre pair de fois : 0, 2 ou 4. Les points de passage se rangent donc par paires, et chaque paire donne un segment.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Un test strict d'un seul côté</h3>
+<p>Le test est <code>(va &lt; level) != (vb &lt; level)</code>. Un coin qui vaut exactement le niveau compte comme « au-dessus ». Ainsi un passage n'est jamais compté deux fois, et quand il y en a un, va et vb sont forcément différents.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire que le col a une seule bonne réponse. Avec deux coins pleins en diagonale, relier e0 à e1 ou e0 à e3 est aussi juste. Contour apparie dans l'ordre des arêtes, sans regarder le centre : sur une grille trop lâche, deux courbes voisines peuvent se raccorder du mauvais côté.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 15 · Courbes de niveau et lignes de courant</div>
+</section>
+<!-- ============ PAGE 3 · INTERPOLER ET JOINDRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 15</b></div>
+<p class="rubrique">Schéma 2 · Interpoler, répartir, joindre</p>
+<h2>Du point de passage à la courbe</h2>
+<p style="max-width:165mm">Le champ n'est connu qu'aux coins. Entre deux coins, Contour le suppose <b>linéaire</b> : c'est ce qui permet de placer le point de passage au bon endroit de l'arête, et non au milieu.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 270" width="100%">
+<rect fill="#EFE9E1" height="270" width="292" x="0" y="0"></rect><rect fill="#EFE9E1" height="270" width="292" x="308" y="0"></rect>
+<text fill="#00695C" font-size="12" font-weight="800" x="14" y="24">Interpoler sur une arête</text>
+<text fill="#00695C" font-size="12" font-weight="800" x="322" y="24">Joindre les segments</text>
+<!-- arête -->
+<line stroke="#2B2F33" stroke-width="1.6" x1="40" x2="260" y1="150" y2="150"></line>
+<line stroke="#B5AEA5" stroke-dasharray="2 2" x1="40" x2="40" y1="150" y2="130"></line>
+<line stroke="#B5AEA5" stroke-dasharray="2 2" x1="260" x2="260" y1="150" y2="50"></line>
+<line stroke="#2B2F33" stroke-width="1.4" x1="40" x2="260" y1="130" y2="50"></line>
+<line stroke="#00695C" stroke-dasharray="5 3" x1="30" x2="270" y1="110" y2="110"></line>
+<line stroke="#00695C" stroke-dasharray="2 2" x1="95" x2="95" y1="110" y2="150"></line>
+<circle cx="95" cy="150" fill="#00695C" r="4.5"></circle>
+<circle cx="40" cy="150" fill="#2B2F33" r="3.5"></circle><circle cx="260" cy="150" fill="#2B2F33" r="3.5"></circle>
+<g fill="#2B2F33" font-size="9.5">
+<text text-anchor="end" x="34" y="134">va = 2</text>
+<text text-anchor="end" x="252" y="46">vb = 10</text>
+<text fill="#00695C" text-anchor="end" x="270" y="104">niveau 4</text>
+</g>
+<g class="mono" fill="#2B2F33" text-anchor="middle">
+<text class="mono" style="font-size:9px" x="40" y="166">pa</text>
+<text class="mono" style="font-size:9px" x="260" y="166">pb</text>
+<text class="mono" fill="#00695C" font-weight="700" style="font-size:9px" x="95" y="166">t = 0,25</text>
+</g>
+<!-- niveaux -->
+<text fill="#00695C" font-size="11" font-weight="700" x="14" y="196">Répartir les niveaux</text>
+<line stroke="#2B2F33" stroke-width="1.6" x1="40" x2="260" y1="226" y2="226"></line>
+<g fill="#00695C"><rect height="16" width="4" x="93" y="218"></rect><rect height="16" width="4" x="148" y="218"></rect><rect height="16" width="4" x="203" y="218"></rect></g>
+<g fill="#2B2F33"><rect height="12" width="2" x="39" y="220"></rect><rect height="12" width="2" x="259" y="220"></rect></g>
+<g class="mono" fill="#00695C" text-anchor="middle">
+<text class="mono" style="font-size:8.5px" x="95" y="213">l=0</text><text class="mono" style="font-size:8.5px" x="150" y="213">l=1</text><text class="mono" style="font-size:8.5px" x="205" y="213">l=2</text>
+</g>
+<g fill="#6B7378" font-size="9" text-anchor="middle"><text x="40" y="246">min</text><text x="260" y="246">max</text></g>
+<text fill="#2B2F33" font-size="9.5" text-anchor="middle" x="150" y="262">Levels = 3 : aux quarts, jamais sur min ni max</text>
+<!-- joindre -->
+<line stroke="#D8D0C6" x1="345" x2="345" y1="42" y2="186"></line>
+<line stroke="#D8D0C6" x1="381" x2="381" y1="42" y2="186"></line>
+<line stroke="#D8D0C6" x1="417" x2="417" y1="42" y2="186"></line>
+<line stroke="#D8D0C6" x1="453" x2="453" y1="42" y2="186"></line>
+<line stroke="#D8D0C6" x1="489" x2="489" y1="42" y2="186"></line>
+<line stroke="#D8D0C6" x1="525" x2="525" y1="42" y2="186"></line>
+<line stroke="#D8D0C6" x1="561" x2="561" y1="42" y2="186"></line>
+<line stroke="#D8D0C6" x1="345" x2="561" y1="42" y2="42"></line>
+<line stroke="#D8D0C6" x1="345" x2="561" y1="78" y2="78"></line>
+<line stroke="#D8D0C6" x1="345" x2="561" y1="114" y2="114"></line>
+<line stroke="#D8D0C6" x1="345" x2="561" y1="150" y2="150"></line>
+<line stroke="#D8D0C6" x1="345" x2="561" y1="186" y2="186"></line>
+<line stroke="#00695C" stroke-width="2.4" x1="381.0" x2="378.9" y1="139.2" y2="150.0"></line>
+<circle cx="381.0" cy="139.2" fill="#2B2F33" r="2.2"></circle>
+<circle cx="378.9" cy="150.0" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#E65100" stroke-width="2.4" x1="378.9" x2="381.0" y1="150.0" y2="160.8"></line>
+<circle cx="378.9" cy="150.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="381.0" cy="160.8" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#00695C" stroke-width="2.4" x1="417.0" x2="414.6" y1="76.0" y2="78.0"></line>
+<circle cx="417.0" cy="76.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="414.6" cy="78.0" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#E65100" stroke-width="2.4" x1="414.6" x2="386.5" y1="78.0" y2="114.0"></line>
+<circle cx="414.6" cy="78.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="386.5" cy="114.0" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#00695C" stroke-width="2.4" x1="386.5" x2="381.0" y1="114.0" y2="139.2"></line>
+<circle cx="386.5" cy="114.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="381.0" cy="139.2" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#E65100" stroke-width="2.4" x1="386.5" x2="381.0" y1="186.0" y2="160.8"></line>
+<circle cx="386.5" cy="186.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="381.0" cy="160.8" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#00695C" stroke-width="2.4" x1="453.0" x2="417.0" y1="60.6" y2="76.0"></line>
+<circle cx="453.0" cy="60.6" fill="#2B2F33" r="2.2"></circle>
+<circle cx="417.0" cy="76.0" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#E65100" stroke-width="2.4" x1="489.0" x2="453.0" y1="61.0" y2="60.6"></line>
+<circle cx="489.0" cy="61.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="453.0" cy="60.6" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#00695C" stroke-width="2.4" x1="525.0" x2="489.0" y1="77.4" y2="61.0"></line>
+<circle cx="525.0" cy="77.4" fill="#2B2F33" r="2.2"></circle>
+<circle cx="489.0" cy="61.0" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#E65100" stroke-width="2.4" x1="525.7" x2="525.0" y1="78.0" y2="77.4"></line>
+<circle cx="525.7" cy="78.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="525.0" cy="77.4" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#00695C" stroke-width="2.4" x1="525.7" x2="553.4" y1="78.0" y2="114.0"></line>
+<circle cx="525.7" cy="78.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="553.4" cy="114.0" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#E65100" stroke-width="2.4" x1="553.4" x2="561.0" y1="114.0" y2="149.5"></line>
+<circle cx="553.4" cy="114.0" fill="#2B2F33" r="2.2"></circle>
+<circle cx="561.0" cy="149.5" fill="#2B2F33" r="2.2"></circle>
+<line stroke="#00695C" stroke-width="2.4" x1="561.0" x2="553.4" y1="150.5" y2="186.0"></line>
+<circle cx="561.0" cy="150.5" fill="#2B2F33" r="2.2"></circle>
+<circle cx="553.4" cy="186.0" fill="#2B2F33" r="2.2"></circle>
+<g fill="#2B2F33" font-size="9.5">
+<text x="322" y="212">Chaque case pose son segment : une LineCurve,</text>
+<text x="322" y="226">sans savoir ce que font ses voisines.</text>
+<text class="mono" fill="#00695C" style="font-size:9px" x="322" y="246">Curve.JoinCurves(segments, tolerance)</text>
+<text x="322" y="262">recolle les bouts communs en polylignes.</text>
+</g>
+</svg>
+<div class="boite apres" style="margin-top:5mm"><span class="etiq">Contour.cs · 110 et 125–127</span>double level = min + (max - min) * (l + 1) / (levels + 1);
+…
+double t = (level - va) / (vb - va);
+Point3d pa = rows[a0][a1], pb = rows[b0][b1];
+cross.Add(pa + t * (pb - pa));</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Lire la formule de t</h3>
+<p>t mesure la part du chemin entre va et vb qu'il faut parcourir pour atteindre le niveau : (4 − 2) / (10 − 2) = 0,25. Le point est alors <code>pa + t · (pb − pa)</code>, le même mélange qu'un point sur un segment (cours 09).</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Une branche par niveau</h3>
+<p>Les courbes d'un niveau l de la grille g vont dans <code>{g;l}</code>. Une branche peut contenir plusieurs courbes : deux bosses du champ donnent deux îles au même niveau.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Attendre des courbes lisses. Ce sont des polylignes, avec un sommet par arête traversée : leur finesse dépend de l'écart de la grille, pas du nombre de niveaux. Pour des courbes plus douces, resserre la grille.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 15 · Courbes de niveau et lignes de courant</div>
+</section>
+<!-- ============ PAGE 4 · LIGNES DE COURANT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 15</b></div>
+<p class="rubrique">Schéma 3 · Intégrer pas à pas</p>
+<h2>Euler dérive, le point milieu tient</h2>
+<p style="max-width:165mm">Une ligne de courant se calcule en répétant : regarder la direction du champ, avancer d'un pas. La question est <b>où</b> on regarde la direction. Ici, un champ qui tourne autour d'un centre : la vraie ligne est un cercle.</p>
+<div class="deuxcol" style="margin-top:3mm; align-items:start">
+<svg viewbox="0 0 300 250" width="100%">
+<rect fill="#EFE9E1" height="250" width="300" x="0" y="0"></rect>
+<circle cx="150" cy="125" fill="none" r="60" stroke="#B5AEA5" stroke-dasharray="4 3"></circle>
+<path d="M210.0 125.0 L210.0 147.0 L202.4 167.7 L188.5 184.7 L170.1 196.6 L148.9 202.6 L126.9 202.3 L105.8 196.0 L87.1 184.3 L72.0 168.3 L61.3 149.1 L55.6 127.9 L54.9 105.9 L59.3 84.3 L68.3 64.2 L81.4 46.6 L97.9 32.1" fill="none" stroke="#E65100" stroke-width="1.6"></path>
+<circle cx="210.0" cy="125.0" fill="#E65100" r="2.2"></circle>
+<circle cx="210.0" cy="147.0" fill="#E65100" r="2.2"></circle>
+<circle cx="202.4" cy="167.7" fill="#E65100" r="2.2"></circle>
+<circle cx="188.5" cy="184.7" fill="#E65100" r="2.2"></circle>
+<circle cx="170.1" cy="196.6" fill="#E65100" r="2.2"></circle>
+<circle cx="148.9" cy="202.6" fill="#E65100" r="2.2"></circle>
+<circle cx="126.9" cy="202.3" fill="#E65100" r="2.2"></circle>
+<circle cx="105.8" cy="196.0" fill="#E65100" r="2.2"></circle>
+<circle cx="87.1" cy="184.3" fill="#E65100" r="2.2"></circle>
+<circle cx="72.0" cy="168.3" fill="#E65100" r="2.2"></circle>
+<circle cx="61.3" cy="149.1" fill="#E65100" r="2.2"></circle>
+<circle cx="55.6" cy="127.9" fill="#E65100" r="2.2"></circle>
+<circle cx="54.9" cy="105.9" fill="#E65100" r="2.2"></circle>
+<circle cx="59.3" cy="84.3" fill="#E65100" r="2.2"></circle>
+<circle cx="68.3" cy="64.2" fill="#E65100" r="2.2"></circle>
+<circle cx="81.4" cy="46.6" fill="#E65100" r="2.2"></circle>
+<circle cx="97.9" cy="32.1" fill="#E65100" r="2.2"></circle>
+<path d="M210.0 125.0 L206.0 146.6 L194.5 165.4 L177.1 178.8 L156.0 185.0 L134.0 183.2 L114.2 173.6 L99.1 157.6 L90.7 137.3 L90.2 115.3 L97.5 94.6 L111.8 77.8 L131.1 67.2 L152.9 64.2 L174.3 69.2 L192.6 81.4 L205.4 99.3" fill="none" stroke="#00695C" stroke-width="2"></path>
+<circle cx="210.0" cy="125.0" fill="#00695C" r="2.2"></circle>
+<circle cx="206.0" cy="146.6" fill="#00695C" r="2.2"></circle>
+<circle cx="194.5" cy="165.4" fill="#00695C" r="2.2"></circle>
+<circle cx="177.1" cy="178.8" fill="#00695C" r="2.2"></circle>
+<circle cx="156.0" cy="185.0" fill="#00695C" r="2.2"></circle>
+<circle cx="134.0" cy="183.2" fill="#00695C" r="2.2"></circle>
+<circle cx="114.2" cy="173.6" fill="#00695C" r="2.2"></circle>
+<circle cx="99.1" cy="157.6" fill="#00695C" r="2.2"></circle>
+<circle cx="90.7" cy="137.3" fill="#00695C" r="2.2"></circle>
+<circle cx="90.2" cy="115.3" fill="#00695C" r="2.2"></circle>
+<circle cx="97.5" cy="94.6" fill="#00695C" r="2.2"></circle>
+<circle cx="111.8" cy="77.8" fill="#00695C" r="2.2"></circle>
+<circle cx="131.1" cy="67.2" fill="#00695C" r="2.2"></circle>
+<circle cx="152.9" cy="64.2" fill="#00695C" r="2.2"></circle>
+<circle cx="174.3" cy="69.2" fill="#00695C" r="2.2"></circle>
+<circle cx="192.6" cy="81.4" fill="#00695C" r="2.2"></circle>
+<circle cx="205.4" cy="99.3" fill="#00695C" r="2.2"></circle>
+<circle cx="150" cy="125" fill="#2B2F33" r="2.5"></circle>
+<g fill="#2B2F33" font-size="9.5">
+<text x="222" y="22"><tspan fill="#E65100" font-weight="700">●</tspan> Euler</text>
+<text x="222" y="38"><tspan fill="#00695C" font-weight="700">●</tspan> point milieu</text>
+<text fill="#6B7378" x="222" y="54">- - cercle exact</text>
+</g>
+<text fill="#2B2F33" font-size="9" x="226" y="129">graine</text>
+<text fill="#6B7378" font-size="9" text-anchor="middle" x="150" y="242">16 pas de même longueur, même graine</text>
+</svg>
+<div style="font-size:8.6pt">
+<h3>Euler : la direction au départ</h3>
+<p><code>p += v(p) · step</code>. Le pas suit la tangente au cercle, donc sort toujours un peu du cercle. L'erreur ne se corrige jamais : la ligne s'enroule en spirale vers l'extérieur.</p>
+<h3 style="margin-top:3mm">Point milieu : la direction à mi-chemin</h3>
+<p>On fait d'abord un demi-pas d'essai avec v1, on lit la direction v2 à cet endroit, puis on fait le <b>vrai</b> pas complet depuis p avec v2. La direction lue à mi-chemin tient compte de la courbure : la ligne reste tout près du cercle.</p>
+<p style="margin-top:2mm">C'est la méthode de Runge-Kutta d'ordre 2 : deux lectures du champ par pas, pour une erreur bien plus petite.</p>
+</div>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Flow.cs · 95–101</span>Vector3d v1 = field(p);
+if (v1.IsZero) break;
+Vector3d v2 = field(p + v1 * (step / 2));
+if (v2.IsZero) break;
+p += v2 * step;
+if (bounded &amp;&amp; rect.Contains(p) != PointContainment.Inside) break;
+line.Add(p);</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Le champ de Flow</span>
+    En chaque point, Flow prend la tangente de chaque guide à son point le plus proche, pondérée par <code style="white-space:nowrap">1 / d²</code> (ligne 82) : le guide le plus proche domine. La somme est ramenée à la longueur 1 par <code>Unitize</code>. Chaque pas mesure donc exactement Step, et une ligne fait au plus Count × Step.
+  </div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier le sens des guides. La tangente suit le sens de paramétrage de la courbe : retourner un guide retourne le courant. Deux guides de sens opposés s'annulent entre eux ; la somme est nulle, <code>Unitize</code> échoue, le champ rend <code>Vector3d.Zero</code> et la ligne s'arrête.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 15 · Courbes de niveau et lignes de courant</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 15</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Contour.cs : les marching squares</h2>
+<p style="max-width:165mm">Le tableau <code>v[i, j]</code>, le minimum et le maximum sont prêts (lignes 98–106, cours 14). Voici la boucle des niveaux, pour une grille g.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l k1"><span class="n">108</span><span class="kw">for</span> (<span class="kw">int</span> l = 0; l &lt; levels; l++)<span class="rep r1">1</span></div>
+<div class="l"><span class="n">109</span>{</div>
+<div class="l k1"><span class="n">110</span> <span class="kw">double</span> level = min + (max - min)</div>
+<div class="l k1"><span class="n"> </span>      * (l + 1) / (levels + 1);</div>
+<div class="l"><span class="n">111</span> <span class="ty">List</span>&lt;<span class="ty">Curve</span>&gt; segments = <span class="kw">new</span> ...;</div>
+<div class="l k2"><span class="n">114</span> <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; rows.Count - 1; i++)<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">115</span> <span class="kw">for</span> (<span class="kw">int</span> j = 0; j &lt; count - 1; j++)</div>
+<div class="l"><span class="n">116</span>    {</div>
+<div class="l k3"><span class="n">117</span> <span class="kw">int</span>[,] c = { { i, j }, { i + 1, j },<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n"> </span>        { i + 1, j + 1 }, { i, j + 1 } };</div>
+<div class="l"><span class="n">118</span> <span class="ty">List</span>&lt;<span class="ty">Point3d</span>&gt; cross = <span class="kw">new</span> ...;</div>
+<div class="l k3"><span class="n">119</span> <span class="kw">for</span> (<span class="kw">int</span> e = 0; e &lt; 4; e++)</div>
+<div class="l"><span class="n">120</span>      {</div>
+<div class="l k3"><span class="n">121</span> <span class="kw">int</span> a0 = c[e, 0], a1 = c[e, 1],</div>
+<div class="l k3"><span class="n"> </span>          b0 = c[(e + 1) % 4, 0],</div>
+<div class="l k3"><span class="n"> </span>          b1 = c[(e + 1) % 4, 1];</div>
+<div class="l"><span class="n">122</span> <span class="kw">double</span> va = v[a0, a1], vb = v[b0, b1];</div>
+<div class="l k4"><span class="n">123</span> <span class="kw">if</span> ((va &lt; level) != (vb &lt; level))<span class="rep r4">4</span></div>
+<div class="l"><span class="n">124</span>        {</div>
+<div class="l k5"><span class="n">125</span> <span class="kw">double</span> t = (level - va) / (vb - va);<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">126</span> <span class="ty">Point3d</span> pa = rows[a0][a1],</div>
+<div class="l k5"><span class="n"> </span>                  pb = rows[b0][b1];</div>
+<div class="l k5"><span class="n">127</span>          cross.Add(pa + t * (pb - pa));</div>
+<div class="l"><span class="n">128</span>        }</div>
+<div class="l"><span class="n">129</span>      }</div>
+<div class="l k6"><span class="n">130</span> <span class="kw">for</span> (<span class="kw">int</span> k = 0; k + 1 &lt; cross.Count; k += 2)<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">131</span>        segments.Add(<span class="kw">new</span> <span class="ty">LineCurve</span>(</div>
+<div class="l k6"><span class="n"> </span>          cross[k], cross[k + 1]));</div>
+<div class="l"><span class="n">132</span>    }</div>
+<div class="l k7"><span class="n">134</span> <span class="kw">if</span> (segments.Count &gt; 0)<span class="rep r7">7</span></div>
+<div class="l k7"><span class="n">135</span>    result.AddRange(<span class="ty">Curve</span>.JoinCurves(</div>
+<div class="l k7"><span class="n"> </span>      segments, tolerance), <span class="kw">new</span> <span class="ty">GH_Path</span>(g, l));</div>
+<div class="l"><span class="n">136</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Un niveau à la fois</b>Levels niveaux répartis strictement entre min et max (page 3).</li>
+<li><span class="rep r2">2</span><b>Toutes les cases</b>On s'arrête un rang avant la fin : chaque case a besoin de ses voisins i + 1 et j + 1.</li>
+<li><span class="rep r3">3</span><b>Le tour de la case</b>Quatre coins dans l'ordre ; l'arête e va du coin e au coin e + 1, et <code>% 4</code> referme le tour.</li>
+<li><span class="rep r4">4</span><b>Le test de passage</b>Un coin sous le niveau, l'autre non (page 2).</li>
+<li><span class="rep r5">5</span><b>Interpoler</b>t est entre 0 et 1, et vb − va n'est jamais nul ici.</li>
+<li><span class="rep r6">6</span><b>Apparier</b>Les passages deux par deux, dans l'ordre des arêtes : 0, 1 ou 2 segments.</li>
+<li><span class="rep r7">7</span><b>Joindre et ranger</b>Les segments du niveau deviennent des polylignes, rangées en {g;l}.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Ce que la grille impose</span>
+    Les lignes 117 à 127 n'utilisent que les voisins i + 1 et j + 1 : Contour suppose que les rangées sont alignées point à point. C'est pour cela qu'il coupe toutes les rangées à la plus courte (ligne 95, cours 14).
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 15 · Courbes de niveau et lignes de courant</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 15</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">(va &lt; level) != (vb &lt; level)</td><td>l'arête traverse le niveau</td><td>Contour:123</td></tr>
+<tr><td class="c">(level - va) / (vb - va)</td><td>où, sur l'arête, entre 0 et 1</td><td>Contour:125</td></tr>
+<tr><td class="c">pa + t * (pb - pa)</td><td>le point de passage</td><td>Contour:127</td></tr>
+<tr><td class="c">Curve.JoinCurves(segments, tol)</td><td>segments recollés en polylignes</td><td>Contour:135</td></tr>
+<tr><td class="c">field(p + v1 * (step / 2))</td><td>la direction au point milieu</td><td>Flow:97</td></tr>
+<tr><td class="c">sum.Unitize() ? sum : Vector3d.Zero</td><td>une direction de longueur 1, ou nulle</td><td>Flow:84</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Courbe de niveau</dt><dd>Les points où un champ scalaire vaut une même valeur. On dit aussi isoligne.</dd>
+<dt>Marching squares</dt><dd>Trouver les courbes de niveau case par case, sur une grille.</dd>
+<dt>Interpolation</dt><dd>Estimer une valeur entre deux valeurs connues, ici en ligne droite.</dd>
+<dt>Ligne de courant</dt><dd>La trajectoire d'une graine qui suit un champ de vecteurs.</dd>
+<dt>Point milieu</dt><dd>Intégrer en lisant la direction à mi-pas (Runge-Kutta d'ordre 2).</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 143</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 15 · Courbes de niveau et lignes de courant</div>
+</section>
+</body>
+</html>

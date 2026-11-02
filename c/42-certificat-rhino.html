@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>42 · Le certificat, un document Rhino sans fenêtre</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 42</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Le certificat, un document Rhino sans fenêtre</h1>
+<p class="chapeau">À la fin d'un parcours validé, Magpie remet un certificat PDF. Il n'utilise pour cela ni Word ni bibliothèque PDF : il ouvre en coulisse un <b>document Rhino invisible</b>, y remplit quelques textes nommés, et imprime la mise en plan. Rhino sert ici de moteur de mise en page.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>37</b> et <b>41</b></span>
+<span class="pastille">Exemples · <b>Core/MagpieCertificateGenerator.cs</b>, <b>Core/TrainingManager.cs</b> (Magpie)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 214" width="100%">
+<path d="M6 14 h116 l14 14 v34 h-130 z" fill="#fff" stroke="#6D4C41" stroke-width="1.4"></path>
+<text fill="#6D4C41" font-size="8.4" font-weight="700" text-anchor="middle" x="71.0" y="37.0">Ressource embarquée</text>
+<text class="mono" fill="#2B2F33" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="71.0" y="50.0">certificate_template.3dm</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="middle" x="71" y="76">dans Magpie.Core.dll</text>
+<line stroke="#2B2F33" stroke-width="1.4" x1="136" x2="160" y1="38" y2="38"></line><polygon fill="#2B2F33" points="160,38 153.6,40.7 153.6,35.3"></polygon>
+<path d="M162 14 h126 l14 14 v34 h-140 z" fill="#fff" stroke="#1565C0" stroke-width="1.4"></path>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="middle" x="232.0" y="37.0">Fichier temporaire</text>
+<text class="mono" fill="#2B2F33" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="232.0" y="50.0">%TEMP%\magpie_certificate…</text>
+<line stroke="#2B2F33" stroke-width="1.4" x1="302" x2="326" y1="38" y2="38"></line><polygon fill="#2B2F33" points="326,38 319.6,40.7 319.6,35.3"></polygon>
+<rect fill="#fff" height="48" rx="5" stroke="#1F5F7A" stroke-dasharray="5 3" stroke-width="1.4" width="120" x="328" y="14"></rect>
+<text fill="#1F5F7A" font-size="8.4" font-weight="700" text-anchor="middle" x="388" y="33">Document sans fenêtre</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="388" y="47">champs remplis</text>
+<line stroke="#2B2F33" stroke-width="1.4" x1="448" x2="472" y1="38" y2="38"></line><polygon fill="#2B2F33" points="472,38 465.6,40.7 465.6,35.3"></polygon>
+<path d="M474 14 h104 l14 14 v34 h-118 z" fill="#fff" stroke="#2E7D32" stroke-width="1.4"></path>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="middle" x="533.0" y="37.0">PDF, 300 dpi</text>
+<text class="mono" fill="#2B2F33" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="533.0" y="50.0">Certificats\…pdf</text>
+<rect fill="#3A3A3A" height="104" rx="6" width="480" x="60" y="96"></rect>
+<text fill="#fff" font-size="9" font-weight="700" text-anchor="start" x="72" y="112">Rhino</text>
+<rect fill="#F2F2F2" height="70" rx="3" width="220" x="72" y="120"></rect>
+<text fill="#2B2F33" font-size="8.4" font-weight="700" text-anchor="middle" x="182" y="148">Document actif de l'utilisateur</text>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="182" y="162">visible, jamais touché</text>
+<rect fill="none" height="70" rx="3" stroke="#bbb" stroke-dasharray="5 3" width="220" x="308" y="120"></rect>
+<text fill="#fff" font-size="8.4" font-weight="700" text-anchor="middle" x="418" y="148">Document sans fenêtre</text>
+<text fill="#ddd" font-size="7.8" text-anchor="middle" x="418" y="162">aucune vue ; Dispose() à la fin</text>
+<path d="M388 62 C 388 80, 418 90, 418 118" fill="none" stroke="#1F5F7A" stroke-dasharray="3 3" stroke-width="1.2"></path>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Le gabarit est un fichier <code>.3dm</code> dessiné dans Rhino ; le code n'en connaît que les noms de quelques objets texte, et il remplace leur contenu avant d'en faire une page PDF.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un formulaire imprimé avec des cases étiquetées. Le graphiste dessine le formulaire comme il veut ; le secrétariat ne fait que remplir les cases « Nom », « Date », « Parcours », sans jamais toucher au dessin.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>ouvrir un document Rhino sans fenêtre, et le refermer ;</li>
+<li>retrouver un objet par son nom et changer son texte ;</li>
+<li>distinguer un champ obligatoire d'un champ facultatif ;</li>
+<li>dire quand le certificat est produit, et qui le produira demain.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Le document actif de l'utilisateur n'est jamais touché : <code>RhinoDoc.CreateHeadless</code> ouvre un second document, sans vue à l'écran, qui vit le temps de produire le PDF puis est refermé dans un <code>finally</code> (MagpieCertificateGenerator.cs, lignes 55–57 et 90–96).
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 42 · Le certificat, un document Rhino sans fenêtre</div>
+</section>
+<!-- ============ PAGE 2 · LE GABARIT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 42</b></div>
+<p class="rubrique">Schéma 1 · Le gabarit et ses champs</p>
+<h2>Des objets texte qui portent un nom</h2>
+<p style="max-width:165mm">Dans le gabarit, chaque texte à remplir est un objet texte ordinaire de la mise en plan, dont la propriété <b>Nom</b> (celle du panneau Propriétés de Rhino) vaut <code>Magpie_Nom</code>, <code>Magpie_Parcours</code>… Le reste de la page, cadre, logo, phrases fixes, le code l'ignore.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 232" width="100%">
+<rect fill="#EFE9E1" height="232" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="204" stroke="#6B7378" width="330" x="24" y="14"></rect>
+<rect fill="none" height="188" stroke="#1F5F7A" stroke-width="2" width="314" x="32" y="22"></rect>
+<text fill="#1F5F7A" font-size="13" font-weight="700" text-anchor="middle" x="189" y="50">CERTIFICAT</text>
+<text fill="#6B7378" font-size="8" font-style="italic" text-anchor="middle" x="189" y="68">atteste que</text>
+<rect fill="#2E7D32" fill-opacity=".12" height="18" rx="2" stroke="#2E7D32" stroke-dasharray="3 2" width="150" x="114.0" y="76"></rect>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="middle" x="189" y="89">Magpie_Nom</text>
+<text fill="#6B7378" font-size="8" font-style="italic" text-anchor="middle" x="189" y="112">a suivi avec succès le parcours</text>
+<rect fill="#2E7D32" fill-opacity=".12" height="18" rx="2" stroke="#2E7D32" stroke-dasharray="3 2" width="170" x="104.0" y="120"></rect>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="middle" x="189" y="133">Magpie_Parcours</text>
+<rect fill="#2E7D32" fill-opacity=".12" height="18" rx="2" stroke="#2E7D32" stroke-dasharray="3 2" width="100" x="60.0" y="148"></rect>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="middle" x="110" y="161">Magpie_Date</text>
+<rect fill="#E65100" fill-opacity=".12" height="18" rx="2" stroke="#E65100" stroke-dasharray="3 2" width="110" x="213.0" y="148"></rect>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="middle" x="268" y="161">Magpie_Numero</text>
+<rect fill="#E65100" fill-opacity=".12" height="18" rx="2" stroke="#E65100" stroke-dasharray="3 2" width="110" x="45.0" y="174"></rect>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="middle" x="100" y="187">Magpie_Numero</text>
+<rect fill="#E65100" fill-opacity=".12" height="18" rx="2" stroke="#E65100" stroke-dasharray="3 2" width="110" x="213.0" y="174"></rect>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="middle" x="268" y="187">Magpie_Statut</text>
+<text fill="#C62828" font-size="7" font-style="italic" text-anchor="middle" x="268" y="203">absent du gabarit livré</text>
+<rect fill="#2E7D32" height="10" width="10" x="378" y="20"></rect><text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="394" y="29">obligatoire : absent, erreur</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="394" y="46">Nom, Parcours, Date</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="394" y="59">SetTextField, lignes 100–106</text>
+<rect fill="#E65100" height="10" width="10" x="378" y="84"></rect><text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="start" x="394" y="93">facultatif : absent, on passe</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="394" y="110">Statut, Numéro</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="394" y="123">SetOptionalTextField, 109–112</text>
+<text fill="#2B2F33" font-size="8.2" font-weight="700" text-anchor="start" x="378" y="152">Le numéro est posé deux fois :</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="378" y="166">dans le bloc de détails et en bas</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="378" y="179">à gauche (lignes 27–28). Un seul</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="378" y="192">appel remplit les deux.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="378" y="216">Schéma de principe, pas le gabarit réel.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Core/MagpieCertificateGenerator.cs · 15–29</span>// Convention de nommage des objets texte du gabarit - un seul
+// endroit où ces noms sont écrits en dur.
+private const string FieldNom = "Magpie_Nom";
+private const string FieldParcours = "Magpie_Parcours";
+private const string FieldDate = "Magpie_Date";
+private const string FieldStatut = "Magpie_Statut";
+…
+private const string FieldNumero = "Magpie_Numero";</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Un nom, pas une position</h3>
+<p>Le code ne dit jamais « le texte en haut à gauche ». Le graphiste peut déplacer, agrandir ou changer la police d'un champ dans Rhino : tant que l'objet garde son Nom, le certificat suit, sans recompiler une ligne.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Trois obligatoires, deux facultatifs</h3>
+<p>Nom, parcours et date sont exigés : leur absence lève une erreur qui dit quoi vérifier (lignes 100–106). Statut et numéro sont facultatifs : absents, on passe (lignes 109–112), pour qu'un ancien gabarit marche encore.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège réel</span>
+    Exiger un champ que le gabarit n'a pas. Le gabarit livré ne contient aucun objet <code>Magpie_Statut</code> : l'exiger comme les trois autres ferait échouer toute génération. Il est donc facultatif, et l'ajouter au gabarit suffira à faire apparaître la mention (lignes 65–69).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 42 · Le certificat, un document Rhino sans fenêtre</div>
+</section>
+<!-- ============ PAGE 3 · LE DOCUMENT SANS FENÊTRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 42</b></div>
+<p class="rubrique">Schéma 2 · Un document en coulisse</p>
+<h2>Ouvrir, remplir, imprimer, refermer</h2>
+<p style="max-width:165mm">Le gabarit voyage dans le binaire, comme ressource embarquée. Rhino ne sait pas ouvrir une ressource : il faut d'abord la recopier dans un vrai fichier, puis l'ouvrir en document sans fenêtre.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="62" rx="5" stroke="#6D4C41" stroke-width="1.4" width="106" x="12" y="40"></rect>
+<circle cx="26" cy="54" fill="#6D4C41" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="26" y="57.5">1</text>
+<text fill="#6D4C41" font-size="8.6" font-weight="700" text-anchor="start" x="40" y="58">Extraire</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="20" y="78">ressource → %TEMP%</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="20" y="94">lignes 53, 136–153</text>
+<line stroke="#2B2F33" stroke-width="1.2" x1="118" x2="130" y1="71" y2="71"></line><polygon fill="#2B2F33" points="130,71 123.6,73.7 123.6,68.3"></polygon>
+<rect fill="#fff" height="62" rx="5" stroke="#1565C0" stroke-width="1.4" width="106" x="130" y="40"></rect>
+<circle cx="144" cy="54" fill="#1565C0" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="144" y="57.5">2</text>
+<text fill="#1565C0" font-size="8.6" font-weight="700" text-anchor="start" x="158" y="58">Ouvrir</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="138" y="78">CreateHeadless</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="138" y="94">lignes 57</text>
+<line stroke="#2B2F33" stroke-width="1.2" x1="236" x2="248" y1="71" y2="71"></line><polygon fill="#2B2F33" points="248,71 241.6,73.7 241.6,68.3"></polygon>
+<rect fill="#fff" height="62" rx="5" stroke="#7B1FA2" stroke-width="1.4" width="106" x="248" y="40"></rect>
+<circle cx="262" cy="54" fill="#7B1FA2" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="262" y="57.5">3</text>
+<text fill="#7B1FA2" font-size="8.6" font-weight="700" text-anchor="start" x="276" y="58">Remplir</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="256" y="78">les champs nommés</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="256" y="94">lignes 61–72</text>
+<line stroke="#2B2F33" stroke-width="1.2" x1="354" x2="366" y1="71" y2="71"></line><polygon fill="#2B2F33" points="366,71 359.6,73.7 359.6,68.3"></polygon>
+<rect fill="#fff" height="62" rx="5" stroke="#E65100" stroke-width="1.4" width="106" x="366" y="40"></rect>
+<circle cx="380" cy="54" fill="#E65100" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="380" y="57.5">4</text>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="start" x="394" y="58">Mise en plan</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="374" y="78">GetPageViews()[0]</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="374" y="94">lignes 74–76</text>
+<line stroke="#2B2F33" stroke-width="1.2" x1="472" x2="484" y1="71" y2="71"></line><polygon fill="#2B2F33" points="484,71 477.6,73.7 477.6,68.3"></polygon>
+<rect fill="#fff" height="62" rx="5" stroke="#2E7D32" stroke-width="1.4" width="106" x="484" y="40"></rect>
+<circle cx="498" cy="54" fill="#2E7D32" r="8"></circle><text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="498" y="57.5">5</text>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="512" y="58">Imprimer</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="492" y="78">FilePdf, 300 dpi</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="492" y="94">lignes 83–86</text>
+<path d="M248 32 v-8 h332 v8" fill="none" stroke="#1F5F7A" stroke-width="1.3"></path>
+<text class="mono" fill="#1F5F7A" font-size="9" font-weight="700" style="font-size:9px" text-anchor="middle" x="414" y="18">try</text>
+<rect fill="#E6EFF2" height="30" rx="4" stroke="#1F5F7A" stroke-dasharray="5 3" width="332" x="248" y="118"></rect>
+<text fill="#1F5F7A" font-size="8.6" font-weight="700" text-anchor="middle" x="414" y="137">finally : doc.Dispose(), qu'un champ manque ou non</text>
+<path d="M414 102 v16" stroke="#1F5F7A" stroke-dasharray="3 2"></path>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="16" y="170">Une erreur en 1 ou 2 se produit avant le try : il n'y a alors aucun document à refermer.</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="16" y="186">Une erreur en 3, 4 ou 5 traverse le finally : le document est refermé, puis l'erreur remonte à l'appelant.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Core/MagpieCertificateGenerator.cs · 53–96</span>string templatePath = ExtractTemplateToTempFile();
+RhinoDoc doc = RhinoDoc.CreateHeadless(templatePath);
+try
+{
+    SetTextField(doc, FieldNom, nom);   …
+    var pageViews = doc.Views.GetPageViews();
+    …
+    var pdf = Rhino.FileIO.FilePdf.Create();
+    var captureSettings = new Rhino.Display.ViewCaptureSettings(pageViews[0], 300); // 300 dpi
+    pdf.AddPage(captureSettings);
+    pdf.Write(outputPath);
+    return outputPath;
+}
+finally { doc.Dispose(); }</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>D'où vient le gabarit</h3>
+<p>Tout ce qui est sous <code>plugin\Resources\</code> est embarqué par un glob (Magpie.Core.csproj, ligne 36). Le gabarit y est sous le nom <code>Magpie.Resources.certificate_template.3dm</code> (ligne 13), recopié dans <code>%TEMP%\magpie_certificate_template.3dm</code> (ligne 138), écrasé à chaque fois.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>La première mise en plan</h3>
+<p>Le PDF reçoit une seule page : la capture de <code>pageViews[0]</code>, à 300 points par pouce. Un gabarit sans mise en plan est refusé avec un message clair (lignes 74–76). Le fichier part dans <code>Certificats\</code> du dossier de travail (lignes 78–81).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier de refermer le document sans fenêtre. Rien ne le montre à l'écran : s'il n'est pas libéré, il reste ouvert, invisible, jusqu'à la fermeture de Rhino (commentaire des lignes 92–94). D'où le <code>finally</code>, qui le referme même quand un champ manque.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 42 · Le certificat, un document Rhino sans fenêtre</div>
+</section>
+<!-- ============ PAGE 4 · QUAND ET DEMAIN ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 42</b></div>
+<p class="rubrique">Schéma 3 · Quand le certificat naît</p>
+<h2>Jamais au prix de l'écran de fin</h2>
+<p style="max-width:165mm">Le certificat est produit par <code>CompleteParcours</code>, au dernier exercice. Deux règles l'encadrent : pas de certificat sous le seuil de réussite, et aucun échec de génération ne doit priver l'apprenant de son écran de fin.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 226" width="100%">
+<rect fill="#EFE9E1" height="226" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="40" rx="4" stroke="#1F5F7A" stroke-width="1.3" width="140" x="12" y="16"></rect>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="middle" x="82.0" y="33.0">CompleteParcours</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="middle" x="82.0" y="47.0">dernier exercice</text>
+<line stroke="#2B2F33" stroke-width="1.4" x1="152" x2="180" y1="36" y2="36"></line><polygon fill="#2B2F33" points="180,36 173.6,38.7 173.6,33.3"></polygon>
+<rect fill="#fff" height="40" rx="4" stroke="#6D4C41" stroke-width="1.3" width="130" x="182" y="16"></rect>
+<text fill="#6D4C41" font-size="9" font-weight="700" text-anchor="middle" x="247.0" y="33.0">ExportResults</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="middle" x="247.0" y="47.0">échec : on continue</text>
+<line stroke="#2B2F33" stroke-width="1.4" x1="312" x2="340" y1="36" y2="36"></line><polygon fill="#2B2F33" points="340,36 333.6,38.7 333.6,33.3"></polygon>
+<polygon fill="#fff" points="400,8 460,36 400,64 340,36" stroke="#7B1FA2" stroke-width="1.4"></polygon>
+<text fill="#7B1FA2" font-size="8.6" font-weight="700" text-anchor="middle" x="400" y="34">validé ?</text>
+<text fill="#6B7378" font-size="7.2" text-anchor="middle" x="400" y="46">seuil 80 %</text>
+<line stroke="#2E7D32" stroke-width="1.4" x1="460" x2="488" y1="36" y2="36"></line><polygon fill="#2E7D32" points="488,36 481.6,38.7 481.6,33.3"></polygon>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="middle" x="474" y="30">oui</text>
+<rect fill="#fff" height="40" rx="4" stroke="#2E7D32" stroke-width="1.3" width="100" x="490" y="16"></rect>
+<text fill="#2E7D32" font-size="9" font-weight="700" text-anchor="middle" x="540.0" y="33.0">Generate</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="middle" x="540.0" y="47.0">numéro + PDF</text>
+<line stroke="#C62828" stroke-width="1.4" x1="400" x2="400" y1="64" y2="96"></line><polygon fill="#C62828" points="400,96 397.3,89.6 402.7,89.6"></polygon>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="408" y="84">non</text>
+<rect fill="#fff" height="36" rx="4" stroke="#C62828" stroke-width="1.3" width="200" x="300" y="98"></rect>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="middle" x="400.0" y="113.0">pas de certificat</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="middle" x="400.0" y="127.0">« parcours non validé »</text>
+<line stroke="#E65100" stroke-width="1.4" x1="540" x2="540" y1="56" y2="96"></line><polygon fill="#E65100" points="540,96 537.3,89.6 542.7,89.6"></polygon>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="548" y="84">erreur</text>
+<rect fill="#fff" height="36" rx="4" stroke="#E65100" stroke-width="1.3" width="80" x="510" y="98"></rect>
+<text fill="#E65100" font-size="9" font-weight="700" text-anchor="middle" x="550.0" y="113.0">catch</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="middle" x="550.0" y="127.0">message gardé</text>
+<line stroke="#2B2F33" stroke-width="1.4" x1="400" x2="400" y1="134" y2="160"></line><polygon fill="#2B2F33" points="400,160 397.3,153.6 402.7,153.6"></polygon>
+<line stroke="#2B2F33" stroke-width="1.4" x1="550" x2="550" y1="134" y2="160"></line><polygon fill="#2B2F33" points="550,160 547.3,153.6 552.7,153.6"></polygon>
+<path d="M590 30 h6 v118" fill="none" stroke="#2E7D32" stroke-width="1.4"></path><line stroke="#2E7D32" stroke-width="1.4" x1="596" x2="596" y1="146" y2="162"></line><polygon fill="#2E7D32" points="596,162 593.3,155.6 598.7,155.6"></polygon>
+<rect fill="#3A3A3A" height="52" rx="6" width="398" x="200" y="162"></rect>
+<text fill="#fff" font-size="8.6" font-weight="700" text-anchor="start" x="212" y="180">Écran de fin (MagpieFinParcours) : toujours affiché</text>
+<rect fill="#555" height="18" rx="9" width="118" x="212" y="188"></rect><text fill="#fff" font-size="7.6" font-weight="700" text-anchor="middle" x="271" y="200.5">Ouvrir le certificat</text>
+<rect fill="#555" height="18" rx="9" width="118" x="340" y="188"></rect><text fill="#fff" font-size="7.6" font-weight="700" text-anchor="middle" x="399" y="200.5">Ouvrir le dossier</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="16" y="160">Le bouton « Ouvrir le</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="16" y="172">certificat » n'est actif que si</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="16" y="184">le fichier existe</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="16" y="196">(MagpieFinParcours.cs, 46).</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Core/TrainingManager.cs · 203–221</span>// Pas de certificat sans parcours validé (décision de Jérémy, 20/10/2026) : le
+// gabarit atteste « a suivi avec succès », ce qui serait faux en deçà du seuil.
+if (!IsParcoursValidated)
+{
+    _certificateError = $"parcours non validé (seuil de {_successThreshold:P0} non atteint)";
+}
+else try
+{
+    …Generate(UserName, _parcoursTitle, maintenant, ValidationLabel, _lastCertificateNumber);
+}
+catch (Exception ex) { _certificateError = ex.Message; }</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Un numéro lisible, pas un registre</h3>
+<p><code>NouveauNumero</code> forme <code>GH-AAAA-MMJJ-XXXX</code> : la date, puis quatre caractères tirés d'une empreinte SHA-1 du nom, du parcours et de l'instant (lignes 38–46). Deux apprenants du même jour n'ont pas le même numéro ; mais personne ne peut encore le vérifier.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Demain, sur le site</h3>
+<p>Le modèle de diffusion (§ 7) confie le certificat au site : gabarit PDF à champs nommés, rempli par <code>pdf-lib</code>, numéro adossé à une page publique de vérification. Les mêmes noms de champs ; un autre moteur. Le générateur Rhino reste jusqu'à la bascule.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège réel</span>
+    Se fier à un numéro de ligne cité dans une doc. Le § 7 du modèle de diffusion renvoie à <code>TrainingManager.cs:172</code> pour l'appel du certificat ; le code a bougé depuis, l'appel est aux lignes 212–214. Cite le nom de la méthode, <code>CompleteParcours</code>, qui lui ne bouge pas.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 42 · Le certificat, un document Rhino sans fenêtre</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 42</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>TrySetTextField : remplir un champ</h2>
+<p style="max-width:165mm">Dix-huit lignes qui font tout le travail sur le gabarit : trouver les objets d'un nom donné, vérifier que ce sont des textes, et les remplacer par une copie au bon contenu.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">117</span><span class="kw">static bool</span> TrySetTextField(<span class="ty">RhinoDoc</span> doc,</div>
+<div class="l"><span class="n"> </span> <span class="kw">string</span> fieldName, <span class="kw">string</span> value)</div>
+<div class="l k1"><span class="n">121</span> <span class="kw">var</span> objets = doc.Objects<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n"> </span>    .Where(o =&gt; o.Attributes.Name == fieldName)</div>
+<div class="l k1"><span class="n"> </span>    .ToList();</div>
+<div class="l k2"><span class="n">122</span> <span class="kw">if</span> (objets.Count == 0) <span class="kw">return false</span>;<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">124</span> <span class="kw">foreach</span> (<span class="kw">var</span> obj <span class="kw">in</span> objets) {<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">126</span> <span class="kw">var</span> textEntity =<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n"> </span>      obj.Geometry.Duplicate() <span class="kw">as</span> <span class="ty">TextEntity</span>;</div>
+<div class="l k5"><span class="n">127</span> <span class="kw">if</span> (textEntity == <span class="kw">null</span>)<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n">128</span> <span class="kw">throw new</span> <span class="ty">InvalidOperationException</span>(…);</div>
+<div class="l k6"><span class="n">130</span>    textEntity.PlainText = value ?? <span class="ty">string</span>.Empty;<span class="rep r6">6</span></div>
+<div class="l k7"><span class="n">131</span>    doc.Objects.Replace(obj.Id, textEntity);<span class="rep r7">7</span></div>
+<div class="l"><span class="n">132</span>  }</div>
+<div class="l"><span class="n">133</span> <span class="kw">return true</span>;</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Tous les objets du nom</b>Le numéro figure deux fois dans le gabarit.</li>
+<li><span class="rep r2">2</span><b>Absent</b>Pas d'erreur ici : l'appelant décide si c'en est une.</li>
+<li><span class="rep r3">3</span><b>Chaque occurrence</b>Remplie de la même valeur.</li>
+<li><span class="rep r4">4</span><b>Une copie</b>On ne modifie pas la géométrie en place.</li>
+<li><span class="rep r5">5</span><b>Pas un texte</b>Faute de gabarit : toujours une erreur.</li>
+<li><span class="rep r6">6</span><b>Le contenu</b>Police et position restent celles du gabarit.</li>
+<li><span class="rep r7">7</span><b>Remplacer</b>Même Id, nouvelle géométrie.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Défaut relevé en passant</span>
+    Les lignes 71 et 72 appellent deux fois <code>SetOptionalTextField(doc, FieldNumero, numero)</code>. C'est sans effet, puisque <code>TrySetTextField</code> remplit déjà toutes les occurrences du nom : le second appel réécrit les mêmes textes. Un doublon à supprimer un jour ; le dépôt n'a pas été modifié.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 42 · Le certificat, un document Rhino sans fenêtre</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3B</b> · La géométrie et le document Rhino</span><b>Cours 42</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">RhinoDoc.CreateHeadless(templatePath)</td><td>ouvrir sans fenêtre</td><td>MagpieCertificateGenerator.cs:57</td></tr>
+<tr><td class="c">doc.Objects.Where(o =&gt; o.Attributes.Name == …)</td><td>trouver un champ</td><td>MagpieCertificateGenerator.cs:121</td></tr>
+<tr><td class="c">textEntity.PlainText = value</td><td>changer le texte</td><td>MagpieCertificateGenerator.cs:130</td></tr>
+<tr><td class="c">doc.Objects.Replace(obj.Id, textEntity)</td><td>remplacer l'objet</td><td>MagpieCertificateGenerator.cs:131</td></tr>
+<tr><td class="c">new ViewCaptureSettings(pageViews[0], 300)</td><td>capturer la mise en plan</td><td>MagpieCertificateGenerator.cs:84</td></tr>
+<tr><td class="c">pdf.AddPage(…); pdf.Write(outputPath)</td><td>écrire le PDF</td><td>MagpieCertificateGenerator.cs:85</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Document sans fenêtre</dt><dd>Un RhinoDoc ouvert par CreateHeadless, sans vue à l'écran, à refermer soi-même.</dd>
+<dt>Mise en plan</dt><dd>La page d'un document Rhino (layout), avec ses détails et ses textes, prête à imprimer.</dd>
+<dt>Gabarit</dt><dd>Le document modèle dont on ne change que des champs nommés.</dd>
+<dt>Champ nommé</dt><dd>Un objet texte du gabarit repéré par sa propriété Nom, pas par sa position.</dd>
+<dt>Ressource embarquée</dt><dd>Un fichier rangé dans le binaire, lu par GetManifestResourceStream.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : fiche récap de la partie 3</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 42 · Le certificat, un document Rhino sans fenêtre</div>
+</section>
+</body>
+</html>

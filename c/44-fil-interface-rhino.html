@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>44 · Le fil d'interface de Rhino</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 44</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Le fil d'interface de Rhino</h1>
+<p class="chapeau">Tout ce que tu vois bouger dans Grasshopper passe par un seul fil d'exécution, qui traite une <b>file de messages</b> l'un après l'autre : un clic, une peinture, un menu. Tes composants n'ont pas de <code>Task.Run</code> ni d'<code>async</code> : leur vrai outil est de <b>remettre à plus tard</b>, sur ce même fil, ce qui ne doit pas se faire au milieu d'un geste.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>11</b>, <b>21</b>, <b>27</b> et <b>43</b></span>
+<span class="pastille">Exemples · <b>CapsuleExecution.cs</b>, <b>ComposantDepart.cs</b> (SnapSet), <b>ChargeurCore.cs</b> (Magpie)</span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 186" width="100%">
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="10" y="16">La file de messages</text>
+<rect fill="#fff" height="26" rx="4" stroke="#1565C0" stroke-width="1.3" width="62" x="300" y="40"></rect>
+<text fill="#1565C0" font-size="8" font-weight="700" text-anchor="middle" x="331.0" y="57">clic</text>
+<rect fill="#fff" height="26" rx="4" stroke="#2E7D32" stroke-width="1.3" width="62" x="230" y="40"></rect>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="middle" x="261.0" y="57">peinture</text>
+<rect fill="#fff" height="26" rx="4" stroke="#1565C0" stroke-width="1.3" width="62" x="160" y="40"></rect>
+<text fill="#1565C0" font-size="8" font-weight="700" text-anchor="middle" x="191.0" y="57">clic</text>
+<rect fill="#fff" height="26" rx="4" stroke="#6B7378" stroke-width="1.3" width="62" x="90" y="40"></rect>
+<text fill="#6B7378" font-size="8" font-weight="700" text-anchor="middle" x="121.0" y="57">minuterie</text>
+<rect fill="#E6EFF2" height="26" rx="4" stroke="#E65100" stroke-width="1.3" width="76" x="6" y="40"></rect>
+<text fill="#E65100" font-size="8" font-weight="700" text-anchor="middle" x="44.0" y="57">action postée</text>
+<text fill="#E65100" font-size="7.6" font-style="italic" text-anchor="start" x="30" y="84">BeginInvoke dépose ici, en fin de file</text>
+<line stroke="#2B2F33" stroke-width="1.4" x1="362" x2="404" y1="53" y2="53"></line><polygon fill="#2B2F33" points="404,53 397.6,55.7 397.6,50.3"></polygon>
+<rect fill="#3A3A3A" height="64" rx="6" width="186" x="406" y="22"></rect>
+<text fill="#fff" font-size="9" font-weight="700" text-anchor="middle" x="499" y="42">Fil d'interface</text>
+<text fill="#ddd" font-size="7.8" text-anchor="middle" x="499" y="58">un message à la fois</text>
+<text fill="#ddd" font-size="7.4" font-style="italic" text-anchor="middle" x="499" y="74">(et la solution de Grasshopper)</text>
+<rect fill="#fff" height="72" rx="5" stroke="#C62828" stroke-width="1.2" width="582" x="10" y="104"></rect>
+<text fill="#C62828" font-size="8.8" font-weight="700" text-anchor="start" x="22" y="124">Si ton code garde le guichet…</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="22" y="142">… aucun message suivant ne passe : le canvas ne se repeint plus, les clics s'accumulent.</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="22" y="158">Garder court ; remettre à plus tard (BeginInvoke) ; attendre le repos (RhinoApp.Idle).</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Pendant que ton code traite un message, aucun autre ne passe : ni peinture, ni clic. On garde donc chaque traitement court, et ce qui peut attendre, on le poste à la fin de la file avec <code>BeginInvoke</code>.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un seul guichet, une seule file. Un client qui ouvre un long dossier au guichet bloque tout le monde ; le bon guichetier lui dit « reprenez un ticket », et le traite à son tour.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>dire ce qu'est la boucle de messages et ce qui la fige ;</li>
+<li>ouvrir une fenêtre après un clic, par <code>BeginInvoke</code> ;</li>
+<li>choisir entre <code>Invalidate</code> et <code>Refresh</code> ;</li>
+<li>attendre le repos de Rhino, ou protéger un état partagé par un verrou.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+<code>BeginInvoke</code> ne crée aucun fil : il dépose l'action dans la file du contrôle, et le <b>même</b> fil l'exécutera après le message en cours. Dans Grasshopper 1, la solution elle-même tourne sur ce fil : un composant lent fige le canvas pour la même raison.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 44 · Le fil d'interface de Rhino</div>
+</section>
+<!-- ============ PAGE 2 · OUVRIR APRÈS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 44</b></div>
+<p class="rubrique">Schéma 1 · Une fenêtre après le clic</p>
+<h2>Ne pas ouvrir de fenêtre au milieu d'un geste</h2>
+<p style="max-width:165mm">Un menu, un sélecteur de couleur ou une boîte de dialogue ont leur propre boucle : ils ne rendent la main qu'à leur fermeture. Ouverts dans <code>RespondToMouseDown</code>, ils suspendraient le geste de Grasshopper en plein milieu. SnapSet les ouvre donc <b>après</b>, par <code>canvas.BeginInvoke</code>.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="16" y="22">Le même fil, deux façons de faire</text>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="44">Menu ouvert DANS le clic</text>
+<line stroke="#6B7378" x1="16" x2="590" y1="80" y2="80"></line>
+<rect fill="#fff" height="22" rx="3" stroke="#1565C0" width="96" x="16" y="54"></rect><text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="middle" x="64" y="69">MouseDown…</text>
+<rect fill="#C62828" fill-opacity=".12" height="22" rx="3" stroke="#C62828" width="300" x="112" y="54"></rect><text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="middle" x="262" y="69">boucle du menu : le geste reste suspendu</text>
+<rect fill="#fff" height="22" rx="3" stroke="#1565C0" width="96" x="412" y="54"></rect><text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="middle" x="460" y="69">…fin du geste</text>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="16" y="118">Menu ouvert PAR BeginInvoke</text>
+<line stroke="#6B7378" x1="16" x2="590" y1="154" y2="154"></line>
+<rect fill="#fff" height="22" rx="3" stroke="#1565C0" width="140" x="16" y="128"></rect><text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="middle" x="86" y="143">MouseDown, rend la main</text>
+<rect fill="#fff" height="22" rx="3" stroke="#6B7378" width="90" x="156" y="128"></rect><text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="middle" x="201" y="143">fin du geste</text>
+<rect fill="#2E7D32" fill-opacity=".12" height="22" rx="3" stroke="#2E7D32" width="300" x="246" y="128"></rect><text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="middle" x="396" y="143">action postée : menu ouvert, geste déjà fini</text>
+<path d="M140 126 C 170 114, 230 114, 250 126" fill="none" stroke="#E65100" stroke-dasharray="3 2"></path>
+<text class="mono" fill="#E65100" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="196" y="106">BeginInvoke</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="end" x="590" y="188">temps →</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">SnapSet · Execution/CapsuleExecution.cs · 683–687 et 1075–1085</span>if (geste.Action == ActionListe.OuvrirMenu)
+{
+    var point = e.ControlLocation;
+    canvas.BeginInvoke(new Action(() =&gt; Proteger(() =&gt; l.MontrerMenu(canvas, point))));
+    return GH_ObjectResponse.Handled;
+}
+…
+private void Proteger(Action action)
+{
+    try { action(); }
+    catch (Exception ex) { Signaler(ex); }   // écrit dans la ligne de commande de Rhino
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Copier le point avant de partir</h3>
+<p><code>var point = e.ControlLocation;</code> est lu <b>maintenant</b>. L'action postée s'exécutera plus tard, quand l'événement de souris ne voudra plus rien dire : elle n'emporte que ce qu'on lui a donné.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Pourquoi Proteger</h3>
+<p>Une exception dans une action postée ne remonte plus à ton gestionnaire de souris, déjà terminé : elle tomberait dans la boucle de messages de Rhino. <code>Proteger</code> l'attrape et l'écrit dans la ligne de commande.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège réel</span>
+    Garder la capture de la souris après une exception. Une feuille qui a capté l'enfoncement doit la rendre dans un <code>finally</code> ; sinon, une exception fige le canvas, qui attend un relâchement qui ne viendra plus (CONTRAT-CONTENEUR.md, C6, ligne 307).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 44 · Le fil d'interface de Rhino</div>
+</section>
+<!-- ============ PAGE 3 · PEINDRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 44</b></div>
+<p class="rubrique">Schéma 2 · Peindre maintenant, ou bientôt</p>
+<h2>Invalidate n'est pas Refresh</h2>
+<p style="max-width:165mm"><code>Invalidate</code> marque le contrôle comme « à repeindre » : la peinture viendra par la file, une seule fois même si on l'a demandée dix fois. <code>Refresh</code> peint <b>tout de suite</b>, au milieu de ce que tu es en train de faire.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 190" width="100%">
+<rect fill="#EFE9E1" height="190" width="600" x="0" y="0"></rect>
+<rect fill="#fff" height="112" rx="6" stroke="#2E7D32" stroke-width="1.4" width="276" x="16" y="14"></rect>
+<text class="mono" fill="#2E7D32" font-size="9.4" font-weight="700" style="font-size:9.4px" text-anchor="start" x="28" y="34">Invalidate()</text>
+<circle cx="32" cy="52" fill="#2E7D32" r="2.4"></circle><text fill="#2B2F33" font-size="8.2" text-anchor="start" x="42" y="55">marque « à repeindre »</text>
+<circle cx="32" cy="70" fill="#2E7D32" r="2.4"></circle><text fill="#2B2F33" font-size="8.2" text-anchor="start" x="42" y="73">rend la main tout de suite</text>
+<circle cx="32" cy="88" fill="#2E7D32" r="2.4"></circle><text fill="#2B2F33" font-size="8.2" text-anchor="start" x="42" y="91">dix demandes = une peinture</text>
+<circle cx="32" cy="106" fill="#2E7D32" r="2.4"></circle><text fill="#2B2F33" font-size="8.2" text-anchor="start" x="42" y="109">la peinture voit l'état fini</text>
+<rect fill="#fff" height="112" rx="6" stroke="#C62828" stroke-width="1.4" width="276" x="308" y="14"></rect>
+<text class="mono" fill="#C62828" font-size="9.4" font-weight="700" style="font-size:9.4px" text-anchor="start" x="320" y="34">Refresh() / RedrawCanvas()</text>
+<circle cx="324" cy="52" fill="#C62828" r="2.4"></circle><text fill="#2B2F33" font-size="8.2" text-anchor="start" x="334" y="55">peint maintenant, synchrone</text>
+<circle cx="324" cy="70" fill="#C62828" r="2.4"></circle><text fill="#2B2F33" font-size="8.2" text-anchor="start" x="334" y="73">au milieu de ton code</text>
+<circle cx="324" cy="88" fill="#C62828" r="2.4"></circle><text fill="#2B2F33" font-size="8.2" text-anchor="start" x="334" y="91">chaque appel = une peinture</text>
+<circle cx="324" cy="106" fill="#C62828" r="2.4"></circle><text fill="#2B2F33" font-size="8.2" text-anchor="start" x="334" y="109">peut voir un état à moitié fait</text>
+<text fill="#2B2F33" font-size="8.2" text-anchor="start" x="16" y="150">Composant de départ : Ligne posée → Colonnes posées → un seul redessin à la fin (PoserLeDepart).</text>
+<text fill="#C62828" font-size="8.2" text-anchor="start" x="16" y="168">Un Refresh entre les deux peindrait la Ligne vide, et sa purge viderait sa liste de membres.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">SnapSet · Appartenance/RegistreDocument.cs · 502–506</span>// Les constituants que pose le composant de départ arrivent déjà rangés (PoserLeDepart) : ni
+// adoption, ni réduction de sélection — et SURTOUT PAS de RedrawCanvas : Instances.RedrawCanvas est un
+// Control.Refresh SYNCHRONE (DLL) ; peindre la Ligne avant que ses Colonnes soient ajoutées déclencherait
+// SignalerRendu, dont la purge viderait sa liste. PoserLeDepart redessine à la fin.
+if (_poseEnCours) return;</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le cas courant : Invalidate</h3>
+<p>Un bouton enfoncé change d'aspect : <code>canvas.Invalidate()</code> (CapsuleExecution.cs, ligne 673), et l'on rend la main. La peinture passera dès que la file sera libre, avec l'état complet.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le nom trompe</h3>
+<p><code>Instances.RedrawCanvas()</code> a l'air d'une demande ; c'est en fait un <code>Refresh</code>. SnapSet l'appelle à la fin d'une opération, jamais au milieu d'une construction en plusieurs temps.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège réel</span>
+    Peindre un état à moitié construit. Pendant que le composant de départ pose une Ligne puis ses Colonnes, un <code>Refresh</code> peindrait la Ligne seule, et sa purge viderait sa liste de membres. D'où le drapeau <code>_poseEnCours</code> et un seul redessin à la fin.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 44 · Le fil d'interface de Rhino</div>
+</section>
+<!-- ============ PAGE 4 · REPOS ET VERROU ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 44</b></div>
+<p class="rubrique">Schéma 3 · Sans canvas, et à plusieurs fils</p>
+<h2>Attendre le repos, ou poser un verrou</h2>
+<p style="max-width:165mm">Sans canvas, il n'y a pas de contrôle à qui poster : on attend alors que Rhino n'ait plus rien à faire, avec l'événement <code>RhinoApp.Idle</code>. Et dans le rare code qui peut être appelé depuis plusieurs fils, on protège l'état partagé par un <code>lock</code>.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="16" y="22">RhinoApp.Idle : une fois</text>
+<line stroke="#6B7378" x1="16" x2="284" y1="70" y2="70"></line>
+<circle cx="50" cy="70" fill="#2E7D32" r="5" stroke="#2E7D32"></circle><text fill="#6B7378" font-size="7.2" text-anchor="middle" x="50" y="90">repos</text>
+<circle cx="120" cy="70" fill="#fff" r="5" stroke="#2E7D32"></circle><text fill="#6B7378" font-size="7.2" text-anchor="middle" x="120" y="90">repos</text>
+<circle cx="190" cy="70" fill="#fff" r="5" stroke="#2E7D32"></circle><text fill="#6B7378" font-size="7.2" text-anchor="middle" x="190" y="90">repos</text>
+<circle cx="260" cy="70" fill="#fff" r="5" stroke="#2E7D32"></circle><text fill="#6B7378" font-size="7.2" text-anchor="middle" x="260" y="90">repos</text>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="middle" x="50" y="56">action, puis -=</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="middle" x="190" y="56">plus rien</text>
+<text fill="#C62828" font-size="8" font-weight="700" text-anchor="start" x="16" y="116">Sans -= : l'action rejoue à chaque repos.</text>
+<circle cx="50" cy="140" fill="#C62828" r="5"></circle>
+<circle cx="120" cy="140" fill="#C62828" r="5"></circle>
+<circle cx="190" cy="140" fill="#C62828" r="5"></circle>
+<circle cx="260" cy="140" fill="#C62828" r="5"></circle>
+<line stroke="#C62828" stroke-dasharray="3 3" x1="16" x2="284" y1="140" y2="140"></line>
+<line stroke="#6B7378" stroke-dasharray="3 3" x1="300" x2="300" y1="12" y2="186"></line>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="316" y="22">lock (Verrou) : un seul à la fois</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="316" y="54">fil A</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="316" y="104">fil B</text>
+<rect fill="#1565C0" fill-opacity=".15" height="22" rx="3" stroke="#1565C0" width="130" x="360" y="40"></rect><text fill="#1565C0" font-size="7.4" font-weight="700" text-anchor="middle" x="425" y="55">Resoudre : charge Core</text>
+<rect fill="#eee" height="22" rx="3" stroke="#6B7378" stroke-dasharray="3 2" width="130" x="360" y="90"></rect><text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="middle" x="425" y="105">attend le verrou</text>
+<rect fill="#2E7D32" fill-opacity=".15" height="22" rx="3" stroke="#2E7D32" width="100" x="490" y="90"></rect><text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="middle" x="540" y="105">« déjà chargé »</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="316" y="140">Le second trouve Magpie.Core déjà en mémoire</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="316" y="154">et le reprend (ChargeurCore.cs, lignes 101–104) :</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="316" y="168">un seul moteur, une seule session.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">SnapSet · Depart/ComposantDepart.cs · 116–132</span>private static void Differer(Action action)
+{
+    var canvas = Instances.ActiveCanvas;
+    if (canvas != null &amp;&amp; canvas.IsHandleCreated) { canvas.BeginInvoke(action); return; }
+
+    EventHandler auRepos = null;
+    auRepos = (s, e) =&gt;
+    {
+        Rhino.RhinoApp.Idle -= auRepos;
+        action();
+    };
+    Rhino.RhinoApp.Idle += auRepos;
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le gestionnaire qui se retire</h3>
+<p><code>Idle</code> se lève à chaque moment de repos, très souvent. Le gestionnaire se désabonne donc lui-même avant d'agir : il ne court qu'une fois. Il est déclaré à <code>null</code> d'abord pour pouvoir se nommer dans son propre corps.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Un verrou pour un chargeur</h3>
+<p><code>AssemblyResolve</code> se lève sur le fil qui a besoin de la bibliothèque, quel qu'il soit. <code>ChargeurCore</code> entoure donc son branchement et sa résolution d'un <code>lock (Verrou)</code> (lignes 63, 76, 99) : un seul Magpie.Core chargé, quoi qu'il arrive.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier le <code>-=</code>. Un gestionnaire d'<code>Idle</code> qui ne se retire pas rejoue son action à chaque repos de Rhino, plusieurs fois par seconde, jusqu'à la fermeture. Le symptôme : un composant qui « se remplace » sans fin, ou un Rhino qui chauffe au repos.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 44 · Le fil d'interface de Rhino</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 44</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Le relâchement sur un échantillon de couleur</h2>
+<p style="max-width:165mm">Le sélecteur de couleur s'ouvre au relâchement, sur la même boîte, comme l'objet natif. Tout y est : la décision prise maintenant, l'ouverture remise à plus tard, la capture rendue quoi qu'il arrive.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="n">818</span><span class="kw">public override</span> <span class="ty">GH_ObjectResponse</span> RespondToMouseUp(…)</div>
+<div class="l k1"><span class="n">826</span> <span class="kw">if</span> (_couleurEnfoncee != <span class="kw">null</span>) {<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n">828</span> <span class="kw">var</span> couleur = _couleurEnfoncee;</div>
+<div class="l k2"><span class="n">829</span> <span class="kw">try</span> {<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">831</span> <span class="kw">if</span> (couleur.SourisRelacheeOuvre(…)) {</div>
+<div class="l k3"><span class="n">833</span> <span class="kw">var</span> point = e.ControlLocation;<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">834</span>        canvas.BeginInvoke(<span class="kw">new</span> <span class="ty">Action</span>(() =&gt;<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n"> </span>          Proteger(() =&gt;</div>
+<div class="l k4"><span class="n"> </span>            couleur.OuvrirSelecteur(canvas, point))));</div>
+<div class="l"><span class="n">835</span>      }</div>
+<div class="l k5"><span class="n">837</span>    } <span class="kw">catch</span> (<span class="ty">Exception</span> ex) { Signaler(ex); }<span class="rep r5">5</span></div>
+<div class="l k6"><span class="n">841</span> <span class="kw">finally</span> {<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">844</span>      couleur.AbandonnerGeste();</div>
+<div class="l k6"><span class="n">845</span>      _couleurEnfoncee = <span class="kw">null</span>;</div>
+<div class="l"><span class="n">846</span>    }</div>
+<div class="l k7"><span class="n">848</span> <span class="kw">return</span> <span class="ty">GH_ObjectResponse</span>.Release;<span class="rep r7">7</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Un geste en cours</b>L'enfoncement avait capté la souris.</li>
+<li><span class="rep r2">2</span><b>Décider maintenant</b>Relâché sur la même boîte ?</li>
+<li><span class="rep r3">3</span><b>Copier le point</b>L'événement ne vivra pas jusque-là.</li>
+<li><span class="rep r4">4</span><b>Ouvrir plus tard</b>Le sélecteur a sa propre boucle.</li>
+<li><span class="rep r5">5</span><b>Une erreur maintenant</b>Écrite, jamais propagée.</li>
+<li><span class="rep r6">6</span><b>Le geste se termine</b>Quoi qu'il arrive.</li>
+<li><span class="rep r7">7</span><b>Rendre la souris</b>Grasshopper reprend la main.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Le même motif dans Magpie</span>
+    L'éditeur de parcours ouvre un exercice au double-clic par <code>sender.BeginInvoke(… OuvrirDansEditeur(id, position))</code>, et lance « Vider », « Importer », « Ajouter » et « Enregistrer » de la même façon (MagpieParcoursEditorAttributes.cs, lignes 525 et 537–540). Deux projets, une même règle, apprise du SDK.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 44 · Le fil d'interface de Rhino</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 44</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">canvas.BeginInvoke(new Action(…))</td><td>exécuter après le message en cours</td><td>CapsuleExecution.cs:834</td></tr>
+<tr><td class="c">try { … } finally { rendre la capture }</td><td>ne jamais figer le canvas</td><td>CapsuleExecution.cs:841</td></tr>
+<tr><td class="c">canvas.Invalidate()</td><td>demander une peinture</td><td>CapsuleExecution.cs:673</td></tr>
+<tr><td class="c">Instances.RedrawCanvas()</td><td>peindre tout de suite</td><td>RegistreDocument.cs:461</td></tr>
+<tr><td class="c">RhinoApp.Idle += auRepos</td><td>agir au repos de Rhino</td><td>ComposantDepart.cs:131</td></tr>
+<tr><td class="c">lock (Verrou) { … }</td><td>un seul fil à la fois</td><td>ChargeurCore.cs:76</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Fil d'exécution</dt><dd>Une suite d'instructions exécutées l'une après l'autre (thread).</dd>
+<dt>Boucle de messages</dt><dd>La boucle du fil d'interface qui traite clics, peintures et minuteries un par un.</dd>
+<dt>BeginInvoke</dt><dd>Poster une action dans la file d'un contrôle, sans l'attendre.</dd>
+<dt>Idle</dt><dd>L'événement de Rhino levé quand la file est vide.</dd>
+<dt>Verrou</dt><dd>lock : une seule exécution à la fois dans le bloc protégé.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 47</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 44 · Le fil d'interface de Rhino</div>
+</section>
+</body>
+</html>

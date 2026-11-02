@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>14 · Grilles, attracteurs et champs</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-5">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 14</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Grilles, attracteurs<br/>et champs</h1>
+<p class="chapeau">Une grille pour poser des points, une fonction de distance pour les influencer, et l'idée qui relie tout : le champ, une valeur en chaque point du plan.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>08</b> chemins · <b>09</b> vecteurs et courbes</span>
+<span class="pastille">Exemples · <b>CreateGrid</b>, <b>CircularGrid</b>, <b>Attractor</b>, <b>Contour</b></span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 230" width="100%">
+<path d="M20.0 120.0 L21.6 121.2 L23.3 122.3 L24.9 123.4 L26.6 124.5 L28.2 125.6 L29.9 126.6 L31.6 127.6 L33.2 128.5 L34.9 129.5 L36.5 130.4 L38.1 131.2 L39.8 132.1 L41.5 132.9 L43.1 133.6 L44.8 134.3 L46.4 135.0 L48.0 135.7 L49.7 136.3 L51.4 136.8 L53.0 137.3 L54.6 137.8 L56.3 138.2 L58.0 138.6 L59.6 138.9 L61.2 139.2 L62.9 139.5 L64.5 139.7 L66.2 139.8 L67.8 139.9 L69.5 140.0 L71.2 140.0 L72.8 140.0 L74.5 139.9 L76.1 139.7 L77.8 139.6 L79.4 139.3 L81.0 139.1 L82.7 138.8 L84.3 138.4 L86.0 138.0 L87.7 137.5 L89.3 137.0 L91.0 136.5 L92.6 135.9 L94.2 135.3 L95.9 134.6 L97.5 133.9 L99.2 133.2 L100.8 132.4 L102.5 131.6 L104.2 130.8 L105.8 129.9 L107.5 129.0 L109.1 128.0 L110.8 127.0 L112.4 126.0 L114.0 125.0 L115.7 123.9 L117.3 122.8 L119.0 121.7 L120.7 120.6 L122.3 119.4 L124.0 118.2 L125.6 117.0 L127.2 115.8 L128.9 114.6 L130.6 113.3 L132.2 112.1 L133.8 110.8 L135.5 109.6 L137.2 108.3 L138.8 107.0 L140.4 105.7 L142.1 104.4 L143.8 103.2 L145.4 101.9 L147.1 100.6 L148.7 99.3 L150.3 98.1 L152.0 96.8 L153.7 95.6 L155.3 94.3 L156.9 93.1 L158.6 91.9 L160.2 90.7 L161.9 89.6 L163.6 88.4 L165.2 87.3 L166.8 86.2 L168.5 85.2 L170.2 84.1 L171.8 83.1 L173.4 82.1 L175.1 81.2 L176.8 80.2 L178.4 79.3 L180.1 78.5 L181.7 77.7 L183.3 76.9 L185.0 76.1 L186.7 75.4 L188.3 74.8 L189.9 74.1 L191.6 73.6 L193.2 73.0 L194.9 72.5 L196.6 72.1 L198.2 71.6 L199.8 71.3 L201.5 71.0 L203.2 70.7 L204.8 70.5 L206.4 70.3 L208.1 70.1 L209.8 70.0 L211.4 70.0 L213.1 70.0 L214.7 70.1 L216.3 70.2 L218.0 70.3 L219.7 70.5 L221.3 70.7 L222.9 71.0 L224.6 71.4 L226.2 71.7 L227.9 72.1 L229.6 72.6 L231.2 73.1 L232.8 73.7 L234.5 74.3 L236.2 74.9 L237.8 75.6 L239.4 76.3 L241.1 77.0 L242.8 77.8 L244.4 78.7 L246.1 79.5 L247.7 80.4 L249.3 81.3 L251.0 82.3 L252.7 83.3 L254.3 84.3 L255.9 85.4 L257.6 86.4 L259.2 87.5 L260.9 88.7 L262.6 89.8 L264.2 91.0 L265.9 92.2 L267.5 93.4 L269.1 94.6 L270.8 95.8 L272.4 97.1 L274.1 98.3 L275.8 99.6 L277.4 100.9 L279.1 102.1 L280.7 103.4 L282.4 104.7 L284.0 106.0 L285.6 107.3 L287.3 108.5 L288.9 109.8 L290.6 111.1 L292.2 112.3 L293.9 113.6 L295.6 114.8 L297.2 116.1 L298.9 117.3 L300.5 118.5 L302.1 119.6 L303.8 120.8 L305.4 121.9 L307.1 123.0 L308.8 124.1 L310.4 125.2 L312.1 126.2 L313.7 127.2 L315.4 128.2 L317.0 129.1 L318.6 130.1 L320.3 130.9 L321.9 131.8 L323.6 132.6 L325.2 133.4 L326.9 134.1 L328.6 134.8 L330.2 135.4 L331.9 136.1 L333.5 136.6 L335.1 137.2 L336.8 137.6 L338.4 138.1 L340.1 138.5 L341.8 138.8 L343.4 139.1 L345.1 139.4 L346.7 139.6 L348.4 139.8 L350.0 139.9" fill="none" stroke="#AD1457" stroke-width="2.6"></path>
+<circle cx="40.0" cy="30.0" fill="#2B2F33" r="3"></circle>
+<circle cx="39.4" cy="61.8" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="40.0" x2="30.3" y1="90.0" y2="104.6"></line>
+<circle cx="40.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="30.3" cy="104.6" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="40.0" x2="35.6" y1="120.0" y2="128.1"></line>
+<circle cx="40.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="35.6" cy="128.1" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="40.0" x2="45.2" y1="150.0" y2="137.9"></line>
+<circle cx="40.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="45.2" cy="137.9" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="40.0" x2="44.1" y1="180.0" y2="166.5"></line>
+<circle cx="40.0" cy="180.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="44.1" cy="166.5" fill="#2B2F33" r="3"></circle>
+<circle cx="69.0" cy="30.0" fill="#2B2F33" r="3"></circle>
+<circle cx="69.0" cy="60.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="69.0" x2="66.9" y1="90.0" y2="100.7"></line>
+<circle cx="69.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="66.9" cy="100.7" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="69.0" x2="68.1" y1="120.0" y2="135.1"></line>
+<circle cx="69.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="68.1" cy="135.1" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="69.0" x2="69.4" y1="150.0" y2="141.4"></line>
+<circle cx="69.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="69.4" cy="141.4" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="69.0" x2="69.2" y1="180.0" y2="163.7"></line>
+<circle cx="69.0" cy="180.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="69.2" cy="163.7" fill="#2B2F33" r="3"></circle>
+<circle cx="98.0" cy="30.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="98.0" x2="99.5" y1="60.0" y2="62.0"></line>
+<circle cx="98.0" cy="60.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="99.5" cy="62.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="98.0" x2="107.4" y1="90.0" y2="104.2"></line>
+<circle cx="98.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="107.4" cy="104.2" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="98.0" x2="103.2" y1="120.0" y2="129.1"></line>
+<circle cx="98.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="103.2" cy="129.1" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="98.0" x2="93.6" y1="150.0" y2="138.5"></line>
+<circle cx="98.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="93.6" cy="138.5" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="98.0" x2="94.0" y1="180.0" y2="165.9"></line>
+<circle cx="98.0" cy="180.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="94.0" cy="165.9" fill="#2B2F33" r="3"></circle>
+<circle cx="127.0" cy="30.1" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="127.0" x2="135.5" y1="60.0" y2="71.4"></line>
+<circle cx="127.0" cy="60.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="135.5" cy="71.4" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="127.0" x2="137.1" y1="90.0" y2="101.8"></line>
+<circle cx="127.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="137.1" cy="101.8" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="127.0" x2="125.7" y1="120.0" y2="117.3"></line>
+<circle cx="127.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="125.7" cy="117.3" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="127.0" x2="117.7" y1="150.0" y2="134.8"></line>
+<circle cx="127.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="117.7" cy="134.8" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="127.0" x2="123.5" y1="180.0" y2="173.0"></line>
+<circle cx="127.0" cy="180.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="123.5" cy="173.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="156.0" x2="159.5" y1="30.0" y2="37.1"></line>
+<circle cx="156.0" cy="30.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="159.5" cy="37.1" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="156.0" x2="165.0" y1="60.0" y2="75.3"></line>
+<circle cx="156.0" cy="60.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="165.0" cy="75.3" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="156.0" x2="158.3" y1="90.0" y2="91.7"></line>
+<circle cx="156.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="158.3" cy="91.7" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="156.0" x2="146.8" y1="120.0" y2="107.4"></line>
+<circle cx="156.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="146.8" cy="107.4" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="156.0" x2="147.4" y1="150.0" y2="138.7"></line>
+<circle cx="156.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="147.4" cy="138.7" fill="#2B2F33" r="3"></circle>
+<circle cx="156.0" cy="180.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="185.0" x2="188.9" y1="30.0" y2="44.2"></line>
+<circle cx="185.0" cy="30.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="188.9" cy="44.2" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="185.0" x2="189.1" y1="60.0" y2="71.6"></line>
+<circle cx="185.0" cy="60.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="189.1" cy="71.6" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="185.0" x2="180.8" y1="90.0" y2="80.3"></line>
+<circle cx="185.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="180.8" cy="80.3" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="185.0" x2="175.5" y1="120.0" y2="106.0"></line>
+<circle cx="185.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="175.5" cy="106.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="185.0" x2="183.5" y1="150.0" y2="148.1"></line>
+<circle cx="185.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="183.5" cy="148.1" fill="#2B2F33" r="3"></circle>
+<circle cx="185.0" cy="180.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="214.0" x2="213.6" y1="30.0" y2="46.3"></line>
+<circle cx="214.0" cy="30.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="213.6" cy="46.3" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="214.0" x2="213.2" y1="60.0" y2="68.6"></line>
+<circle cx="214.0" cy="60.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="213.2" cy="68.6" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="214.0" x2="214.5" y1="90.0" y2="74.9"></line>
+<circle cx="214.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="214.5" cy="74.9" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="214.0" x2="216.0" y1="120.0" y2="109.2"></line>
+<circle cx="214.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="216.0" cy="109.2" fill="#2B2F33" r="3"></circle>
+<circle cx="214.0" cy="150.0" fill="#2B2F33" r="3"></circle>
+<circle cx="214.0" cy="180.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="243.0" x2="238.8" y1="30.0" y2="43.5"></line>
+<circle cx="243.0" cy="30.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="238.8" cy="43.5" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="243.0" x2="237.5" y1="60.0" y2="72.0"></line>
+<circle cx="243.0" cy="60.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="237.5" cy="72.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="243.0" x2="247.0" y1="90.0" y2="81.8"></line>
+<circle cx="243.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="247.0" cy="81.8" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="243.0" x2="253.3" y1="120.0" y2="105.8"></line>
+<circle cx="243.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="253.3" cy="105.8" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="243.0" x2="245.3" y1="150.0" y2="146.9"></line>
+<circle cx="243.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="245.3" cy="146.9" fill="#2B2F33" r="3"></circle>
+<circle cx="243.0" cy="180.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="272.0" x2="268.9" y1="30.0" y2="35.8"></line>
+<circle cx="272.0" cy="30.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="268.9" cy="35.8" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="272.0" x2="262.4" y1="60.0" y2="75.2"></line>
+<circle cx="272.0" cy="60.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="262.4" cy="75.2" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="272.0" x2="269.5" y1="90.0" y2="94.1"></line>
+<circle cx="272.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="269.5" cy="94.1" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="272.0" x2="281.4" y1="120.0" y2="109.1"></line>
+<circle cx="272.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="281.4" cy="109.1" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="272.0" x2="281.2" y1="150.0" y2="137.7"></line>
+<circle cx="272.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="281.2" cy="137.7" fill="#2B2F33" r="3"></circle>
+<circle cx="272.3" cy="179.6" fill="#2B2F33" r="3"></circle>
+<circle cx="301.0" cy="30.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="301.0" x2="293.1" y1="60.0" y2="70.2"></line>
+<circle cx="301.0" cy="60.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="293.1" cy="70.2" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="301.0" x2="291.2" y1="90.0" y2="103.3"></line>
+<circle cx="301.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="291.2" cy="103.3" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="301.0" x2="302.0" y1="120.0" y2="119.7"></line>
+<circle cx="301.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="302.0" cy="119.7" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="301.0" x2="309.5" y1="150.0" y2="134.8"></line>
+<circle cx="301.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="309.5" cy="134.8" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="301.0" x2="304.9" y1="180.0" y2="171.9"></line>
+<circle cx="301.0" cy="180.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="304.9" cy="171.9" fill="#2B2F33" r="3"></circle>
+<circle cx="330.0" cy="30.0" fill="#2B2F33" r="3"></circle>
+<circle cx="329.2" cy="61.0" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="330.0" x2="320.7" y1="90.0" y2="103.4"></line>
+<circle cx="330.0" cy="90.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="320.7" cy="103.4" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="330.0" x2="324.7" y1="120.0" y2="130.4"></line>
+<circle cx="330.0" cy="120.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="324.7" cy="130.4" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="330.0" x2="332.9" y1="150.0" y2="138.9"></line>
+<circle cx="330.0" cy="150.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="332.9" cy="138.9" fill="#2B2F33" r="3"></circle>
+<line stroke="#B5AEA5" stroke-width="1" x1="330.0" x2="333.6" y1="180.0" y2="165.3"></line>
+<circle cx="330.0" cy="180.0" fill="#B5AEA5" r="1.8"></circle>
+<circle cx="333.6" cy="165.3" fill="#2B2F33" r="3"></circle>
+<text fill="#AD1457" font-size="11" font-weight="700" x="372" y="40">Attractor, en une image</text>
+<g fill="#2B2F33" font-size="9.5">
+<text x="372" y="62"><tspan fill="#B5AEA5" font-weight="700">●</tspan> point de la grille d'origine</text>
+<text x="372" y="80"><tspan font-weight="700">●</tspan> point déplacé</text>
+<text x="372" y="98"><tspan fill="#AD1457" font-weight="700">—</tspan> la courbe attractrice</text>
+<text x="372" y="126">Près de la courbe, le point</text>
+<text x="372" y="140">s'en approche beaucoup ; loin,</text>
+<text x="372" y="154">à peine ; au-delà d'une</text>
+<text x="372" y="168">distance AD, plus du tout.</text>
+</g>
+<text fill="#2B2F33" font-size="11" text-anchor="middle" x="300" y="222">Le déplacement de chaque point ne dépend que de <tspan font-weight="700">sa distance</tspan> à la courbe.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un <b>champ</b> associe une valeur à chaque point du plan : un nombre (champ scalaire) ou un vecteur (champ de vecteurs). Une <b>grille</b> l'échantillonne ; un <b>attracteur</b> est un champ de déplacements qui s'affaiblit avec la distance.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Une carte météo. La température existe partout (le champ), on la mesure aux stations (la grille), et le vent pousse chaque ballon selon l'endroit où il se trouve (le champ de vecteurs).</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>construire une grille rectangulaire ou polaire, et ranger ses points en branches ;</li>
+<li>lire une fonction d'atténuation et prévoir le déplacement d'un point ;</li>
+<li>écrire un champ comme une fonction <code>Func&lt;Point3d, double&gt;</code>, et l'échantillonner sur une grille.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Penser en champ, c'est séparer deux questions : <b>que vaut</b> le champ en un point (une fonction), et <b>où</b> on le regarde (une grille, des points). Contour, Flow et Attractor reposent tous les trois sur cette séparation.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 14 · Grilles, attracteurs et champs</div>
+</section>
+<!-- ============ PAGE 2 · GRILLES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 14</b></div>
+<p class="rubrique">Schéma 1 · Deux grilles</p>
+<h2>Rectangulaire ou polaire, rangée par rangée</h2>
+<p style="max-width:165mm">Une grille est une double boucle. Ce qui change d'une grille à l'autre, c'est la formule qui donne la position du point (i, j), et la façon de le ranger dans l'arbre de sortie (cours 08).</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 270" width="100%">
+<rect fill="#EFE9E1" height="270" width="292" x="0" y="0"></rect><rect fill="#EFE9E1" height="270" width="292" x="308" y="0"></rect>
+<text fill="#AD1457" font-size="12" font-weight="800" x="14" y="24">CreateGrid</text>
+<text fill="#AD1457" font-size="12" font-weight="800" x="322" y="24">CircularGrid</text>
+<!-- rectangulaire -->
+<rect fill="#fff" height="140" stroke="#2B2F33" width="200" x="40" y="50"></rect>
+<g fill="#2B2F33">
+<circle cx="40" cy="50" r="3"></circle><circle cx="40" cy="85" r="3"></circle><circle cx="40" cy="120" r="3"></circle><circle cx="40" cy="155" r="3"></circle><circle cx="40" cy="190" r="3"></circle>
+<circle cx="140" cy="50" r="3"></circle><circle cx="140" cy="85" r="3"></circle><circle cx="140" cy="120" r="3"></circle><circle cx="140" cy="155" r="3"></circle><circle cx="140" cy="190" r="3"></circle>
+<circle cx="240" cy="50" r="3"></circle><circle cx="240" cy="85" r="3"></circle><circle cx="240" cy="120" r="3"></circle><circle cx="240" cy="155" r="3"></circle><circle cx="240" cy="190" r="3"></circle>
+</g>
+<g fill="#AD1457"><circle cx="90" cy="50" r="3.5"></circle><circle cx="90" cy="85" r="3.5"></circle><circle cx="90" cy="120" r="3.5"></circle><circle cx="90" cy="155" r="3.5"></circle><circle cx="90" cy="190" r="3.5"></circle></g>
+<g fill="#2B2F33"><circle cx="190" cy="50" r="3"></circle><circle cx="190" cy="85" r="3"></circle><circle cx="190" cy="120" r="3"></circle><circle cx="190" cy="155" r="3"></circle><circle cx="190" cy="190" r="3"></circle></g>
+<text class="mono" fill="#AD1457" font-weight="700" style="font-size:9.5px" text-anchor="middle" x="90" y="208">{p;1}</text>
+<g fill="#2B2F33" font-size="9.5">
+<text x="14" y="232">x = coin.X + (largeur / divX) · i</text>
+<text x="14" y="246">divX = largeur / écart, arrondi au pair</text>
+<text x="14" y="260">une branche par colonne i</text>
+</g>
+<!-- polaire -->
+<g fill="none" stroke="#B5AEA5"><circle cx="454" cy="120" r="35"></circle><circle cx="454" cy="120" r="70"></circle></g>
+<circle cx="454" cy="120" fill="#AD1457" r="4"></circle>
+<g fill="#2B2F33">
+<circle cx="489" cy="120" r="3"></circle><circle cx="471.5" cy="150.3" r="3"></circle><circle cx="436.5" cy="150.3" r="3"></circle><circle cx="419" cy="120" r="3"></circle><circle cx="436.5" cy="89.7" r="3"></circle><circle cx="471.5" cy="89.7" r="3"></circle>
+</g>
+<g fill="#AD1457">
+<circle cx="524" cy="120" r="3.5"></circle><circle cx="518.7" cy="146.8" r="3.5"></circle><circle cx="503.5" cy="169.5" r="3.5"></circle><circle cx="480.8" cy="184.7" r="3.5"></circle><circle cx="454" cy="190" r="3.5"></circle><circle cx="427.2" cy="184.7" r="3.5"></circle><circle cx="404.5" cy="169.5" r="3.5"></circle><circle cx="389.3" cy="146.8" r="3.5"></circle><circle cx="384" cy="120" r="3.5"></circle><circle cx="389.3" cy="93.2" r="3.5"></circle><circle cx="404.5" cy="70.5" r="3.5"></circle><circle cx="427.2" cy="55.3" r="3.5"></circle><circle cx="454" cy="50" r="3.5"></circle><circle cx="480.8" cy="55.3" r="3.5"></circle><circle cx="503.5" cy="70.5" r="3.5"></circle><circle cx="518.7" cy="93.2" r="3.5"></circle>
+</g>
+<g class="mono" font-size="9"><text class="mono" fill="#AD1457" style="font-size:9px" x="462" y="116">{p;0}</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:9px" x="534" y="124">{p;2}</text></g>
+<g fill="#2B2F33" font-size="9.5">
+<text x="322" y="232">rayon de l'anneau i = écartY · i</text>
+<text x="322" y="246">n points = ⌈ circonférence / écartX ⌉</text>
+<text x="322" y="260">le centre seul en {p;0}, un anneau par branche</text>
+</g>
+</svg>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pourquoi un epsilon ?</h3>
+<p>CircularGrid calcule <code>Math.Floor(rayon / écartY + eps)</code> avec <code>eps = 1e-9</code>. Sans lui, un rayon de 30 et un écart de 10 peuvent donner 2,9999999 en virgule flottante (cours 09), donc 2 anneaux au lieu de 3.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Pourquoi des anneaux de plus en plus peuplés ?</h3>
+<p>Pour garder un <b>écart constant</b> entre voisins sur l'anneau : plus le cercle est grand, plus il faut de points. Les branches ont donc des longueurs différentes, ce que les composants en aval doivent accepter.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Supposer que toutes les branches d'une grille ont le même nombre de points. Contour prend la plus courte (<code>rows.Min(r =&gt; r.Count)</code>) ; Wander se replie sur sa propre rangée quand la voisine est trop courte (cours 13).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 14 · Grilles, attracteurs et champs</div>
+</section>
+<!-- ============ PAGE 3 · ATTÉNUATION ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 14</b></div>
+<p class="rubrique">Schéma 2 · L'atténuation</p>
+<h2>Une influence qui s'éteint en douceur</h2>
+<p style="max-width:165mm">Attractor déplace chaque point vers son point le plus proche sur la courbe. La fraction du chemin parcourue dépend de la distance d, par une <b>fonction d'atténuation</b> qui vaut 1 au contact et 0 à la distance AD.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 240" width="100%">
+<rect fill="#EFE9E1" height="240" width="600" x="0" y="0"></rect>
+<!-- axes -->
+<line stroke="#2B2F33" stroke-width="1.2" x1="60" x2="320" y1="200" y2="200"></line>
+<line stroke="#2B2F33" stroke-width="1.2" x1="60" x2="60" y1="200" y2="30"></line>
+<g fill="#6B7378" font-size="9"><text x="44" y="44">1</text><text x="44" y="204">0</text><text x="56" y="216">0</text><text x="292" y="216">AD</text><text x="168" y="232">distance d</text><text x="16" y="120">w(d)</text></g>
+<line stroke="#B5AEA5" stroke-dasharray="3 3" x1="300" x2="300" y1="200" y2="34"></line>
+<line stroke="#AD1457" stroke-width="2.4" x1="300" x2="340" y1="200" y2="200"></line>
+<!-- linéaire -->
+<path d="M60 40 L300 200" fill="none" stroke="#B5AEA5" stroke-dasharray="5 3" stroke-width="1.6"></path>
+<!-- lisse -->
+<path d="M60.0 40.0 L66.0 40.2 L72.0 40.8 L78.0 41.8 L84.0 43.2 L90.0 45.0 L96.0 47.1 L102.0 49.6 L108.0 52.5 L114.0 55.8 L120.0 59.4 L126.0 63.3 L132.0 67.5 L138.0 72.0 L144.0 76.8 L150.0 81.8 L156.0 87.1 L162.0 92.6 L168.0 98.2 L174.0 104.1 L180.0 110.0 L186.0 116.0 L192.0 122.2 L198.0 128.3 L204.0 134.5 L210.0 140.6 L216.0 146.6 L222.0 152.6 L228.0 158.4 L234.0 164.0 L240.0 169.4 L246.0 174.5 L252.0 179.3 L258.0 183.7 L264.0 187.7 L270.0 191.2 L276.0 194.2 L282.0 196.7 L288.0 198.5 L294.0 199.6 L300.0 200.0" fill="none" stroke="#AD1457" stroke-width="2.6"></path>
+<circle cx="180" cy="110" fill="#AD1457" r="4"></circle>
+<text fill="#AD1457" font-size="9" font-weight="700" x="186" y="104">d = AD/2 → 0,56</text>
+<text fill="#6B7378" font-size="9" x="76" y="160">linéaire : 1 − d/AD</text>
+<text fill="#6B7378" font-size="9" x="76" y="173">(cassure à AD)</text>
+<!-- formule et tableau -->
+<text fill="#AD1457" font-size="11" font-weight="700" x="360" y="40">Celle d'Attractor</text>
+<text class="mono" fill="#2B2F33" style="font-size:11px" x="360" y="62">w = (1 − (d/AD)²)²</text>
+<g class="mono" font-size="9.5">
+<text class="mono" fill="#6B7378" style="font-size:9.5px; white-space:pre" x="360" y="92">d     0    5    10   15   20   25</text>
+<text class="mono" fill="#2B2F33" style="font-size:9.5px; white-space:pre" x="360" y="110">w     1   .92  .71  .41  .13   0</text>
+</g>
+<text fill="#6B7378" font-size="9" x="360" y="126">avec AD = 25, la valeur par défaut</text>
+<g fill="#2B2F33" font-size="9.5">
+<text x="360" y="154">Plate au départ : les points tout proches</text>
+<text x="360" y="168">sont presque tous collés à la courbe.</text>
+<text x="360" y="190">Plate à l'arrivée : pas de cassure</text>
+<text x="360" y="204">visible à la frontière d'influence.</text>
+</g>
+</svg>
+<h3 style="margin-top:5mm">Le déplacement d'un point, en trois lignes</h3>
+<svg viewbox="0 0 600 110" width="100%">
+<defs><marker id="c1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#E65100"></path></marker></defs>
+<path d="M20 90 C 120 60, 200 60, 300 80" fill="none" stroke="#AD1457" stroke-width="2.4"></path>
+<circle cx="150" cy="10" fill="#B5AEA5" r="4"></circle><text class="mono" fill="#6B7378" style="font-size:10px" x="158" y="14">pt</text>
+<circle cx="152" cy="67" fill="#fff" r="4" stroke="#AD1457" stroke-width="1.6"></circle><text class="mono" fill="#AD1457" style="font-size:10px" x="160" y="80">closestPt</text>
+<line stroke="#B5AEA5" stroke-dasharray="3 3" x1="150" x2="152" y1="14" y2="63"></line>
+<path d="M150 14 L151 42" marker-end="url(#c1)" stroke="#E65100" stroke-width="2.2"></path>
+<circle cx="151" cy="46" fill="#2B2F33" r="4"></circle>
+<text class="mono" fill="#E65100" font-weight="700" style="font-size:10px" text-anchor="end" x="140" y="36">vec·w·fA</text>
+<g fill="#2B2F33">
+<text class="mono" style="font-size:10px" x="340" y="24">vec = closestPt - pt;</text>
+<text class="mono" style="font-size:10px" x="340" y="46">valVec += vec * w * fA;</text>
+<text class="mono" style="font-size:10px" x="340" y="68">résultat = pt + valVec;</text>
+</g>
+<text fill="#6B7378" font-size="9.5" x="340" y="94">fA = 1 et d = 0 : le point arrive sur la courbe.</text>
+</svg>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Mettre AF (fA) au-dessus de 1. Le point dépasse alors la courbe et passe de l'autre côté : avec fA = 2 et d petit, il se retrouve à la même distance, mais en face. C'est permis, mais rarement voulu.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 14 · Grilles, attracteurs et champs</div>
+</section>
+<!-- ============ PAGE 4 · CHAMPS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 14</b></div>
+<p class="rubrique">Schéma 3 · Les champs</p>
+<h2>Une fonction d'abord, une grille ensuite</h2>
+<p style="max-width:165mm">Contour définit son champ comme une <b>fonction</b> rangée dans une variable : pour un point, la distance à l'attracteur le plus proche. Puis il l'évalue en chaque point de la grille, et range les valeurs dans un tableau.</p>
+<div class="deuxcol" style="margin-top:3mm; align-items:start">
+<svg viewbox="0 0 280 200" width="100%">
+<rect fill="#F4F1F8" height="16" width="16" x="20" y="30"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="20" y="46"></rect>
+<rect fill="#DCD5E7" height="16" width="16" x="20" y="62"></rect>
+<rect fill="#B9ADCE" height="16" width="16" x="20" y="78"></rect>
+<rect fill="#9785B6" height="16" width="16" x="20" y="94"></rect>
+<rect fill="#7760A0" height="16" width="16" x="20" y="110"></rect>
+<rect fill="#AD1457" height="16" width="16" x="20" y="126"></rect>
+<rect fill="#7962A1" height="16" width="16" x="20" y="142"></rect>
+<rect fill="#9A89B8" height="16" width="16" x="20" y="158"></rect>
+<rect fill="#BCB0D0" height="16" width="16" x="20" y="174"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="36" y="30"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="36" y="46"></rect>
+<rect fill="#E5DFED" height="16" width="16" x="36" y="62"></rect>
+<rect fill="#C5BBD7" height="16" width="16" x="36" y="78"></rect>
+<rect fill="#A899C3" height="16" width="16" x="36" y="94"></rect>
+<rect fill="#8975AD" height="16" width="16" x="36" y="110"></rect>
+<rect fill="#674D94" height="16" width="16" x="36" y="126"></rect>
+<rect fill="#71589B" height="16" width="16" x="36" y="142"></rect>
+<rect fill="#9481B4" height="16" width="16" x="36" y="158"></rect>
+<rect fill="#B6A9CC" height="16" width="16" x="36" y="174"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="52" y="30"></rect>
+<rect fill="#E6E1EE" height="16" width="16" x="52" y="46"></rect>
+<rect fill="#CDC4DD" height="16" width="16" x="52" y="62"></rect>
+<rect fill="#B4A7CB" height="16" width="16" x="52" y="78"></rect>
+<rect fill="#9B8AB9" height="16" width="16" x="52" y="94"></rect>
+<rect fill="#806AA6" height="16" width="16" x="52" y="110"></rect>
+<rect fill="#614690" height="16" width="16" x="52" y="126"></rect>
+<rect fill="#755D9E" height="16" width="16" x="52" y="142"></rect>
+<rect fill="#9784B6" height="16" width="16" x="52" y="158"></rect>
+<rect fill="#B9ACCE" height="16" width="16" x="52" y="174"></rect>
+<rect fill="#EAE6F1" height="16" width="16" x="68" y="30"></rect>
+<rect fill="#CFC6DE" height="16" width="16" x="68" y="46"></rect>
+<rect fill="#B5A8CB" height="16" width="16" x="68" y="62"></rect>
+<rect fill="#9C8ABA" height="16" width="16" x="68" y="78"></rect>
+<rect fill="#836EA8" height="16" width="16" x="68" y="94"></rect>
+<rect fill="#6A5096" height="16" width="16" x="68" y="110"></rect>
+<rect fill="#664C94" height="16" width="16" x="68" y="126"></rect>
+<rect fill="#836EA8" height="16" width="16" x="68" y="142"></rect>
+<rect fill="#A292BE" height="16" width="16" x="68" y="158"></rect>
+<rect fill="#C2B7D5" height="16" width="16" x="68" y="174"></rect>
+<rect fill="#D6CFE3" height="16" width="16" x="84" y="30"></rect>
+<rect fill="#B9ADCE" height="16" width="16" x="84" y="46"></rect>
+<rect fill="#9E8DBB" height="16" width="16" x="84" y="62"></rect>
+<rect fill="#836EA8" height="16" width="16" x="84" y="78"></rect>
+<rect fill="#6A5197" height="16" width="16" x="84" y="94"></rect>
+<rect fill="#634992" height="16" width="16" x="84" y="110"></rect>
+<rect fill="#7D66A4" height="16" width="16" x="84" y="126"></rect>
+<rect fill="#9785B6" height="16" width="16" x="84" y="142"></rect>
+<rect fill="#B4A6CA" height="16" width="16" x="84" y="158"></rect>
+<rect fill="#D1C9DF" height="16" width="16" x="84" y="174"></rect>
+<rect fill="#C6BCD7" height="16" width="16" x="100" y="30"></rect>
+<rect fill="#A797C1" height="16" width="16" x="100" y="46"></rect>
+<rect fill="#8974AC" height="16" width="16" x="100" y="62"></rect>
+<rect fill="#6C5398" height="16" width="16" x="100" y="78"></rect>
+<rect fill="#634892" height="16" width="16" x="100" y="94"></rect>
+<rect fill="#7C66A3" height="16" width="16" x="100" y="110"></rect>
+<rect fill="#9582B5" height="16" width="16" x="100" y="126"></rect>
+<rect fill="#AEA0C7" height="16" width="16" x="100" y="142"></rect>
+<rect fill="#C9BFD9" height="16" width="16" x="100" y="158"></rect>
+<rect fill="#E4DFED" height="16" width="16" x="100" y="174"></rect>
+<rect fill="#BBAFCF" height="16" width="16" x="116" y="30"></rect>
+<rect fill="#9987B8" height="16" width="16" x="116" y="46"></rect>
+<rect fill="#7861A0" height="16" width="16" x="116" y="62"></rect>
+<rect fill="#5D418D" height="16" width="16" x="116" y="78"></rect>
+<rect fill="#7A63A2" height="16" width="16" x="116" y="94"></rect>
+<rect fill="#9482B4" height="16" width="16" x="116" y="110"></rect>
+<rect fill="#AE9FC6" height="16" width="16" x="116" y="126"></rect>
+<rect fill="#C6BCD8" height="16" width="16" x="116" y="142"></rect>
+<rect fill="#E0D9E9" height="16" width="16" x="116" y="158"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="116" y="174"></rect>
+<rect fill="#B6A9CC" height="16" width="16" x="132" y="30"></rect>
+<rect fill="#9381B4" height="16" width="16" x="132" y="46"></rect>
+<rect fill="#70589B" height="16" width="16" x="132" y="62"></rect>
+<rect fill="#684E95" height="16" width="16" x="132" y="78"></rect>
+<rect fill="#8A76AD" height="16" width="16" x="132" y="94"></rect>
+<rect fill="#AB9CC4" height="16" width="16" x="132" y="110"></rect>
+<rect fill="#C6BBD7" height="16" width="16" x="132" y="126"></rect>
+<rect fill="#DFD9E9" height="16" width="16" x="132" y="142"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="132" y="158"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="132" y="174"></rect>
+<rect fill="#BAADCF" height="16" width="16" x="148" y="30"></rect>
+<rect fill="#9785B6" height="16" width="16" x="148" y="46"></rect>
+<rect fill="#765E9F" height="16" width="16" x="148" y="62"></rect>
+<rect fill="#5F448F" height="16" width="16" x="148" y="78"></rect>
+<rect fill="#7D67A4" height="16" width="16" x="148" y="94"></rect>
+<rect fill="#9887B7" height="16" width="16" x="148" y="110"></rect>
+<rect fill="#B2A4C9" height="16" width="16" x="148" y="126"></rect>
+<rect fill="#CBC1DB" height="16" width="16" x="148" y="142"></rect>
+<rect fill="#E4DEEC" height="16" width="16" x="148" y="158"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="148" y="174"></rect>
+<rect fill="#C4B9D6" height="16" width="16" x="164" y="30"></rect>
+<rect fill="#A494BF" height="16" width="16" x="164" y="46"></rect>
+<rect fill="#8570AA" height="16" width="16" x="164" y="62"></rect>
+<rect fill="#694F95" height="16" width="16" x="164" y="78"></rect>
+<rect fill="#674D94" height="16" width="16" x="164" y="94"></rect>
+<rect fill="#806BA6" height="16" width="16" x="164" y="110"></rect>
+<rect fill="#9987B8" height="16" width="16" x="164" y="126"></rect>
+<rect fill="#B2A5C9" height="16" width="16" x="164" y="142"></rect>
+<rect fill="#CCC3DC" height="16" width="16" x="164" y="158"></rect>
+<rect fill="#E8E3EF" height="16" width="16" x="164" y="174"></rect>
+<rect fill="#D3CBE1" height="16" width="16" x="180" y="30"></rect>
+<rect fill="#B6A9CC" height="16" width="16" x="180" y="46"></rect>
+<rect fill="#9A88B8" height="16" width="16" x="180" y="62"></rect>
+<rect fill="#7F69A6" height="16" width="16" x="180" y="78"></rect>
+<rect fill="#664C94" height="16" width="16" x="180" y="94"></rect>
+<rect fill="#684E95" height="16" width="16" x="180" y="110"></rect>
+<rect fill="#816BA7" height="16" width="16" x="180" y="126"></rect>
+<rect fill="#9B8AB9" height="16" width="16" x="180" y="142"></rect>
+<rect fill="#B7AACD" height="16" width="16" x="180" y="158"></rect>
+<rect fill="#D4CCE1" height="16" width="16" x="180" y="174"></rect>
+<rect fill="#E6E1EE" height="16" width="16" x="196" y="30"></rect>
+<rect fill="#CBC1DB" height="16" width="16" x="196" y="46"></rect>
+<rect fill="#B1A3C8" height="16" width="16" x="196" y="62"></rect>
+<rect fill="#9886B7" height="16" width="16" x="196" y="78"></rect>
+<rect fill="#7F69A5" height="16" width="16" x="196" y="94"></rect>
+<rect fill="#664B93" height="16" width="16" x="196" y="110"></rect>
+<rect fill="#6A5096" height="16" width="16" x="196" y="126"></rect>
+<rect fill="#8672AB" height="16" width="16" x="196" y="142"></rect>
+<rect fill="#A595C0" height="16" width="16" x="196" y="158"></rect>
+<rect fill="#C4BAD6" height="16" width="16" x="196" y="174"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="212" y="30"></rect>
+<rect fill="#E2DCEB" height="16" width="16" x="212" y="46"></rect>
+<rect fill="#C9BFDA" height="16" width="16" x="212" y="62"></rect>
+<rect fill="#B0A2C8" height="16" width="16" x="212" y="78"></rect>
+<rect fill="#9785B6" height="16" width="16" x="212" y="94"></rect>
+<rect fill="#7C66A3" height="16" width="16" x="212" y="110"></rect>
+<rect fill="#5E438E" height="16" width="16" x="212" y="126"></rect>
+<rect fill="#775F9F" height="16" width="16" x="212" y="142"></rect>
+<rect fill="#9886B7" height="16" width="16" x="212" y="158"></rect>
+<rect fill="#BAAECF" height="16" width="16" x="212" y="174"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="228" y="30"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="228" y="46"></rect>
+<rect fill="#E2DCEB" height="16" width="16" x="228" y="62"></rect>
+<rect fill="#C8BED9" height="16" width="16" x="228" y="78"></rect>
+<rect fill="#AC9DC5" height="16" width="16" x="228" y="94"></rect>
+<rect fill="#8B76AD" height="16" width="16" x="228" y="110"></rect>
+<rect fill="#684E95" height="16" width="16" x="228" y="126"></rect>
+<rect fill="#70589B" height="16" width="16" x="228" y="142"></rect>
+<rect fill="#9381B4" height="16" width="16" x="228" y="158"></rect>
+<rect fill="#B6A9CC" height="16" width="16" x="228" y="174"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="244" y="30"></rect>
+<rect fill="#F4F1F8" height="16" width="16" x="244" y="46"></rect>
+<rect fill="#ECE8F2" height="16" width="16" x="244" y="62"></rect>
+<rect fill="#C9BFDA" height="16" width="16" x="244" y="78"></rect>
+<rect fill="#A697C1" height="16" width="16" x="244" y="94"></rect>
+<rect fill="#836EA8" height="16" width="16" x="244" y="110"></rect>
+<rect fill="#624791" height="16" width="16" x="244" y="126"></rect>
+<rect fill="#7760A0" height="16" width="16" x="244" y="142"></rect>
+<rect fill="#9886B7" height="16" width="16" x="244" y="158"></rect>
+<rect fill="#BAAECF" height="16" width="16" x="244" y="174"></rect>
+<path d="M20.0 128.6 L21.1 129.4 L22.3 130.3 L23.4 131.1 L24.6 131.9 L25.8 132.7 L26.9 133.4 L28.1 134.1 L29.2 134.8 L30.4 135.4 L31.5 136.0 L32.6 136.6 L33.8 137.1 L35.0 137.6 L36.1 138.0 L37.2 138.4 L38.4 138.7 L39.5 139.0 L40.7 139.3 L41.9 139.5 L43.0 139.7 L44.1 139.9 L45.3 139.9 L46.5 140.0 L47.6 140.0 L48.8 140.0 L49.9 139.9 L51.0 139.7 L52.2 139.6 L53.4 139.4 L54.5 139.1 L55.6 138.8 L56.8 138.5 L58.0 138.1 L59.1 137.6 L60.2 137.2 L61.4 136.7 L62.5 136.1 L63.7 135.5 L64.8 134.9 L66.0 134.3 L67.2 133.6 L68.3 132.8 L69.5 132.1 L70.6 131.3 L71.8 130.4 L72.9 129.6 L74.0 128.7 L75.2 127.8 L76.3 126.9 L77.5 125.9 L78.7 124.9 L79.8 123.9 L81.0 122.9 L82.1 121.8 L83.2 120.8 L84.4 119.7 L85.5 118.6 L86.7 117.5 L87.8 116.3 L89.0 115.2 L90.2 114.1 L91.3 112.9 L92.5 111.8 L93.6 110.6 L94.8 109.5 L95.9 108.3 L97.0 107.2 L98.2 106.1 L99.3 104.9 L100.5 103.8 L101.7 102.7 L102.8 101.6 L104.0 100.5 L105.1 99.4 L106.2 98.3 L107.4 97.3 L108.5 96.2 L109.7 95.2 L110.8 94.2 L112.0 93.3 L113.2 92.3 L114.3 91.4 L115.5 90.5 L116.6 89.7 L117.8 88.8 L118.9 88.0 L120.0 87.3 L121.2 86.5 L122.3 85.8 L123.5 85.2 L124.7 84.5 L125.8 84.0 L127.0 83.4 L128.1 82.9 L129.2 82.4 L130.4 82.0 L131.6 81.6 L132.7 81.2 L133.8 80.9 L135.0 80.7 L136.2 80.5 L137.3 80.3 L138.4 80.1 L139.6 80.1 L140.8 80.0 L141.9 80.0 L143.1 80.0 L144.2 80.1 L145.3 80.3 L146.5 80.4 L147.7 80.7 L148.8 80.9 L149.9 81.2 L151.1 81.6 L152.2 82.0 L153.4 82.4 L154.6 82.8 L155.7 83.4 L156.8 83.9 L158.0 84.5 L159.2 85.1 L160.3 85.8 L161.4 86.5 L162.6 87.2 L163.8 88.0 L164.9 88.8 L166.1 89.6 L167.2 90.4 L168.3 91.3 L169.5 92.2 L170.7 93.2 L171.8 94.2 L172.9 95.1 L174.1 96.2 L175.2 97.2 L176.4 98.2 L177.6 99.3 L178.7 100.4 L179.8 101.5 L181.0 102.6 L182.2 103.7 L183.3 104.8 L184.4 106.0 L185.6 107.1 L186.8 108.3 L187.9 109.4 L189.1 110.6 L190.2 111.7 L191.3 112.9 L192.5 114.0 L193.7 115.1 L194.8 116.3 L195.9 117.4 L197.1 118.5 L198.2 119.6 L199.4 120.7 L200.6 121.7 L201.7 122.8 L202.8 123.8 L204.0 124.8 L205.2 125.8 L206.3 126.8 L207.4 127.7 L208.6 128.6 L209.8 129.5 L210.9 130.4 L212.1 131.2 L213.2 132.0 L214.3 132.8 L215.5 133.5 L216.7 134.2 L217.8 134.9 L218.9 135.5 L220.1 136.1 L221.2 136.6 L222.4 137.1 L223.6 137.6 L224.7 138.0 L225.8 138.4 L227.0 138.8 L228.2 139.1 L229.3 139.3 L230.4 139.6 L231.6 139.7 L232.8 139.9 L233.9 140.0 L235.1 140.0 L236.2 140.0 L237.3 140.0 L238.5 139.9 L239.7 139.7 L240.8 139.6 L241.9 139.3 L243.1 139.1 L244.2 138.8 L245.4 138.4 L246.6 138.0 L247.7 137.6 L248.8 137.1 L250.0 136.6" fill="none" stroke="#fff" stroke-width="2.4"></path>
+<text fill="#AD1457" font-size="9.5" font-weight="700" x="20" y="20">distance à la courbe</text>
+<rect fill="#AD1457" height="10" width="12" x="160" y="10"></rect><text fill="#2B2F33" font-size="8.5" x="176" y="19">proche</text>
+<rect fill="#F4F1F8" height="10" stroke="#B5AEA5" width="12" x="212" y="10"></rect><text fill="#2B2F33" font-size="8.5" x="228" y="19">loin</text>
+</svg>
+<div>
+<div class="boite apres" style="margin-top:3mm"><span class="etiq">Contour.cs · 77–85</span>Func&lt;Point3d, double&gt; field = p =&gt;
+{
+    double d = double.MaxValue;
+    foreach (Curve c in curves)
+        if (c.ClosestPoint(p, out double t))
+            d = Math.Min(d, p.DistanceTo(c.PointAt(t)));
+    foreach (Point3d q in pts)
+        d = Math.Min(d, p.DistanceTo(q));
+    return d;
+};</div>
+<p style="font-size:8.4pt; margin-top:2mm">Un minimum de distances : chaque point du plan « appartient » à l'attracteur le plus proche. <code>double.MaxValue</code> sert de départ, comme <code>Vector3d.Zero</code> dans Flow.</p>
+</div>
+</div>
+<table class="aide" style="margin-top:5mm">
+<thead><tr><th>Champ</th><th>Signature</th><th>Ce qu'il rend</th><th>Dans Cuttlefish</th></tr></thead>
+<tbody>
+<tr><td><b>scalaire</b></td><td class="c">Func&lt;Point3d, double&gt;</td><td>un nombre : distance, altitude, densité</td><td>Contour:77</td></tr>
+<tr><td><b>de vecteurs</b></td><td class="c">Func&lt;Point3d, Vector3d&gt;</td><td>une direction et une force</td><td>Flow:73 (cours 09)</td></tr>
+<tr><td><b>de déplacements</b></td><td>écrit en ligne, sans Func</td><td>un vecteur appliqué au point lui-même</td><td>Attractor:81–101</td></tr>
+</tbody>
+</table>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Échantillonner, puis exploiter</span>
+    Contour remplit <code>v[i, j] = field(rows[i][j])</code> et note le minimum et le maximum. Il répartit ensuite ses niveaux entre les deux : <code>min + (max − min) · (l + 1) / (levels + 1)</code>. La suite, tracer les courbes où le champ vaut un niveau donné, est le cours 15.
+  </div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Accepter un seul type d'attracteur. Contour déclare une entrée <code>Geometry</code> générique, puis essaie <code>GH_Convert.ToCurve</code>, sinon <code>GH_Convert.ToPoint3d</code> (lignes 64–70) : courbes et points sont acceptés dans la même liste.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 14 · Grilles, attracteurs et champs</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 14</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Attractor.cs : un champ de déplacements</h2>
+<p style="max-width:165mm">Le cœur de <code>SolveInstance</code>, pour un point de la grille. Les points arrivent en arbre ; la boucle externe (lignes 61–75) parcourt les branches comme au cours 08.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l k1"><span class="n">77</span><span class="kw">foreach</span> (<span class="ty">GH_Point</span> ghPt <span class="kw">in</span> branch)<span class="rep r1">1</span></div>
+<div class="l"><span class="n">78</span>{</div>
+<div class="l k1"><span class="n">79</span> <span class="ty">Point3d</span> pt = ghPt.Value;</div>
+<div class="l k2"><span class="n">81</span> <span class="ty">Vector3d</span> valVec = <span class="ty">Vector3d</span>.Zero;<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">82</span> <span class="kw">int</span> compteur = 0;</div>
+<div class="l"><span class="n">84</span> <span class="kw">foreach</span> (<span class="kw">var</span> curve <span class="kw">in</span> curves)</div>
+<div class="l"><span class="n">85</span>  {</div>
+<div class="l k3"><span class="n">86</span> <span class="kw">if</span> (curve.ClosestPoint(pt, <span class="kw">out double</span> t, dA))<span class="rep r3">3</span></div>
+<div class="l"><span class="n">87</span>    {</div>
+<div class="l k4"><span class="n">88</span> <span class="ty">Point3d</span> closestPt = curve.PointAt(t);<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n">89</span> <span class="ty">Vector3d</span> vec = closestPt - pt;</div>
+<div class="l k5"><span class="n">91</span>      valVec += (vec * <span class="ty">Math</span>.Pow(<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n"> </span>          1 - <span class="ty">Math</span>.Pow(vec.Length / dA, 2), 2) * fA);</div>
+<div class="l k5"><span class="n">93</span>      compteur++;</div>
+<div class="l"><span class="n">94</span>    }</div>
+<div class="l"><span class="n">95</span>  }</div>
+<div class="l k6"><span class="n">96</span> <span class="kw">if</span> (compteur != 0)<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">97</span>  {</div>
+<div class="l k6"><span class="n">98</span>    valVec /= compteur;</div>
+<div class="l k6"><span class="n">100</span>  }</div>
+<div class="l k7"><span class="n">101</span>  result.Add(pt + valVec, path);<span class="rep r7">7</span></div>
+<div class="l"><span class="n">102</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Déballer</b>Un <code>GH_Point</code> de l'arbre, puis son <code>Point3d</code> (cours 08).</li>
+<li><span class="rep r2">2</span><b>Accumuler</b>Un déplacement nul et un compteur, pour faire la moyenne des courbes.</li>
+<li><span class="rep r3">3</span><b>Une distance maximale</b>Cette surcharge de <code>ClosestPoint</code> rend <code>false</code> au-delà de dA : la courbe est ignorée.</li>
+<li><span class="rep r4">4</span><b>Le vecteur vers la courbe</b>Point moins point : un déplacement (cours 09).</li>
+<li><span class="rep r5">5</span><b>Atténuer</b><code>vec.Length</code> est la distance d : on applique w(d) = (1 − (d/AD)²)², puis le facteur fA.</li>
+<li><span class="rep r6">6</span><b>Moyenne</b>Près de deux courbes, le point va vers un compromis, pas vers la somme des deux.</li>
+<li><span class="rep r7">7</span><b>Même adresse</b>Le point déplacé garde le chemin de sa branche : la grille garde sa structure.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Ce que la moyenne change</span>
+    Sans la division ligne 98, un point situé entre deux courbes serait tiré deux fois, et pourrait dépasser les deux. Avec elle, l'influence reste bornée par le facteur fA, quel que soit le nombre de courbes.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 14 · Grilles, attracteurs et champs</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 14</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">new GH_Path(p, i)</td><td>range la colonne i du rectangle p</td><td>CreateGrid:76</td></tr>
+<tr><td class="c">circle.PointAt(2π · j / n)</td><td>le j-ième de n points sur un cercle</td><td>CircularGrid:77</td></tr>
+<tr><td class="c">Math.Floor(x + 1e-9)</td><td>arrondi inférieur, à l'abri des miettes</td><td>CircularGrid:67</td></tr>
+<tr><td class="c">c.ClosestPoint(p, out t, dMax)</td><td>point le plus proche, ou false au-delà de dMax</td><td>Attractor:86</td></tr>
+<tr><td class="c">Math.Pow(1 - Math.Pow(d / D, 2), 2)</td><td>atténuation lisse de 1 à 0</td><td>Attractor:91</td></tr>
+<tr><td class="c">Func&lt;Point3d, double&gt;</td><td>un champ scalaire</td><td>Contour:77</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Champ</dt><dd>Une valeur, nombre ou vecteur, en chaque point du plan.</dd>
+<dt>Échantillonner</dt><dd>Évaluer un champ en un nombre fini de points.</dd>
+<dt>Attracteur</dt><dd>Une géométrie qui attire les points proches.</dd>
+<dt>Atténuation</dt><dd>La fonction qui fait décroître une influence avec la distance.</dd>
+<dt>Grille polaire</dt><dd>Des points rangés par anneaux autour d'un centre.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 36</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 14 · Grilles, attracteurs et champs</div>
+</section>
+</body>
+</html>

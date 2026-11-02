@@ -1,0 +1,160 @@
+/* Trame commune de la bibliothèque de cours : A4, en-tête, folio, encadrés, code repéré, QCM. */
+  @page { size: A4; margin: 0; }
+  :root {
+    --accent: #1F5F7A;      /* couleur du bloc B */
+    --accent-pale: #E6EFF2;
+    --ink: #2B2F33;
+    --muted: #6B7378;
+    --panel: #EFE9E1;       /* aplat beige derrière les illustrations */
+    --line: #D9D2C8;
+    --m1: #2E7D32; --m1p: #E8F3E8;   /* héritage */
+    --m2: #1565C0; --m2p: #E5EEF9;   /* constructeur */
+    --m3: #7B1FA2; --m3p: #F1E6F5;   /* entrées */
+    --m4: #E65100; --m4p: #FCEDE2;   /* lecture et garde */
+    --m5: #C62828; --m5p: #F9E5E5;   /* messages */
+    --m6: #00838F; --m6p: #E0F2F3;   /* sortie */
+    --m7: #6D4C41; --m7p: #EFE8E5;   /* identité */
+  }
+  * { box-sizing: border-box; font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font-family: "Inter", sans-serif; color: var(--ink); font-size: 9.6pt; line-height: 1.5; }
+  .page { width: 210mm; height: 297mm; padding: 14mm 16mm 16mm; position: relative; overflow: hidden; page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+
+  /* En-tête et pied identiques sur chaque page */
+  .entete { display: flex; justify-content: space-between; align-items: baseline; font-size: 7.6pt; color: var(--muted); letter-spacing: .02em; border-bottom: .3mm solid var(--accent); padding-bottom: 2mm; margin-bottom: 7mm; }
+  .entete b { color: var(--accent); font-weight: 600; }
+  .folio { position: absolute; left: 0; bottom: 0; width: 15mm; height: 13mm; background: var(--panel); color: var(--ink); font-weight: 700; font-size: 11pt; display: flex; align-items: center; justify-content: center; }
+  .pied { position: absolute; right: 16mm; bottom: 5mm; font-size: 7pt; color: var(--muted); }
+
+  /* Typographie */
+  .rubrique { font-size: 8.4pt; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin: 0 0 2mm; }
+  h1 { font-family: "Inter Display", "Inter", sans-serif; font-size: 30pt; line-height: 1.08; margin: 0 0 3mm; color: var(--accent); font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-family: "Inter Display", "Inter", sans-serif; font-size: 17pt; line-height: 1.15; margin: 0 0 4mm; font-weight: 650; }
+  h3 { font-size: 8.4pt; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin: 0 0 1.5mm; }
+  p { margin: 0 0 2.4mm; }
+  .chapeau { font-size: 12pt; line-height: 1.4; color: var(--ink); margin-bottom: 6mm; max-width: 150mm; }
+  code, .mono { font-family: "JetBrains Mono", monospace; font-size: .9em; }
+  /* Pas de ligatures : => et <= doivent se lire tels qu'on les tape */
+  code, .mono, .code, svg .mono { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  code { background: #F3F1EE; padding: .2mm 1mm; border-radius: .8mm; }
+
+  .meta { display: flex; gap: 3mm; margin-bottom: 8mm; flex-wrap: wrap; }
+  .pastille { font-size: 7.8pt; border: .25mm solid var(--line); border-radius: 10mm; padding: .8mm 3mm; color: var(--muted); }
+  .pastille b { color: var(--ink); font-weight: 600; }
+
+  .encadre { border-left: 1.2mm solid var(--accent); background: var(--accent-pale); padding: 3mm 4mm; margin: 3mm 0; }
+  .encadre.piege { border-color: var(--m4); background: var(--m4p); }
+  .encadre .titre { font-weight: 700; font-size: 8pt; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 1mm; display: block; }
+  .encadre.piege .titre { color: var(--m4); }
+  .encadre:not(.piege) .titre { color: var(--accent); }
+
+  .panneau { background: var(--panel); }
+  .deuxcol { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+  .objectifs { counter-reset: o; list-style: none; padding: 0; margin: 0; }
+  .objectifs li { counter-increment: o; position: relative; padding-left: 9mm; margin-bottom: 2.5mm; }
+  .objectifs li::before { content: counter(o); position: absolute; left: 0; top: -.3mm; width: 6mm; height: 6mm; border-radius: 50%; background: var(--accent); color: #fff; font-size: 8pt; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+  svg text { font-family: "Inter", sans-serif; }
+  svg .mono { font-family: "JetBrains Mono", monospace; }
+  .legende { font-size: 7.8pt; color: var(--muted); }
+
+  /* Page code : bandes colorées et repères numérotés */
+  .code-zone { display: grid; grid-template-columns: 112mm 1fr; gap: 5mm; align-items: start; }
+  .code { font-family: "JetBrains Mono", monospace; font-size: 7.3pt; line-height: 1.62; background: #FAF9F7; border: .25mm solid var(--line); padding: 3mm 0; }
+  .l { padding: 0 3mm 0 9mm; position: relative; white-space: pre; border-left: 1.1mm solid transparent; }
+  .l .n { position: absolute; left: 1.2mm; color: #B5AEA5; font-size: 6.4pt; }
+  .l.k1 { background: var(--m1p); border-color: var(--m1); }
+  .l.k2 { background: var(--m2p); border-color: var(--m2); }
+  .l.k3 { background: var(--m3p); border-color: var(--m3); }
+  .l.k4 { background: var(--m4p); border-color: var(--m4); }
+  .l.k5 { background: var(--m5p); border-color: var(--m5); }
+  .l.k6 { background: var(--m6p); border-color: var(--m6); }
+  .l.k7 { background: var(--m7p); border-color: var(--m7); }
+  .rep { display: inline-flex; width: 4.2mm; height: 4.2mm; border-radius: 50%; color: #fff; font-family: "Inter", sans-serif; font-weight: 700; font-size: 6.6pt; align-items: center; justify-content: center; vertical-align: middle; position: absolute; right: 2mm; top: .5mm; }
+  .r1 { background: var(--m1); } .r2 { background: var(--m2); } .r3 { background: var(--m3); } .r4 { background: var(--m4); } .r5 { background: var(--m5); } .r6 { background: var(--m6); } .r7 { background: var(--m7); }
+  .kw { color: #0B4F9C; } .ty { color: #2B7A78; } .st { color: #A3501B; } .cm { color: #8A8F93; font-style: italic; }
+  .notes { list-style: none; margin: 0; padding: 0; }
+  .notes li { position: relative; padding: 0 0 0 7mm; margin-bottom: 3.2mm; font-size: 8.4pt; line-height: 1.45; }
+  .notes li .rep { position: absolute; left: 0; top: .2mm; right: auto; }
+  .notes li b { display: block; font-size: 8.2pt; }
+
+  /* QCM */
+  .qcm { counter-reset: q; display: grid; grid-template-columns: 1fr 1fr; column-gap: 7mm; row-gap: 3.2mm; }
+  .q { counter-increment: q; border-top: .25mm solid var(--line); padding-top: 2mm; break-inside: avoid; }
+  .q .enonce { font-weight: 600; font-size: 8.5pt; margin-bottom: 1.2mm; line-height: 1.35; }
+  .q .enonce::before { content: counter(q, decimal-leading-zero) "  "; color: var(--accent); font-weight: 700; }
+  .q ul { list-style: none; margin: 0; padding: 0; font-size: 8.1pt; line-height: 1.38; }
+  .q li { padding-left: 6mm; position: relative; margin-bottom: .5mm; }
+  .q li::before { content: ""; position: absolute; left: 0; top: .9mm; width: 2.8mm; height: 2.8mm; border: .3mm solid var(--muted); border-radius: .6mm; }
+  .q li span { font-weight: 700; color: var(--muted); margin-right: 1mm; }
+  .q .tag { font-size: 6.8pt; color: var(--m2); font-weight: 600; letter-spacing: .04em; }
+
+  .corrige { display: grid; grid-template-columns: 1fr 1fr; column-gap: 7mm; row-gap: 2mm; font-size: 8pt; line-height: 1.4; }
+  .corrige div b { color: var(--accent); }
+  .glossaire { display: grid; grid-template-columns: 34mm 1fr; row-gap: 1.6mm; column-gap: 4mm; font-size: 8.2pt; }
+  .glossaire dt { font-family: "JetBrains Mono", monospace; font-size: 7.6pt; color: var(--accent); font-weight: 600; }
+  .glossaire dd { margin: 0; }
+
+  /* Une couleur par bloc */
+  body.bloc-a { --accent: #9C4A1A; --accent-pale: #F6ECE5; }
+  body.bloc-b { --accent: #1F5F7A; --accent-pale: #E6EFF2; }
+  body.bloc-c { --accent: #5B3F8C; --accent-pale: #EEE9F5; }
+  body.bloc-d { --accent: #2F6B3A; --accent-pale: #E7F0E8; }
+  body.bloc-e { --accent: #8A2E4B; --accent-pale: #F5E8EC; }
+  body.bloc-f { --accent: #7A5A12; --accent-pale: #F4EEDF; }
+  body.bloc-g { --accent: #3E5A6B; --accent-pale: #E8EEF1; }
+  body.bloc-h { --accent: #1F6E66; --accent-pale: #E4F0EE; }
+body.bloc-i { --accent: #5B4A8A; --accent-pale: #ECE8F4; }
+  body.bloc-j { --accent: #5E6B1F; --accent-pale: #EFF1E1; }
+  body.bloc-k { --accent: #3B5B92; --accent-pale: #E7ECF5; }
+  body.bloc-l { --accent: #A03A2C; --accent-pale: #F6E8E5; }
+  body.bloc-m { --accent: #8A4F7D; --accent-pale: #F3E8F1; }
+  body.bloc-n { --accent: #2A7A8C; --accent-pale: #E4F1F3; }
+  body.bloc-o { --accent: #B0476E; --accent-pale: #F7E9EF; }
+  body.bloc-p { --accent: #1D6FB8; --accent-pale: #E6F0FA; }
+  body.bloc-q { --accent: #4F46B8; --accent-pale: #ECEBFA; }
+  body.bloc-r { --accent: #A85F1E; --accent-pale: #F8EDE2; }
+  body.bloc-s { --accent: #C2410C; --accent-pale: #FCEDE5; }
+  body.bloc-t { --accent: #8A6A0E; --accent-pale: #F7F0DD; }
+  body.bloc-u { --accent: #4A4A68; --accent-pale: #ECECF2; }
+  body.bloc-v { --accent: #1E2A44; --accent-pale: #E8EBF2; }
+  body.bloc-w { --accent: #6B2C7A; --accent-pale: #F1E9F3; }
+  body.bloc-x { --accent: #5D4037; --accent-pale: #EFEBE9; }
+  body.bloc-y { --accent: #00695C; --accent-pale: #E0F2F1; }
+  body.bloc-z { --accent: #AD1457; --accent-pale: #FCE4EC; }
+  body.bloc-aa { --accent: #0E7490; --accent-pale: #E0F4F8; }
+
+  /* Parties (rangement du 01/11/2026) */
+  body.partie-1 { --accent: #6B2C7A; --accent-pale: #F1E9F3; }
+  body.partie-2 { --accent: #5D4037; --accent-pale: #EFEBE9; }
+  body.partie-3 { --accent: #1F5F7A; --accent-pale: #E6EFF2; }
+  body.partie-4 { --accent: #00695C; --accent-pale: #E0F2F1; }
+  body.partie-5 { --accent: #AD1457; --accent-pale: #FCE4EC; }
+  body.partie-6 { --accent: #2F6B3A; --accent-pale: #E7F0E8; }
+  body.partie-7 { --accent: #1D6FB8; --accent-pale: #E6F0FA; }
+  body.partie-8 { --accent: #7A5A12; --accent-pale: #F4EEDF; }
+  body.partie-9 { --accent: #A03A2C; --accent-pale: #F6E8E5; }
+  body.partie-10 { --accent: #4A4A68; --accent-pale: #ECECF2; }
+  body.partie-11 { --accent: #4F46B8; --accent-pale: #ECEBFA; }
+  body.partie-12 { --accent: #C2410C; --accent-pale: #FCEDE5; }
+
+  /* Paires avant / après (cours de syntaxe) */
+  .paire { display: grid; grid-template-columns: 30mm 1fr 1fr; gap: 3mm; padding: 3mm 0; border-top: .25mm solid var(--line); align-items: start; }
+  .paire .nom { font-weight: 700; font-size: 8.8pt; line-height: 1.25; }
+  .paire .nom .rep { position: static; margin-bottom: 1.2mm; }
+  .paire .ver { display: inline-block; font-size: 6.8pt; font-weight: 700; letter-spacing: .05em; color: #fff; background: var(--accent); border-radius: 1mm; padding: .2mm 1.4mm; margin-top: 1.2mm; }
+  .paire .src { display: block; font-weight: 400; font-size: 6.8pt; color: var(--muted); margin-top: 1mm; font-family: "JetBrains Mono", monospace; }
+  .boite { font-family: "JetBrains Mono", monospace; font-variant-ligatures: none; font-size: 7.1pt; line-height: 1.55; white-space: pre; padding: 2mm 2.5mm; border-radius: 1mm; position: relative; }
+  .boite.avant { background: #F3F1EE; color: #5E6468; }
+  .boite.apres { background: #FFFFFF; border: .3mm solid var(--accent); color: var(--ink); }
+  .boite .etiq { position: absolute; top: -2.3mm; left: 2mm; font-family: "Inter", sans-serif; font-size: 6.2pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; background: #fff; padding: 0 1mm; color: var(--muted); }
+  .boite.apres .etiq { color: var(--accent); }
+  .hl { border-radius: .6mm; padding: 0 .4mm; }
+  .boite.avant .hl { background: #E9D9CF; color: #7A3B14; text-decoration: line-through; text-decoration-color: rgba(122,59,20,.45); }
+  .boite.apres .hl { background: #FFE7B3; color: #2B2F33; font-weight: 600; }
+  .aide { width: 100%; border-collapse: collapse; font-size: 7.6pt; }
+  .aide th { text-align: left; font-size: 6.8pt; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: .3mm solid var(--accent); padding: 1mm 1.5mm; }
+  .aide td { border-bottom: .2mm solid var(--line); padding: 1.1mm 1.5mm; vertical-align: top; }
+  .aide td.c { font-family: "JetBrains Mono", monospace; font-variant-ligatures: none; font-size: 7pt; }
+  .oui { color: var(--m1); font-weight: 700; } .non { color: var(--m5); font-weight: 700; }

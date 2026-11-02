@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>13 · Le hasard reproductible</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-5">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 13</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Le hasard<br/>reproductible</h1>
+<p class="chapeau">Pourquoi Maze, Truchet ou Hatch redonnent exactement le même motif avec la même graine, et comment un tirage mal placé casse cette promesse.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>03</b> collections · <b>11</b> cycle de vie</span>
+<span class="pastille">Exemples · <b>Wander</b>, <b>Dune</b>, <b>Hatch</b>, <b>Truchet</b>, <b>Worm</b></span>
+</div>
+<div class="panneau" style="padding:6mm 6mm 4mm; margin-bottom:6mm;">
+<svg viewbox="0 0 600 230" width="100%">
+<defs><marker id="a1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#2B2F33"></path></marker></defs>
+<!-- trois lignes -->
+<g font-size="10.5" font-weight="700">
+<rect fill="#FCE4EC" height="34" rx="6" stroke="#AD1457" width="120" x="10" y="20"></rect><text class="mono" fill="#AD1457" style="font-size:10.5px" text-anchor="middle" x="70" y="42">new Random(42)</text>
+<rect fill="#FCE4EC" height="34" rx="6" stroke="#AD1457" width="120" x="10" y="80"></rect><text class="mono" fill="#AD1457" style="font-size:10.5px" text-anchor="middle" x="70" y="102">new Random(42)</text>
+<rect fill="#fff" height="34" rx="6" stroke="#C62828" width="120" x="10" y="140"></rect><text class="mono" fill="#C62828" style="font-size:10.5px" text-anchor="middle" x="70" y="162">new Random()</text>
+</g>
+<g stroke="#2B2F33" stroke-width="1.4"><path d="M130 37 H 156" marker-end="url(#a1)"></path><path d="M130 97 H 156" marker-end="url(#a1)"></path><path d="M130 157 H 156" marker-end="url(#a1)"></path></g>
+<!-- suites -->
+<g fill="#fff" stroke="#AD1457">
+<rect height="30" rx="4" width="56" x="160" y="22"></rect><rect height="30" rx="4" width="56" x="222" y="22"></rect><rect height="30" rx="4" width="56" x="284" y="22"></rect><rect height="30" rx="4" width="56" x="346" y="22"></rect>
+<rect height="30" rx="4" width="56" x="160" y="82"></rect><rect height="30" rx="4" width="56" x="222" y="82"></rect><rect height="30" rx="4" width="56" x="284" y="82"></rect><rect height="30" rx="4" width="56" x="346" y="82"></rect>
+</g>
+<g fill="#fff" stroke="#C62828" stroke-dasharray="4 3">
+<rect height="30" rx="4" width="56" x="160" y="142"></rect><rect height="30" rx="4" width="56" x="222" y="142"></rect><rect height="30" rx="4" width="56" x="284" y="142"></rect><rect height="30" rx="4" width="56" x="346" y="142"></rect>
+</g>
+<g fill="#2B2F33" text-anchor="middle">
+<text class="mono" style="font-size:11px" x="188" y="42">a</text><text class="mono" style="font-size:11px" x="250" y="42">b</text><text class="mono" style="font-size:11px" x="312" y="42">c</text><text class="mono" style="font-size:11px" x="374" y="42">d</text>
+<text class="mono" style="font-size:11px" x="188" y="102">a</text><text class="mono" style="font-size:11px" x="250" y="102">b</text><text class="mono" style="font-size:11px" x="312" y="102">c</text><text class="mono" style="font-size:11px" x="374" y="102">d</text>
+<text class="mono" fill="#C62828" style="font-size:11px" x="188" y="162">?</text><text class="mono" fill="#C62828" style="font-size:11px" x="250" y="162">?</text><text class="mono" fill="#C62828" style="font-size:11px" x="312" y="162">?</text><text class="mono" fill="#C62828" style="font-size:11px" x="374" y="162">?</text>
+</g>
+<text fill="#6B7378" font-size="12" x="410" y="42">…</text><text fill="#6B7378" font-size="12" x="410" y="102">…</text><text fill="#6B7378" font-size="12" x="410" y="162">…</text>
+<!-- accolade et verdict -->
+<path d="M432 22 q 8 0 8 8 v 74 q 0 8 -8 8" fill="none" stroke="#2E7D32" stroke-width="1.6"></path>
+<text fill="#2E7D32" font-size="10.5" font-weight="700" x="450" y="62">même graine,</text>
+<text fill="#2E7D32" font-size="10.5" font-weight="700" x="450" y="77">même suite</text>
+<text fill="#2B2F33" font-size="9" x="450" y="94">aujourd'hui, demain,</text>
+<text fill="#2B2F33" font-size="9" x="450" y="106">chez un collègue</text>
+<text fill="#C62828" font-size="10.5" font-weight="700" x="450" y="154">graine tirée</text>
+<text fill="#C62828" font-size="10.5" font-weight="700" x="450" y="169">de l'horloge</text>
+<text fill="#2B2F33" font-size="9" x="450" y="184">change à chaque calcul</text>
+<text fill="#2B2F33" font-size="11" text-anchor="middle" x="300" y="218">Le « hasard » d'un ordinateur est une <tspan font-weight="700">suite calculée</tspan> : la graine choisit seulement où elle commence.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un générateur <b>pseudo-aléatoire</b> produit une suite de nombres entièrement déterminée par sa <b>graine</b> : même graine, même suite, donc même motif, tant que le code tire ses nombres dans le même ordre.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Un livre rempli de nombres au hasard. La graine est la page où tu commences à lire. Deux personnes qui ouvrent à la même page lisent les mêmes nombres ; si l'une saute une ligne, tout le reste se décale.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>expliquer pourquoi <code>new Random(seed)</code> est reproductible et <code>new Random()</code> ne l'est pas ;</li>
+<li>transformer un tirage en angle, en décalage, en choix dans une liste, en pile ou face ;</li>
+<li>repérer un tirage mal placé ou une borne oubliée, comme dans Dune.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">À retenir</span>
+    Dans Grasshopper, un composant est recalculé souvent (cours 11). Sans graine fixe, le motif <b>change à chaque recalcul</b>, même quand rien n'a bougé : impossible de retrouver le dessin qu'on aimait. C'est pourquoi Cuttlefish expose une entrée <b>Seed</b>.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 13 · Le hasard reproductible</div>
+</section>
+<!-- ============ PAGE 2 · COMMENT ÇA MARCHE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 13</b></div>
+<p class="rubrique">Schéma 1 · Le mécanisme</p>
+<h2>Un état, une formule, un nombre</h2>
+<p style="max-width:165mm">Le générateur garde un <b>état</b> caché. À chaque tirage, une formule fixe calcule l'état suivant, et en tire un nombre. Voici un générateur jouet, minuscule, pour voir le principe : <code>x ← (5 · x + 3) mod 16</code>, graine 7.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 170" width="100%">
+<defs><marker id="b1" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" fill="#AD1457"></path></marker></defs>
+<rect fill="#EFE9E1" height="170" width="600" x="0" y="0"></rect>
+<g>
+<circle cx="50" cy="60" fill="#AD1457" r="24"></circle><text class="mono" fill="#fff" font-weight="700" style="font-size:14px" text-anchor="middle" x="50" y="65">7</text>
+<circle cx="140" cy="60" fill="#fff" r="24" stroke="#AD1457" stroke-width="2"></circle><text class="mono" font-weight="700" style="font-size:14px" text-anchor="middle" x="140" y="65">6</text>
+<circle cx="230" cy="60" fill="#fff" r="24" stroke="#AD1457" stroke-width="2"></circle><text class="mono" font-weight="700" style="font-size:14px" text-anchor="middle" x="230" y="65">1</text>
+<circle cx="320" cy="60" fill="#fff" r="24" stroke="#AD1457" stroke-width="2"></circle><text class="mono" font-weight="700" style="font-size:14px" text-anchor="middle" x="320" y="65">8</text>
+<circle cx="410" cy="60" fill="#fff" r="24" stroke="#AD1457" stroke-width="2"></circle><text class="mono" font-weight="700" style="font-size:14px" text-anchor="middle" x="410" y="65">11</text>
+<circle cx="500" cy="60" fill="#fff" r="24" stroke="#AD1457" stroke-width="2"></circle><text class="mono" font-weight="700" style="font-size:14px" text-anchor="middle" x="500" y="65">10</text>
+</g>
+<g stroke="#AD1457" stroke-width="1.6"><path d="M74 60 H 112" marker-end="url(#b1)"></path><path d="M164 60 H 202" marker-end="url(#b1)"></path><path d="M254 60 H 292" marker-end="url(#b1)"></path><path d="M344 60 H 382" marker-end="url(#b1)"></path><path d="M434 60 H 472" marker-end="url(#b1)"></path></g>
+<text fill="#6B7378" font-size="14" x="540" y="65">…</text>
+<text fill="#AD1457" font-size="9.5" font-weight="700" text-anchor="middle" x="50" y="104">graine</text>
+<g class="mono" fill="#6B7378" font-size="9" text-anchor="middle">
+<text class="mono" style="font-size:8.5px" x="93" y="42">38 mod 16</text><text class="mono" style="font-size:8.5px" x="183" y="42">33 mod 16</text><text class="mono" style="font-size:8.5px" x="273" y="42">8 mod 16</text><text class="mono" style="font-size:8.5px" x="363" y="42">43 mod 16</text><text class="mono" style="font-size:8.5px" x="453" y="42">58 mod 16</text>
+</g>
+<g fill="#2B2F33" font-size="9.5" text-anchor="middle">
+<text x="140" y="104">tirage 1</text><text x="230" y="104">tirage 2</text><text x="320" y="104">tirage 3</text><text x="410" y="104">tirage 4</text><text x="500" y="104">tirage 5</text>
+</g>
+<text fill="#2B2F33" font-size="10" x="20" y="140">Rien d'aléatoire : avec la graine 7, le tirage 3 vaudra <tspan font-weight="700">toujours</tspan> 8. Divisé par 16, il devient un réel entre 0 et 1 : 0,5.</text>
+<text fill="#6B7378" font-size="9.5" x="20" y="158">Le Random de .NET suit une autre formule, bien plus longue à se répéter, mais exactement le même principe.</text>
+</svg>
+<h3 style="margin-top:5mm">Les trois méthodes de System.Random</h3>
+<table class="aide" style="margin-top:2mm">
+<thead><tr><th>Appel</th><th>Ce qu'il rend</th><th>Dans Cuttlefish</th></tr></thead>
+<tbody>
+<tr><td class="c">rand.NextDouble()</td><td>un réel dans [0 ; 1[ : 0 possible, 1 jamais</td><td>Hatch (angles), Blur (décalages)</td></tr>
+<tr><td class="c">rand.Next(n)</td><td>un entier dans [0 ; n[ : de 0 à n − 1</td><td>Maze (voisin), Truchet (pile ou face)</td></tr>
+<tr><td class="c">rand.Next(min, max)</td><td>un entier dans [min ; max[ : <b>max exclu</b></td><td>Wander, Dune</td></tr>
+</tbody>
+</table>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Pourquoi la borne haute est exclue</span>
+    Pour que <code>list[rand.Next(list.Count)]</code> soit toujours un indice valide : avec 4 éléments, on tire 0, 1, 2 ou 3, jamais 4. C'est la même convention que les indices et les boucles <code>for (i = 0; i &lt; n; i++)</code>.
+  </div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Créer <code>new Random(seed)</code> <b>dans</b> une boucle. Chaque tour repart de la même graine et tire le même premier nombre : toutes les cellules reçoivent le même angle. On crée le générateur <b>une fois</b>, avant la boucle, comme Hatch ligne 62.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 13 · Le hasard reproductible</div>
+</section>
+<!-- ============ PAGE 3 · L'ORDRE DES TIRAGES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 13</b></div>
+<p class="rubrique">Schéma 2 · L'ordre des tirages</p>
+<h2>Un tirage en plus ou en moins décale tout le reste</h2>
+<p style="max-width:165mm">La graine fixe la suite, pas l'usage qu'on en fait. Si le nombre de tirages dépend des données, le même Seed peut donner un motif différent dès qu'une donnée change. Hatch, ligne 70 : « Un angle par cellule, tiré même si la cellule est ignorée, pour que le Seed reste stable. »</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 250" width="100%">
+<rect fill="#EFE9E1" height="250" width="292" x="0" y="0"></rect><rect fill="#EFE9E1" height="250" width="292" x="308" y="0"></rect>
+<text fill="#C62828" font-size="11.5" font-weight="700" x="14" y="24">Tirer seulement si la cellule est valide</text>
+<text fill="#2E7D32" font-size="11.5" font-weight="700" x="322" y="24">Tirer pour chaque cellule (Hatch)</text>
+<g fill="#6B7378" font-size="9.5"><text x="14" y="44">suite : a b c d…</text><text x="322" y="44">suite : a b c d…</text></g>
+<!-- gauche, cas 1 -->
+<text fill="#2B2F33" font-size="9.5" font-weight="700" x="14" y="72">lundi : la cellule 2 est ouverte</text>
+<g font-size="9" text-anchor="middle">
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="14" y="80"></rect><text x="44" y="96">cellule 1</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="44" y="112">a</text>
+<rect fill="#F3F1EE" height="40" rx="4" stroke="#B5AEA5" stroke-dasharray="3 3" width="60" x="82" y="80"></rect><text fill="#6B7378" x="112" y="96">cellule 2</text><text fill="#6B7378" x="112" y="112">ignorée</text>
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="150" y="80"></rect><text x="180" y="96">cellule 3</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="180" y="112">b</text>
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="218" y="80"></rect><text x="248" y="96">cellule 4</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="248" y="112">c</text>
+</g>
+<text fill="#2B2F33" font-size="9.5" font-weight="700" x="14" y="152">mardi : tu la refermes</text>
+<g font-size="9" text-anchor="middle">
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="14" y="160"></rect><text x="44" y="176">cellule 1</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="44" y="192">a</text>
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="82" y="160"></rect><text x="112" y="176">cellule 2</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="112" y="192">b</text>
+<rect fill="#FCE4E4" height="40" rx="4" stroke="#C62828" width="60" x="150" y="160"></rect><text x="180" y="176">cellule 3</text><text class="mono" fill="#C62828" font-weight="700" style="font-size:10px" x="180" y="192">c</text>
+<rect fill="#FCE4E4" height="40" rx="4" stroke="#C62828" width="60" x="218" y="160"></rect><text x="248" y="176">cellule 4</text><text class="mono" fill="#C62828" font-weight="700" style="font-size:10px" x="248" y="192">d</text>
+</g>
+<text fill="#C62828" font-size="9.5" x="14" y="228">Les cellules 3 et 4 changent d'angle,</text>
+<text fill="#C62828" font-size="9.5" x="14" y="242">alors que tu n'y as pas touché.</text>
+<!-- droite -->
+<text fill="#2B2F33" font-size="9.5" font-weight="700" x="322" y="72">lundi : la cellule 2 est ouverte</text>
+<g font-size="9" text-anchor="middle">
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="322" y="80"></rect><text x="352" y="96">cellule 1</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="352" y="112">a</text>
+<rect fill="#F3F1EE" height="40" rx="4" stroke="#B5AEA5" stroke-dasharray="3 3" width="60" x="390" y="80"></rect><text fill="#6B7378" x="420" y="96">ignorée</text><text class="mono" fill="#6B7378" style="font-size:10px" x="420" y="112">b perdu</text>
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="458" y="80"></rect><text x="488" y="96">cellule 3</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="488" y="112">c</text>
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="526" y="80"></rect><text x="556" y="96">cellule 4</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="556" y="112">d</text>
+</g>
+<text fill="#2B2F33" font-size="9.5" font-weight="700" x="322" y="152">mardi : tu la refermes</text>
+<g font-size="9" text-anchor="middle">
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="322" y="160"></rect><text x="352" y="176">cellule 1</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="352" y="192">a</text>
+<rect fill="#fff" height="40" rx="4" stroke="#2B2F33" width="60" x="390" y="160"></rect><text x="420" y="176">cellule 2</text><text class="mono" fill="#AD1457" font-weight="700" style="font-size:10px" x="420" y="192">b</text>
+<rect fill="#E8F3E8" height="40" rx="4" stroke="#2E7D32" width="60" x="458" y="160"></rect><text x="488" y="176">cellule 3</text><text class="mono" fill="#2E7D32" font-weight="700" style="font-size:10px" x="488" y="192">c</text>
+<rect fill="#E8F3E8" height="40" rx="4" stroke="#2E7D32" width="60" x="526" y="160"></rect><text x="556" y="176">cellule 4</text><text class="mono" fill="#2E7D32" font-weight="700" style="font-size:10px" x="556" y="192">d</text>
+</g>
+<text fill="#2E7D32" font-size="9.5" x="322" y="228">Chaque cellule garde son angle :</text>
+<text fill="#2E7D32" font-size="9.5" x="322" y="242">le tirage est lié à sa place, pas à sa validité.</text>
+</svg>
+<div class="boite apres" style="margin-top:5mm"><span class="etiq">Hatch.cs · 67–79</span>for (int c = 0; c &lt; cells.Count; c++)
+{
+    Curve cell = cells[c];
+    // Un angle par cellule, tiré même si la cellule est ignorée, pour que le Seed reste stable.
+    double angle = rand.NextDouble() * Math.PI;
+    …
+    if (cell == null || !cell.IsClosed || !cell.TryGetPlane(out Plane plane, tolerance))
+    { lost++; continue; }</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Tirer dans l'ordre d'un parcours qui dépend des données, comme une boucle <code>while</code> qui s'arrête plus ou moins tôt. Le motif reste reproductible pour <b>ces</b> données, mais un petit changement en amont peut tout redistribuer. Ce n'est pas une erreur, c'est un choix : il faut le faire en connaissance de cause.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 13 · Le hasard reproductible</div>
+</section>
+<!-- ============ PAGE 4 · TRANSFORMER UN TIRAGE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 13</b></div>
+<p class="rubrique">Schéma 3 · Transformer un tirage</p>
+<h2>Du nombre brut à la décision de dessin</h2>
+<p style="max-width:165mm">Le générateur ne rend que des nombres uniformes. Toute la variété des motifs vient de la façon de les <b>transformer</b>. Cinq recettes couvrent tout Cuttlefish.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 300" width="100%">
+<g>
+<rect fill="#EFE9E1" height="54" width="600" x="0" y="0"></rect><rect fill="#EFE9E1" height="54" width="600" x="0" y="60"></rect><rect fill="#EFE9E1" height="54" width="600" x="0" y="120"></rect><rect fill="#EFE9E1" height="54" width="600" x="0" y="180"></rect><rect fill="#EFE9E1" height="54" width="600" x="0" y="240"></rect>
+</g>
+<g fill="#AD1457" font-size="11" font-weight="700"><text x="14" y="24">Un angle</text><text x="14" y="84">Un décalage centré</text><text x="14" y="144">Pile ou face</text><text x="14" y="204">Un choix pondéré</text><text x="14" y="264">Un mélange</text></g>
+<g fill="#6B7378" font-size="9"><text x="14" y="40">Hatch:71</text><text x="14" y="100">Blur:116</text><text x="14" y="160">Truchet:70</text><text x="14" y="220">Wander:76</text><text x="14" y="280">Worm:135</text></g>
+<g fill="#2B2F33">
+<text class="mono" style="font-size:10px" x="150" y="31">rand.NextDouble() * Math.PI</text>
+<text class="mono" style="font-size:10px" x="150" y="91">(rand.NextDouble() - 0.5) * x</text>
+<text class="mono" style="font-size:10px" x="150" y="151">rand.Next(2) == 1</text>
+<text class="mono" style="font-size:10px" x="150" y="211">ids[rand.Next(0, ids.Count)]</text>
+<text class="mono" style="font-size:10px" x="150" y="271">Shuffle(list, rand)</text>
+</g>
+<g fill="#2B2F33" font-size="9.5">
+<text x="380" y="24">[0 ; π[ : toutes les directions,</text><text x="380" y="38">un demi-tour suffit pour une ligne</text>
+<text x="380" y="84">[−x/2 ; x/2[ : on bouge autant</text><text x="380" y="98">d'un côté que de l'autre</text>
+<text x="380" y="144">0 ou 1, une chance sur deux :</text><text x="380" y="158">la tuile est tournée ou non</text>
+<text x="380" y="204">ids = { −1, 0, 0, 1 } : rester (0)</text><text x="380" y="218">est deux fois plus probable</text>
+<text x="380" y="264">Fisher-Yates : chaque ordre</text><text x="380" y="278">a la même chance</text>
+</g>
+<!-- mini dessins -->
+<g fill="none" stroke="#AD1457" stroke-width="1.6">
+<line x1="344" x2="370" y1="38" y2="16"></line>
+<line stroke="#B5AEA5" x1="340" x2="372" y1="87" y2="87"></line><circle cx="356" cy="87" fill="#B5AEA5" r="2" stroke="none"></circle><circle cx="364" cy="82" fill="#AD1457" r="3.5" stroke="none"></circle>
+<rect height="24" width="24" x="344" y="132"></rect><path d="M344 144 A 12 12 0 0 0 356 132"></path><path d="M368 144 A 12 12 0 0 0 356 156"></path>
+</g>
+</svg>
+<div class="encadre piege" style="margin-top:5mm">
+<span class="titre">Piège réel · Dune.cs, ligne 63</span>
+<code>int offset = ids[rand.Next(0, ids.Count - 1)];</code> avec <code>ids = { -1, 0, 0, 1 }</code>. La borne haute étant exclue, <code>Next(0, 3)</code> rend 0, 1 ou 2 : l'indice 3, donc le décalage <b>+1</b>, n'est <b>jamais</b> tiré. La dune n'emprunte jamais un point de la rangée suivante. Wander, son successeur, écrit <code>rand.Next(0, ids.Count)</code> et borne la rangée avec <code>Math.Max</code> et <code>Math.Min</code>.
+  </div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">Dune n'a pas non plus de graine</span>
+<code>new Random()</code> ligne 55 : le dessin change à chaque recalcul. GridGenerator fait de même dans <code>BlurPoint</code>. Wander, Worm, Truchet, Maze, Hatch et Blur exposent une entrée Seed, de défaut 0.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 13 · Le hasard reproductible</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 13</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Wander.cs : errer, mais toujours de la même façon</h2>
+<p style="max-width:165mm">Wander trace une polyligne par rangée de points ; à chaque point, elle peut emprunter celui de la rangée voisine. L'entrée Seed a été ajoutée après coup (commit 67ef7eb, « entrée Seed sur Worm et Wander »).</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l k1"><span class="n">52</span><span class="kw">int</span> seed = 0;<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n">53</span>DA.GetData(2, <span class="kw">ref</span> seed);</div>
+<div class="l"><span class="n"> </span><span class="cm">// … rangées de points, lignes 55–57</span></div>
+<div class="l k2"><span class="n">59</span><span class="ty">List</span>&lt;<span class="kw">int</span>&gt; ids = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="kw">int</span>&gt; { -1, 0, 0, 1 };<span class="rep r2">2</span></div>
+<div class="l"><span class="n">60</span><span class="ty">List</span>&lt;<span class="ty">Curve</span>&gt; curves = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Curve</span>&gt;();</div>
+<div class="l k3"><span class="n">61</span><span class="ty">Random</span> rand = <span class="kw">new</span> <span class="ty">Random</span>(seed);<span class="rep r3">3</span></div>
+<div class="l"><span class="n"> </span></div>
+<div class="l"><span class="n">65</span><span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt; rows.Count; i++)</div>
+<div class="l"><span class="n">66</span>{</div>
+<div class="l"><span class="n"> </span> <span class="cm">// … rangée de moins de 2 points : Warning, continue</span></div>
+<div class="l"><span class="n">73</span> <span class="ty">List</span>&lt;<span class="ty">Point3d</span>&gt; pointList = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Point3d</span>&gt;();</div>
+<div class="l"><span class="n">74</span> <span class="kw">for</span> (<span class="kw">int</span> j = 0; j &lt; rows[i].Count; j++)</div>
+<div class="l"><span class="n">75</span>  {</div>
+<div class="l k4"><span class="n">76</span> <span class="kw">int</span> offset = ids[rand.Next(0, ids.Count)];<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">77</span> <span class="kw">int</span> row = <span class="ty">Math</span>.Max(0,<span class="rep r5">5</span></div>
+<div class="l k5"><span class="n"> </span> <span class="ty">Math</span>.Min(rows.Count - 1, i + offset));</div>
+<div class="l k6"><span class="n">80</span> <span class="kw">if</span> (j &gt;= rows[row].Count)<span class="rep r6">6</span></div>
+<div class="l k6"><span class="n">81</span>    {</div>
+<div class="l k6"><span class="n">82</span>      row = i;</div>
+<div class="l k6"><span class="n">83</span>      shortNeighbour = <span class="kw">true</span>;</div>
+<div class="l k6"><span class="n">84</span>    }</div>
+<div class="l"><span class="n">85</span>    pointList.Add(rows[row][j]);</div>
+<div class="l"><span class="n">86</span>  }</div>
+<div class="l k7"><span class="n">88</span> <span class="ty">Polyline</span> poly = <span class="kw">new</span> <span class="ty">Polyline</span>(pointList);<span class="rep r7">7</span></div>
+<div class="l"><span class="n"> </span> <span class="cm">// … segments trop courts, congé, ajout (cours 10)</span></div>
+<div class="l"><span class="n">95</span>}</div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>La graine vient du canvas</b>Une entrée entière, 0 par défaut : l'utilisateur essaie 1, 2, 3… et garde celle qui lui plaît.</li>
+<li><span class="rep r2">2</span><b>Une urne</b>Quatre boules, dont deux « 0 » : rester sur sa rangée a une chance sur deux, monter ou descendre une sur quatre.</li>
+<li><span class="rep r3">3</span><b>Un seul générateur</b>Créé avant les boucles ; chaque tirage avance la même suite.</li>
+<li><span class="rep r4">4</span><b>Tirer une boule</b>Borne haute exclue : 0 à 3, les quatre indices.</li>
+<li><span class="rep r5">5</span><b>Rester dans les bornes</b>La première rangée ne peut pas descendre, la dernière ne peut pas monter.</li>
+<li><span class="rep r6">6</span><b>Voisin trop court</b>On reste sur sa rangée, et un Remark le dira après la boucle.</li>
+<li><span class="rep r7">7</span><b>Le tracé</b>La liste devient une polyligne, puis une courbe à congés.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:5mm">
+<span class="titre">Un détail qui compte</span>
+    Repère <b style="color:var(--m4)">4</b> : le tirage a lieu <b>avant</b> le test du voisin trop court, à chaque point. Le nombre de tirages ne dépend donc que du nombre de points de chaque rangée, comme dans Hatch : déplacer des points ne redistribue pas le hasard ; en ajouter ou en retirer, si.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 13 · Le hasard reproductible</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5A</b> · Le hasard et les motifs</span><b>Cours 13</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">new Random(seed)</td><td>générateur reproductible, créé une fois</td><td>Wander:61, Hatch:62</td></tr>
+<tr><td class="c">rand.NextDouble() * k</td><td>réel dans [0 ; k[</td><td>Hatch:71</td></tr>
+<tr><td class="c">(rand.NextDouble() - 0.5) * k</td><td>réel centré dans [−k/2 ; k/2[</td><td>Blur:116</td></tr>
+<tr><td class="c">rand.Next(2) == 1</td><td>pile ou face</td><td>Truchet:70</td></tr>
+<tr><td class="c">list[rand.Next(list.Count)]</td><td>un élément au hasard</td><td>Maze:84</td></tr>
+<tr><td class="c">Math.Max(0, Math.Min(n - 1, i))</td><td>borne un indice dans [0 ; n − 1]</td><td>Wander:77</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Pseudo-aléatoire</dt><dd>Une suite calculée qui a l'air aléatoire.</dd>
+<dt>Graine (seed)</dt><dd>La valeur de départ qui fixe toute la suite.</dd>
+<dt>Borne exclue</dt><dd>La valeur maximale que le tirage n'atteint jamais.</dd>
+<dt>Tirage pondéré</dt><dd>Un choix où certaines issues sont plus probables que d'autres.</dd>
+<dt>Fisher-Yates</dt><dd>Le mélange équitable d'une liste, utilisé par Worm.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 145</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 13 · Le hasard reproductible</div>
+</section>
+</body>
+</html>

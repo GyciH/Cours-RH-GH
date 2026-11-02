@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>142 · Delaunay et Voronoi</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 142</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Delaunay et Voronoi</h1>
+<p class="chapeau">Un nuage de points se relie en triangles d'innombrables façons. Une seule, à quelques égalités près, évite au mieux les triangles en aiguille : celle de Delaunay. Et elle porte en elle le diagramme de Voronoi, qui en est l'exact envers. Cuttlefish dessine les deux.</p>
+<div class="meta">
+<span class="pastille"><b>45 min</b> de lecture et de QCM</span>
+<span class="pastille">Prérequis · <b>139</b>, <b>141</b></span>
+<span class="pastille">Exemples · <b>Cuttlefish</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 232" width="100%">
+<polygon fill="#E0F2F1" fill-opacity="1" points="50.0,82.0 130.0,12.0 210.0,82.0" stroke="#00695C" stroke-width="1.1"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="50.0,82.0 210.0,82.0 130.0,142.0" stroke="#00695C" stroke-width="1.1"></polygon>
+<circle cx="130.0" cy="92.7" fill="none" r="80.7" stroke="#C62828" stroke-dasharray="4 3" stroke-width="1.1"></circle>
+<circle cx="50" cy="82" fill="#00695C" r="3"></circle>
+<circle cx="130" cy="12" fill="#00695C" r="3"></circle>
+<circle cx="210" cy="82" fill="#00695C" r="3"></circle>
+<circle cx="130" cy="142" fill="#00695C" r="3"></circle>
+<polygon fill="#E0F2F1" fill-opacity="1" points="350.0,82.0 430.0,12.0 430.0,142.0" stroke="#00695C" stroke-width="1.1"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="430.0,12.0 510.0,82.0 430.0,142.0" stroke="#00695C" stroke-width="1.1"></polygon>
+<circle cx="416.2" cy="77.0" fill="none" r="66.4" stroke="#2E7D32" stroke-dasharray="4 3" stroke-width="1.1"></circle>
+<circle cx="350" cy="82" fill="#00695C" r="3"></circle>
+<circle cx="430" cy="12" fill="#00695C" r="3"></circle>
+<circle cx="510" cy="82" fill="#00695C" r="3"></circle>
+<circle cx="430" cy="142" fill="#00695C" r="3"></circle>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="start" x="30" y="200">diagonale ac : le cercle de abc contient d</text>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="start" x="330" y="200">diagonale bd : aucun cercle ne contient de point</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="10" y="222">Delaunay : aucun point à l'intérieur du cercle circonscrit d'un triangle. Échanger la diagonale suffit à corriger. Exemple à la main.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Une triangulation est de Delaunay quand le cercle passant par les trois sommets de chaque triangle ne contient aucun autre point.</p>
+<h3 style="margin-top:4mm">L'analogie</h3>
+<p>Des bulles qui gonflent entre des clous plantés : chaque bulle qui touche trois clous sans en avaler un quatrième trace un triangle.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>énoncer le critère du cercle vide ;</li>
+<li>dire ce que Delaunay garantit ;</li>
+<li>passer de Delaunay à Voronoi ;</li>
+<li>repérer les cas dégénérés.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Delaunay et Voronoi sont deux lectures d'une même structure : qui est voisin de qui. Calcule l'une, tu as l'autre presque gratuitement.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 142 · Delaunay et Voronoi</div>
+</section>
+<!-- ============ PAGE 2 · QUALITÉ ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 142</b></div>
+<p class="rubrique">Schéma 1 · Ce que garantit Delaunay</p>
+<h2>Mêmes points, mêmes triangles, autres diagonales</h2>
+<p style="max-width:165mm">Toute triangulation de n points a le même nombre de triangles et couvre la même surface. On a comparé Delaunay à une triangulation quelconque mais valide, obtenue par balayage.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Mille points au hasard, deux triangulations des mêmes points (.NET 8, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40"></text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="250" y="40">Delaunay (Bowyer-Watson)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="420" y="40">balayage par X, sans échange</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">triangles, aire couverte</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="250" y="61">1 984 ; 0,9831</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="61">1 984 ; 0,9831</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">plus petit angle du maillage</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="250" y="79">0,14°</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="79">0,00°</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">plus petit angle, moyenne par triangle</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="250" y="97">29,8°</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="97">2,4°</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="115">triangles de moins de 10°</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="250" y="115">148</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="115">1 859</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="120"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="133">triangles au cercle non vide</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="250" y="133">0</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="133">1 932</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="158">Même nombre de triangles, même surface : seul change le choix des diagonales. Delaunay maximise le plus</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="174">petit angle ; il évite les aiguilles, sans pouvoir les supprimer quand les points eux-mêmes sont mal placés.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="196">Balayage : trier par X, relier chaque nouveau point aux arêtes visibles de l'enveloppe. Une triangulation valide, mais quelconque.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, le test du cercle (d dans le cercle de abc, abc trigo)</span>double InCircle(Pt a, Pt b, Pt c, Pt d) { /* a, b, c ramenés en d */
+    return (ax*ax + ay*ay) * (bx*cy - cx*by) - (bx*bx + by*by) * (ax*cy - cx*ay)
+         + (cx*cx + cy*cy) * (ax*by - bx*ay); }     // &gt; 0 : dedans</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>L'échange de diagonale</h3>
+<p>Deux triangles qui forment un quadrilatère convexe : si le cercle de l'un contient le quatrième point, on échange la diagonale. Répété jusqu'à plus soif, on arrive à Delaunay.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Bowyer-Watson</h3>
+<p>On ajoute les points un à un ; chaque point détruit les triangles dont il viole le cercle, et l'on recoud le trou en étoile autour de lui.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire que Delaunay interdit les triangles plats. Sur mille points au hasard, il en restait 148 sous 10°, et un à 0,14° (mesuré) : il fait au mieux avec les points qu'on lui donne.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 142 · Delaunay et Voronoi</div>
+</section>
+<!-- ============ PAGE 3 · DUALITÉ ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 142</b></div>
+<p class="rubrique">Schéma 2 · L'envers de Delaunay</p>
+<h2>Voronoi en quelques millisecondes</h2>
+<p style="max-width:165mm">Le centre du cercle d'un triangle de Delaunay est à égale distance de ses trois sommets, et d'aucun point plus près : c'est un sommet de Voronoi. Il suffit de les relier.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Voronoi = le dual de Delaunay : les centres des cercles circonscrits sont ses sommets (trois séries, mesuré)</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="16" y="40">sites</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="110" y="40">Delaunay, Bowyer-Watson naïf</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="280" y="40">puis tous les centres</text>
+<text fill="#6B7378" font-size="7.4" font-weight="700" text-anchor="start" x="420" y="40">découpes (cours 141)</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="48"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="61">1 600</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="110" y="61">19 à 42 ms</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="61">0,3 à 0,7 ms</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="61">336 à 410 ms</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="79">4 000</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="110" y="79">128 à 192 ms</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="79">0,6 à 7,4 ms</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="79">non mesuré</text>
+<rect fill="#fff" height="18" opacity=".55" width="580" x="10" y="84"></rect>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="97">16 000</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="110" y="97">2 276 à 2 472 ms</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="280" y="97">4,2 à 8,4 ms</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="97">non mesuré</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="122">Chaque triangle donne un sommet de Voronoi ; chaque arête de Delaunay, une arête de Voronoi qui lui est</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="16" y="138">perpendiculaire. Sommets par cellule mesurés : 5,96 à 6,00, la moyenne que prévoit la formule d'Euler.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="162">Notre Bowyer-Watson cherche les triangles à détruire en les parcourant tous : il reste en n², d'où 2,4 s à 16 000.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="176">Les versions sérieuses localisent le point par une marche dans le maillage : n log n en pratique (non mesuré ici).</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="196">Dernière colonne : la recopie du Voronoi de Cuttlefish, même machine, sites au hasard.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, rassembler les sommets de Voronoi par site</span>foreach (var t in triangles) {
+    var centre = CentreCirconscrit(p[t.A], p[t.B], p[t.C]);
+    cellules[t.A].Add(centre); cellules[t.B].Add(centre); cellules[t.C].Add(centre); }   // puis trier par angle</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Ce qui reste à faire</h3>
+<p>Les centres d'une cellule arrivent dans le désordre : on les trie par angle autour du site. Les cellules du bord sont ouvertes ; on les ferme en les découpant par le rectangle.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Delaunay chez Grasshopper</h3>
+<p>Le SDK fournit un solveur, Grasshopper.Kernel.Geometry.Delaunay, et un autre pour Voronoi. Cuttlefish appelle le premier ; son Voronoi est écrit à la main.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Construire Voronoi cellule par cellule quand une triangulation est disponible. À 1 600 sites : 336 à 410 ms par découpes, contre 19 à 42 ms pour Delaunay puis ses centres (mesuré).
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 142 · Delaunay et Voronoi</div>
+</section>
+<!-- ============ PAGE 4 · DÉGÉNÉRÉ ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 142</b></div>
+<p class="rubrique">Schéma 3 · Les cas dégénérés</p>
+<h2>Quatre points sur un cercle</h2>
+<p style="max-width:165mm">Le critère suppose qu'aucun cercle ne passe par quatre points. Sur une grille, chaque carré le contredit, et le test du cercle répond exactement zéro.</p>
+<svg style="margin-top:2mm" viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#00695C" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="22">Une grille de 4 × 4 points : quatre points par cercle (mesuré)</text>
+<polygon fill="#E0F2F1" fill-opacity="1" points="30.0,40.0 64.0,40.0 64.0,74.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="30.0,40.0 64.0,74.0 30.0,74.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="64.0,40.0 98.0,40.0 98.0,74.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="64.0,40.0 98.0,74.0 64.0,74.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="98.0,40.0 132.0,40.0 132.0,74.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="98.0,40.0 132.0,74.0 98.0,74.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="30.0,74.0 64.0,74.0 64.0,108.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="30.0,74.0 64.0,108.0 30.0,108.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="64.0,74.0 98.0,74.0 98.0,108.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="64.0,74.0 98.0,108.0 64.0,108.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="98.0,74.0 132.0,74.0 132.0,108.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="98.0,74.0 132.0,108.0 98.0,108.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="30.0,108.0 64.0,108.0 64.0,142.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="30.0,108.0 64.0,142.0 30.0,142.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="64.0,108.0 98.0,108.0 98.0,142.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="64.0,108.0 98.0,142.0 64.0,142.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="98.0,108.0 132.0,108.0 132.0,142.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<polygon fill="#E0F2F1" fill-opacity="1" points="98.0,108.0 132.0,142.0 98.0,142.0" stroke="#00695C" stroke-width="0.9"></polygon>
+<circle cx="81.0" cy="91.0" fill="none" r="24.0" stroke="#E65100" stroke-dasharray="3 2" stroke-width="1.1"></circle>
+<circle cx="30" cy="40" fill="#00695C" r="2.4"></circle>
+<circle cx="64" cy="40" fill="#00695C" r="2.4"></circle>
+<circle cx="98" cy="40" fill="#00695C" r="2.4"></circle>
+<circle cx="132" cy="40" fill="#00695C" r="2.4"></circle>
+<circle cx="30" cy="74" fill="#00695C" r="2.4"></circle>
+<circle cx="64" cy="74" fill="#00695C" r="2.4"></circle>
+<circle cx="98" cy="74" fill="#00695C" r="2.4"></circle>
+<circle cx="132" cy="74" fill="#00695C" r="2.4"></circle>
+<circle cx="30" cy="108" fill="#00695C" r="2.4"></circle>
+<circle cx="64" cy="108" fill="#00695C" r="2.4"></circle>
+<circle cx="98" cy="108" fill="#00695C" r="2.4"></circle>
+<circle cx="132" cy="108" fill="#00695C" r="2.4"></circle>
+<circle cx="30" cy="142" fill="#00695C" r="2.4"></circle>
+<circle cx="64" cy="142" fill="#00695C" r="2.4"></circle>
+<circle cx="98" cy="142" fill="#00695C" r="2.4"></circle>
+<circle cx="132" cy="142" fill="#00695C" r="2.4"></circle>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="190" y="50">18 triangles ; 9 tests « dans le cercle ? » ont valu exactement zéro.</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="190" y="66">Chaque carré a quatre sommets sur un même cercle : les deux diagonales</text>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="190" y="82">sont également Delaunay. 2⁹ = 512 triangulations valides (déduit).</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="190" y="106">Côté Voronoi, les deux triangles d'un carré ont le même centre : deux</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="190" y="122">sommets confondus, donc une arête de longueur nulle. C'est la même</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="190" y="138">dégénérescence qu'au cours 139, vue par l'autre bout.</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="190" y="162">Les grilles de Cuttlefish produisent exactement ce cas.</text>
+</svg>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, une secousse pour sortir des égalités</span>var rnd = new Random(1);
+var secoues = points.Select(p =&gt; p + new Vector3d(rnd.NextDouble(), rnd.NextDouble(), 0) * 1e-9 * echelle);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Deux façons d'en sortir</h3>
+<p>Secouer légèrement les points, pour qu'aucun quadruplet ne soit cocyclique ; ou trancher l'égalité par une règle fixe, comme l'ordre des indices. La seconde est reproductible.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Les points alignés</h3>
+<p>Trois points alignés n'ont pas de cercle : aucun triangle ne les relie. Un groupe entièrement aligné ne donne rien du tout, sans que ce soit une erreur.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Comparer deux triangulations d'une grille arête par arête. Les deux diagonales de chaque carré sont valides : deux programmes justes peuvent rendre des maillages différents.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 142 · Delaunay et Voronoi</div>
+</section>
+<!-- ============ PAGE 5 · LE CODE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 142</b></div>
+<p class="rubrique">Dans tes projets</p>
+<h2>Cuttlefish triangule dans le plan XY</h2>
+<p style="max-width:165mm">Delaunay.cs regroupe les points par branche, les projette sur XY pour le solveur de Grasshopper, puis dessine chaque face avec les points d'origine, Z compris : une triangulation de terrain.</p>
+<div class="code-zone" style="margin-top:3mm">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Delaunay.cs</span></div>
+<div class="l k1"><span class="n">56</span>if (pts.Count &lt; 3)<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">64</span>… nodes.Append(new Node2(p.X, p.Y));<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">65</span>….Delaunay.Solver.Solve_Faces(nodes, 1);<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">69</span>new PolylineCurve(new[] { pts[f.A], … })<span class="rep r4">4</span></div>
+<div class="l"><span class="cm">cuttlefish/Voronoi.cs</span></div>
+<div class="l k5"><span class="n">98</span>for (int i = 0; i &lt; currentPoints.Count - 1; i++)<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Garde</b>Moins de 3.</li>
+<li><span class="rep r2">2</span><b>Projection</b>Z oublié.</li>
+<li><span class="rep r3">3</span><b>Solveur</b>Du SDK.</li>
+<li><span class="rep r4">4</span><b>Z rendu</b>Par l'indice.</li>
+<li><span class="rep r5">5</span><b>Autre voie</b>Par découpes.</li>
+</ul>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À surveiller · des points qui se superposent en XY</span>
+    La garde de la ligne 56 compte les points, pas leur disposition. Des points tous alignés en XY, ou deux points de même X et Y à des hauteurs différentes, sont des cas dégénérés pour le solveur : pas de triangle dans le premier cas, un sommet en double dans le second. Ce que rend alors Solve_Faces n'a pas pu être observé ici, Grasshopper ne tourne pas dans ce conteneur (déduit). Le second argument, 1, serait d'après le SDK une amplitude de secousse ; son effet exact reste à vérifier dans Grasshopper. Relevé sans rien modifier.
+  </div>
+<div class="folio">5</div>
+<div class="pied">Cours 142 · Delaunay et Voronoi</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 142</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Écriture</th><th>Ce qu'elle fait</th><th>Où la voir</th></tr></thead>
+<tbody>
+<tr><td class="c">InCircle(a, b, c, d)</td><td>d est-il dans le cercle de abc ?</td><td>page 2</td></tr>
+<tr><td class="c">Node2List / Node2</td><td>les points 2D du solveur Grasshopper</td><td>Delaunay.cs:63</td></tr>
+<tr><td class="c">Solver.Solve_Faces(nodes, 1)</td><td>les triangles de Delaunay, par indices</td><td>Delaunay.cs:65</td></tr>
+<tr><td class="c">f.A, f.B, f.C</td><td>les trois indices d'une face</td><td>Delaunay.cs:69</td></tr>
+<tr><td class="c">CentreCirconscrit(a, b, c)</td><td>un sommet de Voronoi</td><td>page 3</td></tr>
+<tr><td class="c">secousse × 1e-9 × échelle</td><td>sortir des cas cocycliques</td><td>page 4</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:5mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Cercle circonscrit</dt><dd>Le cercle qui passe par les trois sommets d'un triangle.</dd>
+<dt>Triangulation de Delaunay</dt><dd>Celle dont aucun cercle circonscrit ne contient d'autre point.</dd>
+<dt>Dual</dt><dd>La structure obtenue en échangeant faces et sommets d'une autre.</dd>
+<dt>Cocycliques</dt><dd>Des points posés sur un même cercle.</dd>
+<dt>Échange de diagonale</dt><dd>Remplacer la diagonale commune de deux triangles par l'autre.</dd>
+</dl>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 15</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 142 · Delaunay et Voronoi</div>
+</section>
+</body>
+</html>
