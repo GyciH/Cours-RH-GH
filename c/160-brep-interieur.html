@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>160 · Le Brep de l'intérieur</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 160</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Le Brep de l'intérieur</h1>
+<p class="chapeau">Une boîte, un plateau percé, une coque : dans Rhino, presque tout ce qui a un volume est un Brep. Savoir de quoi il est fait, des faces cousues par des arêtes, explique pourquoi un solide refuse de se fermer, pourquoi un booléen échoue, et comment réparer.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>157</b>, <b>158</b></span>
+<span class="pastille">Exemples · <b>Rhino 8, What, ShowEdges, RhinoCommon</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une boîte percée vue par Rhino : des faces, cousues par des arêtes</text>
+<polygon fill="#fff" points="150.0,160.0 245.3,105.0 245.3,55.0 150.0,110.0" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<polygon fill="#F4F1EA" points="150.0,160.0 89.4,125.0 89.4,75.0 150.0,110.0" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<polygon fill="#fff" points="150.0,110.0 245.3,55.0 184.6,20.0 89.4,75.0" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<ellipse cx="167.3" cy="65.0" fill="#EFE9E1" rx="17.1" ry="9.9" stroke="#7B1FA2" stroke-width="2"></ellipse>
+<line stroke="#1565C0" stroke-width="3" x1="245.3" x2="245.3" y1="55.0" y2="105.0"></line>
+<circle cx="150.0" cy="110.0" fill="#E65100" r="4"></circle>
+<circle cx="211.32" cy="67.0" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="211.32" y="70.2">1</text>
+<circle cx="261.26" cy="80.0" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="261.26" y="83.2">2</text>
+<circle cx="171.32" cy="91.0" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="171.32" y="94.2">3</text>
+<circle cx="134.0" cy="102.0" fill="#E65100" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="134.0" y="105.2">4</text>
+<circle cx="330" cy="54" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="330" y="57.2">1</text>
+<text fill="#2E7D32" font-size="8.8" font-weight="700" text-anchor="start" x="344" y="57">Face</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="344" y="70">un morceau de surface, limité par des boucles</text>
+<circle cx="330" cy="88" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="330" y="91.2">2</text>
+<text fill="#1565C0" font-size="8.8" font-weight="700" text-anchor="start" x="344" y="91">Arête</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="344" y="104">une courbe 3D partagée par deux faces</text>
+<circle cx="330" cy="122" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="330" y="125.2">3</text>
+<text fill="#7B1FA2" font-size="8.8" font-weight="700" text-anchor="start" x="344" y="125">Boucle intérieure</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="344" y="138">le bord du trou, sur la face du dessus</text>
+<circle cx="330" cy="156" fill="#E65100" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="330" y="159.2">4</text>
+<text fill="#E65100" font-size="8.8" font-weight="700" text-anchor="start" x="344" y="159">Sommet</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="344" y="172">un point où des arêtes se rejoignent</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un Brep décrit un objet par ses bords : des faces, chacune taillée dans une surface par des boucles, cousues entre elles par des arêtes. Un solide est un Brep dont chaque arête est partagée par deux faces.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Un plateau modélisé face par face refuse de devenir un solide : Join laisse une « polysurface ouverte ». ShowEdges colore une petite arête libre sur un coin. Une face s'arrête à 0,05 mm de sa voisine, au-dessus de la tolérance. On la remplace, et What annonce enfin une polysurface fermée.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>nommer les pièces d'un Brep : faces, boucles, trims, arêtes, sommets ;</li>
+<li>dire si une arête est libre, intérieure ou non manifold ;</li>
+<li>trouver et réparer un bord ouvert ;</li>
+<li>parcourir un Brep en RhinoCommon.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Une face = une surface de base + des boucles qui en gardent une partie. Une arête est une courbe 3D cousue entre faces : touchée par une face, elle est libre ; par deux, intérieure ; par trois ou plus, non manifold. Un solide n'a que des arêtes intérieures.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 160 · Le Brep de l'intérieur</div>
+</section>
+<!-- ============ PAGE 2 · LES PIÈCES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 160</b></div>
+<p class="rubrique">Schéma 1 · Les pièces</p>
+<h2>Une face, c'est une surface et des boucles</h2>
+<p style="max-width:165mm">Couper une surface ne la raccourcit pas : Rhino garde la surface entière et lui ajoute des boucles qui disent quelle partie est visible. Chaque boucle est faite de trims, des courbes tracées dans le plan (u, v) de la surface.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une face : une surface de base, et les boucles qui en gardent une partie</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="middle" x="150" y="42">dans l'espace (u, v) de la surface</text>
+<rect fill="none" height="140" stroke="#6B7378" stroke-dasharray="4 3" width="220" x="40" y="52"></rect>
+<text fill="#6B7378" font-size="7.2" text-anchor="start" x="44" y="205">surface de base, non coupée</text>
+<path d="M62 70 L238 70 L238 150 Q238 176 212 176 L62 176 Z" fill="#fff" stroke="#2E7D32" stroke-width="2.2"></path>
+<circle cx="150" cy="122" fill="#EFE9E1" r="22" stroke="#7B1FA2" stroke-width="2.2"></circle>
+<line stroke="#2E7D32" stroke-width="1.2" x1="100" x2="120" y1="70" y2="70"></line><polygon fill="#2E7D32" points="120,70 113.6,72.7 113.6,67.3"></polygon>
+<line stroke="#2E7D32" stroke-width="1.2" x1="238" x2="238" y1="105" y2="120"></line><polygon fill="#2E7D32" points="238,120 235.3,113.6 240.7,113.6"></polygon>
+<circle cx="70" cy="62" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="70" y="65.2">1</text>
+<circle cx="180" cy="104" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="180" y="107.2">3</text>
+<circle cx="248" cy="168" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="248" y="171.2">2</text>
+<circle cx="300" cy="62" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="300" y="65.2">1</text>
+<text fill="#2E7D32" font-size="8.8" font-weight="700" text-anchor="start" x="314" y="65">Boucle extérieure</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="314" y="78">garde ce qui est dedans ; une seule par face</text>
+<circle cx="300" cy="98" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="300" y="101.2">3</text>
+<text fill="#7B1FA2" font-size="8.8" font-weight="700" text-anchor="start" x="314" y="101">Boucle intérieure</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="314" y="114">retire un trou ; autant qu'il y a de trous</text>
+<circle cx="300" cy="134" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="300" y="137.2">2</text>
+<text fill="#1565C0" font-size="8.8" font-weight="700" text-anchor="start" x="314" y="137">Trim</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="314" y="150">chaque morceau de boucle : une courbe 2D en (u, v)</text>
+<circle cx="300" cy="170" fill="#E65100" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="300" y="173.2">4</text>
+<text fill="#E65100" font-size="8.8" font-weight="700" text-anchor="start" x="314" y="173">Arête associée</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="314" y="186">chaque trim renvoie à une arête 3D du Brep</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, parcourir les faces et leurs boucles</span>foreach (BrepFace f in brep.Faces)
+    foreach (BrepLoop l in f.Loops)
+        Print($"face {f.FaceIndex} : boucle {l.LoopType}, {l.Trims.Count} trims");</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le trim et l'arête</h3>
+<p>Le trim vit en 2D sur sa face ; l'arête vit en 3D et peut être partagée. Deux faces voisines ont chacune un trim, liés à la même arête : c'est la couture.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le sommet</h3>
+<p>Un sommet termine une ou plusieurs arêtes. Une arête fermée, comme le bord d'un trou rond, n'a qu'un sommet, où elle commence et finit.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire qu'une face coupée a perdu la partie retirée. La surface de base est toujours là : Untrim la fait réapparaître, et c'est elle qu'utilisent certaines commandes de raccord (cours 159).
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 160 · Le Brep de l'intérieur</div>
+</section>
+<!-- ============ PAGE 3 · OUVERT OU FERMÉ ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 160</b></div>
+<p class="rubrique">Schéma 2 · Ouvert ou fermé</p>
+<h2>La valence des arêtes</h2>
+<p style="max-width:165mm">Le nombre de faces qui touchent une arête suffit à juger un Brep. Rhino l'appelle la valence, et ShowEdges colore les arêtes qui posent problème.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 188" width="100%">
+<rect fill="#EFE9E1" height="188" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Combien de faces touchent une arête ? Sa valence dit l'état du Brep</text>
+<line stroke="#C62828" stroke-width="3.2" x1="100" x2="100" y1="60" y2="140"></line>
+<polygon fill="#fff" opacity=".92" points="100.0,60.0 100.0,140.0 43.6,152.3 43.6,72.3" stroke="#6B7378" stroke-width="1"></polygon>
+<line stroke="#C62828" stroke-width="3.2" x1="100" x2="100" y1="60" y2="140"></line>
+<text fill="#C62828" font-size="8.2" font-weight="700" text-anchor="middle" x="100" y="162">libre (naked) · 1 face</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="100" y="176">un bord ouvert</text>
+<line stroke="#2E7D32" stroke-width="3.2" x1="296" x2="296" y1="60" y2="140"></line>
+<polygon fill="#fff" opacity=".92" points="296.0,60.0 296.0,140.0 239.6,152.3 239.6,72.3" stroke="#6B7378" stroke-width="1"></polygon>
+<polygon fill="#fff" opacity=".92" points="296.0,60.0 296.0,140.0 352.4,152.3 352.4,72.3" stroke="#6B7378" stroke-width="1"></polygon>
+<line stroke="#2E7D32" stroke-width="3.2" x1="296" x2="296" y1="60" y2="140"></line>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="middle" x="296" y="162">intérieure · 2 faces</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="296" y="176">cousue : ce qu'on veut</text>
+<line stroke="#E65100" stroke-width="3.2" x1="492" x2="492" y1="60" y2="140"></line>
+<polygon fill="#fff" opacity=".92" points="492.0,60.0 492.0,140.0 435.6,152.3 435.6,72.3" stroke="#6B7378" stroke-width="1"></polygon>
+<polygon fill="#fff" opacity=".92" points="492.0,60.0 492.0,140.0 548.4,152.3 548.4,72.3" stroke="#6B7378" stroke-width="1"></polygon>
+<polygon fill="#fff" opacity=".92" points="492.0,60.0 492.0,140.0 471.5,106.2 471.5,26.2" stroke="#6B7378" stroke-width="1"></polygon>
+<line stroke="#E65100" stroke-width="3.2" x1="492" x2="492" y1="60" y2="140"></line>
+<text fill="#E65100" font-size="8.2" font-weight="700" text-anchor="middle" x="492" y="162">non manifold · 3 faces ou plus</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="492" y="176">ni dedans ni dehors</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, compter les arêtes libres</span>int libres = brep.Edges.Count(e =&gt; e.Valence == EdgeAdjacency.Naked);
+bool solide = brep.IsSolid;   // vrai : aucune arête libre ni non manifold
+Curve[] bords = brep.DuplicateNakedEdgeCurves(true, false);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Libre</h3>
+<p>Une arête libre est un bord ouvert : une surface seule n'a que des arêtes libres ; une boîte sans couvercle en a quatre. Pour un solide, chaque arête libre est un défaut.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Non manifold</h3>
+<p>Trois faces sur une arête, comme deux boîtes collées par un côté, empêchent de dire où est l'intérieur. Booléens et exports échouent : on sépare ou l'on unit autrement.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Faire confiance à la vue ombrée : une fente de 0,05 mm ne se voit pas. Seuls What (« ouverte » ou « fermée ») et ShowEdges le disent.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 160 · Le Brep de l'intérieur</div>
+</section>
+<!-- ============ PAGE 4 · INSPECTER, RÉPARER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 160</b></div>
+<p class="rubrique">Schéma 3 · Inspecter, réparer</p>
+<h2>Un ordre pour diagnostiquer</h2>
+<p style="max-width:165mm">Face à un objet qui se comporte mal, on décrit d'abord, on localise ensuite, et l'on répare au plus près : une face à refaire plutôt qu'une forme entière.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 234" width="100%">
+<rect fill="#EFE9E1" height="234" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Inspecter et réparer un Brep : les commandes de base</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="42">commande</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="150" y="42">ce qu'elle fait</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="420" y="42">quand</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="50"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="65">What</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="65">décrit l'objet : polysurface fermée ou ouverte, faces</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="420" y="65">toujours en premier</text>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="87">ShowEdges</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="87">montre les arêtes libres et non manifold</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="420" y="87">un solide refuse de se fermer</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="94"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="109">Check</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="109">signale un objet mal formé</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="420" y="109">avant un export</text>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="131">ExtractSrf</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="131">détache une face d'une polysurface</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="420" y="131">remplacer une face</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="138"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="153">Join  JoinEdge</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="153">coud des faces, ou force deux arêtes</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="420" y="153">fermer un solide</text>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="175">Untrim</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="175">retire une boucle : la face retrouve sa surface</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="420" y="175">refaire une coupe</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="182"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="197">ShrinkTrimmedSrf</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="197">réduit la surface de base autour de la face</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="420" y="197">alléger, raccorder</text>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="219">DupBorder  DupEdge</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="219">copie des bords en courbes</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="420" y="219">repartir d'un contour</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · l'ordre de diagnostic</span>1. What          polysurface fermée ou ouverte ? combien de faces ?
+2. ShowEdges     où sont les arêtes libres ou non manifold ?
+3. Check         l'objet est-il bien formé ?
+4. ExtractSrf    isoler la face fautive, la refaire, puis Join</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Recoudre</h3>
+<p>Si deux bords sont proches mais au-delà de la tolérance, on refait la face fautive, ou l'on force la couture avec JoinEdge en connaissant l'écart qu'il accepte.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Repartir d'un bord</h3>
+<p>DupBorder copie le contour d'une surface en courbe : on peut reconstruire une face propre à partir des bords voisins.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Lancer JoinEdge pour masquer un grand écart. La couture est déclarée, pas réelle : l'objet paraît fermé, mais un booléen ou un usinage tombera dans la fente.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 160 · Le Brep de l'intérieur</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 160</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Percer, ouvrir, refermer</h2>
+<p style="max-width:165mm; font-size:9pt">Tu crées un bloc percé, tu observes sa structure, tu l'ouvres volontairement, puis tu le refermes et tu vérifies.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Fichier en millimètres. <span class="cmd">Box</span> de <span class="cmd">0,0,0</span> à <span class="cmd">100,60,40</span>.</li>
+<li><span class="cmd">Cylinder</span> de centre <span class="cmd">50,30,-10</span>, rayon <span class="cmd">10</span>, hauteur <span class="cmd">60</span> : il traverse le bloc.</li>
+<li><span class="cmd">BooleanDifference</span> : le bloc, puis le cylindre. Lance <span class="cmd">What</span> sur le résultat.</li>
+<li><span class="cmd">ExtractSrf</span> sur la face du dessus, puis <span class="cmd">Move</span> de <span class="cmd">0,0,20</span>.</li>
+<li><span class="cmd">ShowEdges</span> sur le bloc, puis <span class="cmd">What</span>.</li>
+<li>Redescends la face de 20, <span class="cmd">Join</span> les deux objets, et relance <span class="cmd">What</span>.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Après le perçage, What annonce une <b>polysurface fermée de 7 faces</b> : les 6 du bloc et le cylindre intérieur. Face soulevée, le bloc devient <b>ouvert</b> et ShowEdges colore le rectangle et le cercle du haut. Recollée, la polysurface est de nouveau <b>fermée</b>.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Transforme le trou traversant en trou borgne de 15 mm de profondeur, et prévois combien de faces What annoncera.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Magpie compare des géométries. Quand Rhino ne sait pas mailler un Brep abîmé, il se rabat sur son squelette : les arêtes et les sommets.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">magpie/plugin/Core/GeometrySampler.cs</span></div>
+<div class="l"><span class="n">116</span>var cloud = new List&lt;Point3d&gt;();</div>
+<div class="l k1"><span class="n">117</span>foreach (var edge in brep.Edges) cloud.AddRange(…);<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">118</span>foreach (var vertex in brep.Vertices) cloud.Add(…);<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">119</span>return new SampledCloud(cloud.ToArray(), double.NaN);<span class="rep r3">3</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Les arêtes</b>Des courbes 3D, échantillonnées.</li>
+<li><span class="rep r2">2</span><b>Les sommets</b>Leur position (vertex.Location).</li>
+<li><span class="rep r3">3</span><b>Un nuage plus grossier</b>Mais jamais vide.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ Tu sais dire quelle face porte une boucle intérieure.</li>
+<li style="margin-bottom:1.6mm">☐ ShowEdges montre des arêtes libres seulement quand la face est soulevée.</li>
+<li style="margin-bottom:1.6mm">☐ What dit « fermée » à la fin.</li>
+<li style="margin-bottom:1.6mm">☐ <b>Volume</b> répond à la fin, et refuse quand la face est soulevée.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 160 · Le Brep de l'intérieur</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 160</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Un Brep est fait de faces, chacune une surface de base taillée par des boucles de trims, cousues par des arêtes qui se rejoignent aux sommets. Une arête libre est un bord ouvert ; un solide n'a que des arêtes partagées par deux faces. What, ShowEdges et Check diagnostiquent ; ExtractSrf, Join et Untrim réparent au plus près.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Pars d'un bloc neuf. Cylindre de centre 50,30,25, rayon 10, hauteur 20 : il dépasse au-dessus et s'arrête à 15 mm sous la face du haut. Après BooleanDifference, What annonce 8 faces : les 6 du bloc, la paroi du trou et son fond. Seule la face du dessus porte une boucle intérieure.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">What</td><td>décrire : fermée ou ouverte, nombre de faces</td><td>toujours en premier</td></tr>
+<tr><td class="c">ShowEdges</td><td>arêtes libres et non manifold</td><td>un solide refuse de se fermer</td></tr>
+<tr><td class="c">ExtractSrf  Join</td><td>isoler une face, recoudre</td><td>remplacer une face</td></tr>
+<tr><td class="c">Untrim  ShrinkTrimmedSrf</td><td>retirer une boucle, réduire la base</td><td>refaire ou alléger une coupe</td></tr>
+<tr><td class="c">brep.Faces  .Loops  .Edges</td><td>parcourir la structure en C#</td><td>dans un composant</td></tr>
+<tr><td class="c">brep.IsSolid</td><td>fermé ou non</td><td>avant un booléen ou un export</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Brep</dt><dd>Boundary representation : un objet décrit par ses faces et leurs bords.</dd>
+<dt>Boucle</dt><dd>Un contour fermé de trims sur une face : extérieure ou intérieure.</dd>
+<dt>Trim</dt><dd>Un morceau de boucle, tracé dans l'espace (u, v) de la surface.</dd>
+<dt>Arête libre</dt><dd>Une arête qui ne touche qu'une face : un bord ouvert.</dd>
+<dt>Non manifold</dt><dd>Une arête touchée par trois faces ou plus.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 161, « Mises en plan et layouts ». Dans le guide RhinoCommon, la page « Brep » et ses classes BrepFace, BrepLoop, BrepEdge.</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 161</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 160 · Le Brep de l'intérieur</div>
+</section>
+</body>
+</html>

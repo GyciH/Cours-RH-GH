@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>157 · Modéliser avec précision dans Rhino</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 157</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Modéliser avec précision dans Rhino</h1>
+<p class="chapeau">À l'écran, un trait cliqué « à peu près » ressemble à un trait juste. Mais Rhino calcule au millième près, et c'est ce millième qui décide si un contour se ferme, si un solide est étanche, si une pièce passe à la découpe. Ce cours montre comment dessiner juste dès le premier point.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>débutant</b></span>
+<span class="pastille">Prérequis · <b>9</b>, <b>49</b></span>
+<span class="pastille">Exemples · <b>Rhino 8, GeometrySampler.cs (Magpie)</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 200" width="100%">
+<rect fill="#EFE9E1" height="200" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Le même plateau, dessiné de deux façons</text>
+<polyline fill="none" points="40,60 236,58 238,160 42,162 40,64" stroke="#C62828" stroke-width="2"></polyline>
+<circle cx="40" cy="62" fill="none" r="11" stroke="#C62828" stroke-dasharray="3 2"></circle>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="56" y="52">écart de 0,3 mm</text>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="middle" x="140" y="182">cliqué « à l'œil »</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="middle" x="140" y="195">Join : 1 courbe ouverte, ExtrudeCrv : surface ouverte</text>
+<rect fill="#fff" height="104" stroke="#2E7D32" stroke-width="2" width="196" x="352" y="58"></rect>
+<circle cx="352" cy="58" fill="#2E7D32" r="3"></circle>
+<circle cx="548" cy="58" fill="#2E7D32" r="3"></circle>
+<circle cx="548" cy="162" fill="#2E7D32" r="3"></circle>
+<circle cx="352" cy="162" fill="#2E7D32" r="3"></circle>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="end" x="346" y="52">0,0</text>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="554" y="52">r1200,0</text>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="start" x="554" y="172">r0,800</text>
+<text class="mono" fill="#2E7D32" font-size="7.4" style="font-size:7.4px" text-anchor="end" x="346" y="172">r-1200,0</text>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="middle" x="450" y="182">valeurs tapées</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="middle" x="450" y="195">1 courbe fermée, solide fermé, cote exacte</text>
+<line stroke="#6B7378" stroke-width="1.4" x1="268" x2="330" y1="110" y2="110"></line><polygon fill="#6B7378" points="330,110 323.6,112.7 323.6,107.3"></polygon>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Rhino calcule à la tolérance du document près : on dessine juste en fixant unités et tolérances au départ, puis en plaçant chaque point par une valeur tapée ou une accroche, jamais à l'œil.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Tu dessines un plateau de table de 1 200 × 800 mm, coins arrondis, pour l'envoyer à la découpe. Tracé au jugé, le contour refuse de se joindre, l'extrusion reste ouverte et le fichier revient de l'atelier. Tapé et accroché, il se ferme du premier coup et ses cotes sont exactes.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>choisir les unités et les tolérances d'un document ;</li>
+<li>placer un point par coordonnées absolues, relatives ou polaires, ou par contrainte ;</li>
+<li>accrocher aux objets existants au lieu de viser ;</li>
+<li>vérifier un modèle : mesurer, trouver les bords ouverts.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Deux extrémités plus proches que la tolérance absolue sont confondues ; plus loin, elles restent séparées. Unités et tolérances se règlent avant de dessiner : les changer ensuite ne recalcule pas ce qui existe.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 157 · Modéliser avec précision dans Rhino</div>
+</section>
+<!-- ============ PAGE 2 · UNITÉS ET TOLÉRANCES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 157</b></div>
+<p class="rubrique">Schéma 1 · Unités et tolérances</p>
+<h2>Le millième qui décide</h2>
+<p style="max-width:165mm">Chaque document Rhino a une unité (mm, m…) et deux tolérances. La tolérance absolue est la distance sous laquelle deux points sont tenus pour identiques ; la tolérance d'angle fait de même pour les directions.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 222" width="100%">
+<rect fill="#EFE9E1" height="222" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="9" font-weight="700" text-anchor="start" x="16" y="22">Deux extrémités se rejoignent si leur écart est sous la tolérance absolue (ici 0,001 mm)</text>
+<circle cx="90" cy="92" fill="#fff" r="20" stroke="#1F5F7A" stroke-dasharray="3 2"></circle>
+<line stroke="#2B2F33" stroke-width="2" x1="10" x2="87.0" y1="92" y2="92"></line>
+<line stroke="#2B2F33" stroke-width="2" x1="93.0" x2="170" y1="92" y2="92"></line>
+<circle cx="87.0" cy="92" fill="#2E7D32" r="2.6"></circle><circle cx="93.0" cy="92" fill="#2E7D32" r="2.6"></circle>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="middle" x="90" y="132">écart 0,0004</text>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="middle" x="90" y="146">joint</text>
+<circle cx="300" cy="92" fill="#fff" r="20" stroke="#1F5F7A" stroke-dasharray="3 2"></circle>
+<line stroke="#2B2F33" stroke-width="2" x1="220" x2="293.0" y1="92" y2="92"></line>
+<line stroke="#2B2F33" stroke-width="2" x1="307.0" x2="380" y1="92" y2="92"></line>
+<circle cx="293.0" cy="92" fill="#E65100" r="2.6"></circle><circle cx="307.0" cy="92" fill="#E65100" r="2.6"></circle>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="middle" x="300" y="132">écart 0,0010</text>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="middle" x="300" y="146">joint (limite)</text>
+<circle cx="510" cy="92" fill="#fff" r="20" stroke="#1F5F7A" stroke-dasharray="3 2"></circle>
+<line stroke="#2B2F33" stroke-width="2" x1="430" x2="493.0" y1="92" y2="92"></line>
+<line stroke="#2B2F33" stroke-width="2" x1="527.0" x2="590" y1="92" y2="92"></line>
+<circle cx="493.0" cy="92" fill="#C62828" r="2.6"></circle><circle cx="527.0" cy="92" fill="#C62828" r="2.6"></circle>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="middle" x="510" y="132">écart 0,0030</text>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="middle" x="510" y="146">pas joint</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="middle" x="90" y="62">cercle pointillé : la tolérance</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="16" y="178">La tolérance d'angle (1° en général) joue le même rôle pour les directions : sous elle, deux tangentes</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="16" y="194">sont tenues pour alignées, et la jonction est lisse. Au-dessus, Rhino voit un angle vif.</text>
+<text fill="#6B7378" font-size="7.2" font-style="italic" text-anchor="start" x="16" y="212">Échelle du dessin exagérée : à l'écran, 0,001 mm ne se voit jamais.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, joindre à la tolérance du document</span>double tol = RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+Curve[] jointes = Curve.JoinCurves(courbes, tol);   // écart &gt; tol : plusieurs morceaux
+bool ferme = jointes.Length == 1 &amp;&amp; jointes[0].IsClosed;</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Choisir au départ</h3>
+<p>On part d'un gabarit à la bonne unité ; un gabarit en millimètres est en général réglé à 0,001 mm et 1°. Plus fin que la fabrication, sans excès : une tolérance absurdement petite rend les opérations lentes et fragiles.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Changer d'unité</h3>
+<p>Rhino propose alors de mettre le modèle à l'échelle. Sans cela, un plateau de 1 200 mm devient un plateau de 1 200 m. Travailler près de l'origine garde aussi toute la précision des nombres (cours 49).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Importer un fichier d'un autre logiciel sans regarder son unité ni sa tolérance : les objets se joignent mal, ou plus du tout, parce qu'ils ont été construits avec une précision différente de celle du document.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 157 · Modéliser avec précision dans Rhino</div>
+</section>
+<!-- ============ PAGE 3 · PLACER UN POINT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 157</b></div>
+<p class="rubrique">Schéma 2 · Placer un point</p>
+<h2>Taper plutôt que viser</h2>
+<p style="max-width:165mm">À chaque invite « Point », Rhino accepte un clic ou une valeur tapée. Les valeurs sont exactes ; les clics, non. Les contraintes mêlent les deux : la valeur fixe ce qui compte, le clic choisit le reste.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 236" width="100%">
+<rect fill="#EFE9E1" height="236" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Quatre façons de taper un point (à l'invite « Point suivant »)</text>
+<rect fill="#fff" height="20" rx="3" stroke="#2E7D32" width="98" x="16" y="44"></rect>
+<text class="mono" fill="#2E7D32" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="65" y="58">10,20</text>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="124" y="58">absolu</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="184" y="58">par rapport à l'origine du plan de construction</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1565C0" width="98" x="16" y="70"></rect>
+<text class="mono" fill="#1565C0" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="65" y="84">r50,0</text>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="start" x="124" y="84">relatif</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="184" y="84">par rapport au dernier point (r ou @ devant)</text>
+<rect fill="#fff" height="20" rx="3" stroke="#7B1FA2" width="98" x="16" y="96"></rect>
+<text class="mono" fill="#7B1FA2" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="65" y="110">r50&lt;30</text>
+<text fill="#7B1FA2" font-size="8.4" font-weight="700" text-anchor="start" x="124" y="110">polaire</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="184" y="110">50 de long, à 30° de l'axe X, depuis le dernier point</text>
+<rect fill="#fff" height="20" rx="3" stroke="#E65100" width="98" x="16" y="122"></rect>
+<text class="mono" fill="#E65100" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="65" y="136">50  Entrée</text>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="124" y="136">distance</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="184" y="136">longueur fixée ; tu choisis seulement la direction</text>
+<rect fill="#fff" height="20" rx="3" stroke="#00838F" width="98" x="16" y="148"></rect>
+<text class="mono" fill="#00838F" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="65" y="162">&lt;45  Entrée</text>
+<text fill="#00838F" font-size="8.4" font-weight="700" text-anchor="start" x="124" y="162">angle</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="184" y="162">direction fixée ; tu choisis seulement la longueur</text>
+<line stroke="#6B7378" stroke-width=".8" x1="420" x2="580" y1="200" y2="200"></line>
+<line stroke="#7B1FA2" stroke-width="2" x1="440" x2="530" y1="200" y2="148"></line>
+<path d="M480 200 A40 40 0 0 0 474.6 180" fill="none" stroke="#7B1FA2"></path>
+<text fill="#7B1FA2" font-size="7.6" font-weight="700" text-anchor="start" x="488" y="192">30°</text>
+<text fill="#7B1FA2" font-size="7.6" font-weight="700" text-anchor="end" x="474" y="164">50</text>
+<circle cx="440" cy="200" fill="#7B1FA2" r="5"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="440" y="203.2">3</text>
+<text fill="#6B7378" font-size="7" text-anchor="middle" x="440" y="218">dernier point</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="228">Ortho (F8, ou Maj maintenue) bloque la direction tous les 90° ; le magnétisme de grille (F9) arrondit au pas de la grille.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Les invites de Polyline, en substance</span>Polyline
+  Début ............ 0,0
+  Point suivant .... r1200,0
+  Point suivant .... r0,800
+  Point suivant .... r-1200,0
+  Point suivant .... option Fermer</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le plan de construction</h3>
+<p>Les coordonnées tapées se lisent dans le plan de construction de la vue (CPlane). Le déplacer (commande CPlane) permet de dessiner à plat sur une face inclinée, avec les mêmes saisies.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Combiner avec les accroches</h3>
+<p>Une contrainte de distance ou d'angle reste active pendant qu'on accroche : « 50 Entrée » puis accroche Perpendiculaire donne un segment de 50, perpendiculaire à une courbe.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Cliquer sans accrochage dans une vue de dessus : le point tombe sur le plan de construction, à Z = 0, même si la courbe visée est plus haut. Vu de dessus, le défaut est invisible.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 157 · Modéliser avec précision dans Rhino</div>
+</section>
+<!-- ============ PAGE 4 · ACCROCHER ET VÉRIFIER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 157</b></div>
+<p class="rubrique">Schéma 3 · Accrocher et vérifier</p>
+<h2>Ce qui existe sert de repère</h2>
+<p style="max-width:165mm">Les accroches aux objets (Osnap) placent le curseur sur un point exact d'une géométrie existante : extrémité, milieu, centre, intersection, perpendiculaire, tangente. SmartTrack prolonge ces repères par des lignes temporaires.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 216" width="100%">
+<rect fill="#EFE9E1" height="216" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Accrocher à ce qui existe, puis vérifier ce qu'on a obtenu</text>
+<polyline fill="none" points="40,170 40,70 200,70" stroke="#2B2F33" stroke-width="2"></polyline>
+<circle cx="150" cy="140" fill="none" r="30" stroke="#2B2F33" stroke-width="2"></circle>
+<line stroke="#2B2F33" stroke-width="2" x1="40" x2="230" y1="170" y2="110"></line>
+<rect fill="none" height="8" stroke="#2E7D32" stroke-width="1.6" width="8" x="196" y="66"></rect>
+<rect fill="none" height="8" stroke="#1565C0" stroke-width="1.6" width="8" x="116" y="66"></rect>
+<rect fill="none" height="8" stroke="#7B1FA2" stroke-width="1.6" width="8" x="146" y="136"></rect>
+<rect fill="none" height="8" stroke="#2E7D32" stroke-width="1.6" width="8" x="36" y="166"></rect>
+<rect fill="none" height="8" stroke="#E65100" stroke-width="1.6" width="8" x="176" y="121.8"></rect>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="206" y="66">Fin</text>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="middle" x="120" y="62">Milieu</text>
+<text fill="#7B1FA2" font-size="7.6" font-weight="700" text-anchor="middle" x="150" y="120">Centre</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="start" x="188" y="140">Inter</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="middle" x="130" y="200">le curseur saute au point exact</text>
+<polygon fill="#fff" points="360,100 460,100 500,70 400,70" stroke="#2B2F33"></polygon>
+<polygon fill="#F6F3EE" points="360,100 460,100 460,170 360,170" stroke="#2B2F33"></polygon>
+<polygon fill="#ECE6DD" points="460,100 500,70 500,140 460,170" stroke="#2B2F33"></polygon>
+<polyline fill="none" points="360,100 400,70 500,70" stroke="#C62828" stroke-width="3"></polyline>
+<line stroke="#C62828" stroke-width="3" x1="360" x2="360" y1="100" y2="170"></line>
+<line stroke="#C62828" stroke-width="3" x1="360" x2="460" y1="170" y2="170"></line>
+<text fill="#C62828" font-size="8" font-weight="700" text-anchor="start" x="520" y="84">ShowEdges :</text>
+<text fill="#C62828" font-size="8" text-anchor="start" x="520" y="98">bords ouverts</text>
+<text fill="#C62828" font-size="8" text-anchor="start" x="520" y="112">en rouge</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="middle" x="430" y="200">une face manque : la polysurface est ouverte</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Forcer une accroche pour un seul clic</span>Line
+  Début ....... Cen    puis clic sur le cercle : le début est son centre
+  Fin ......... Perp   puis clic sur la droite : le segment lui est perpendiculaire</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Peu d'accroches permanentes</h3>
+<p>Fin, Proche, Point, Milieu, Intersection suffisent souvent en permanence. Les autres se forcent pour un seul clic, en tapant leur nom (Cen, Perp, Tan…) à l'invite.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Mesurer, puis vérifier</h3>
+<p>Distance, Length, Area et Volume donnent les vraies valeurs. What décrit un objet (« polysurface fermée »), ShowEdges montre les bords ouverts, Check signale les objets abîmés.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Activer toutes les accroches à la fois : près d'une zone dense, le curseur saute sur un point voisin qui n'est pas le bon. Mieux vaut peu d'accroches, et forcer celle dont on a besoin.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 157 · Modéliser avec précision dans Rhino</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 157</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Un plateau de table, au millimètre</h2>
+<p style="max-width:165mm; font-size:9pt">Tu vas dessiner le plateau de la situation de départ en ne tapant que des valeurs, puis vérifier par des mesures que le solide est fermé et que ses cotes sont justes.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Crée un fichier depuis un gabarit en millimètres. Dans Options › Unités, vérifie : mm, tolérance absolue 0,001, angle 1°.</li>
+<li>Lance <span class="cmd">Polyline</span>. Tape <span class="cmd">0,0</span>, puis <span class="cmd">r1200,0</span>, <span class="cmd">r0,800</span>, <span class="cmd">r-1200,0</span>, et choisis l'option Fermer.</li>
+<li>Lance <span class="cmd">FilletCorners</span>, rayon 50, et sélectionne le contour.</li>
+<li>Mesure-le avec <span class="cmd">Length</span>.</li>
+<li>Extrude-le avec <span class="cmd">ExtrudeCrv</span> : distance 25, option Solide = Oui.</li>
+<li>Contrôle avec <span class="cmd">What</span>, <span class="cmd">ShowEdges</span> puis <span class="cmd">Volume</span>.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Le contour mesure <b>3 914,16 mm</b> : 2 × (1 200 + 800), moins 8 fois le rayon, plus un cercle complet de rayon 50. What annonce une <b>polysurface fermée</b>, ShowEdges ne trouve aucun bord ouvert, et le volume vaut environ <b>23 946 350 mm³</b>.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Perce quatre trous de 8 mm de diamètre, centrés à 40 mm de chaque bord, sans cliquer une seule fois au jugé. Le solide doit rester fermé. Quel volume obtiens-tu ?
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Un plugin bien élevé ne fige pas sa propre précision : il lit celle du document. Magpie s'en sert pour régler le pas de ses mesures, et Cuttlefish la passe à Rhino pour arrondir des coins (Dune.cs:76).</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">magpie/plugin/Core/GeometrySampler.cs</span></div>
+<div class="l k1"><span class="n">209</span>var doc = Rhino.RhinoDoc.ActiveDoc;<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">210</span>double tolerance = doc != null &amp;&amp; … &gt; 0<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">211</span>    ? doc.ModelAbsoluteTolerance<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">212</span>    : 0.001;<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">213</span>return tolerance * AbsoluteSpacingFactor;<span class="rep r4">4</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Le document actif</b>Peut manquer, sous Compute.</li>
+<li><span class="rep r2">2</span><b>Sa tolérance</b>Lue, jamais devinée.</li>
+<li><span class="rep r3">3</span><b>Un repli</b>Le défaut d'un modèle en mm.</li>
+<li><span class="rep r4">4</span><b>Une précision adaptée</b>Proportionnelle à l'unité.</li>
+</ul>
+</div>
+<div class="folio">5</div>
+<div class="pied">Cours 157 · Modéliser avec précision dans Rhino</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 157</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Unités et tolérances se fixent avant de dessiner. Chaque point important se tape (absolu, relatif, polaire) ou s'accroche à l'existant ; une contrainte de distance ou d'angle laisse le clic choisir le reste. Ce qui compte se vérifie par une mesure et par ShowEdges, jamais à l'œil.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Lance Circle et tape 40,40 pour le centre, puis le rayon 4. Copie le cercle avec Copy, en tapant r1120,0, r0,720 et r1120,720. Extrude les quatre cercles en solides plus hauts que le plateau, puis BooleanDifference. Autre voie : sélectionner le contour et les cercles ensemble avant ExtrudeCrv, qui fait les trous d'un coup. Volume attendu : environ <b>23 941 323 mm³</b>, soit 4 × π × 4² × 25 de moins.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">0,0  r50,0  r50&lt;30</td><td>absolu, relatif, polaire</td><td>à chaque invite de point</td></tr>
+<tr><td class="c">50 Entrée  /  &lt;45 Entrée</td><td>contrainte de distance, d'angle</td><td>longueur ou direction connue</td></tr>
+<tr><td class="c">F8  /  F9</td><td>Ortho, magnétisme de grille</td><td>tracés orthogonaux</td></tr>
+<tr><td class="c">Osnap  Cen  Perp  Tan</td><td>accroches permanentes, ou forcées une fois</td><td>partir de l'existant</td></tr>
+<tr><td class="c">CPlane</td><td>déplacer le plan de construction</td><td>dessiner sur une face inclinée</td></tr>
+<tr><td class="c">Length  Distance  Area  Volume</td><td>mesurer</td><td>vérifier une cote</td></tr>
+<tr><td class="c">What  ShowEdges  Check</td><td>décrire, bords ouverts, objets abîmés</td><td>avant d'exporter</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Tolérance absolue</dt><dd>La distance sous laquelle deux points sont tenus pour identiques.</dd>
+<dt>Tolérance d'angle</dt><dd>L'écart d'angle sous lequel deux directions sont tenues pour alignées.</dd>
+<dt>Plan de construction</dt><dd>Le plan de la vue où tombent les points cliqués et où se lisent les coordonnées.</dd>
+<dt>Accroche (Osnap)</dt><dd>Le placement du curseur sur un point exact d'un objet existant.</dd>
+<dt>Bord ouvert</dt><dd>Une arête qui n'appartient qu'à une seule face : la polysurface fuit.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 158, « Stratégies de surfaçage ». Dans l'aide de Rhino, les pages « Units and tolerances » et « Object snaps » détaillent tous les réglages.</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 158</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 157 · Modéliser avec précision dans Rhino</div>
+</section>
+</body>
+</html>

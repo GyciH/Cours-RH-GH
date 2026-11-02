@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>159 · Continuité et qualité des surfaces</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 159</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Continuité et qualité des surfaces</h1>
+<p class="chapeau">Deux surfaces qui se touchent ne se raccordent pas forcément bien. Entre un angle franc et un passage invisible, il y a des niveaux qu'on nomme G0, G1, G2. Ce cours apprend à les reconnaître dans les reflets, à les mesurer, et à choisir celui dont un objet a besoin.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>158</b>, <b>52</b></span>
+<span class="pastille">Exemples · <b>Rhino 8, BlendSrf, Zebra, GCon</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 190" width="100%">
+<rect fill="#EFE9E1" height="190" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Trois façons de passer d'une droite à une courbe</text>
+<line stroke="#2B2F33" stroke-width="2" x1="20" x2="90" y1="130" y2="130"></line>
+<polyline fill="none" points="90.0,130.0 91.4,128.0 92.9,125.9 94.3,123.9 95.7,121.8 97.2,119.8 98.6,117.7 100.0,115.7 101.5,113.6 102.9,111.6 104.3,109.5 105.8,107.5 107.2,105.4 108.6,103.4 110.1,101.3 111.5,99.3 112.9,97.2 114.4,95.2 115.8,93.1 117.2,91.1 118.7,89.0" stroke="#C62828" stroke-width="2"></polyline>
+<path d="M106 130 A16 16 0 0 0 99.2 116.9" fill="none" stroke="#C62828"></path>
+<text fill="#C62828" font-size="7" font-weight="700" text-anchor="start" x="112" y="126">angle</text>
+<text fill="#C62828" font-size="8.6" font-weight="700" text-anchor="middle" x="90" y="160">G0 · position</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="90" y="174">les bords se touchent, avec un angle</text>
+<line stroke="#2B2F33" stroke-width="2" x1="216" x2="286" y1="130" y2="130"></line>
+<polyline fill="none" points="286.0,130.0 289.1,129.9 292.3,129.5 295.3,128.9 298.4,128.0 301.3,127.0 304.2,125.6 306.9,124.1 309.5,122.4 312.0,120.4 314.3,118.3 316.4,116.0 318.4,113.5 320.1,110.9 321.6,108.2 323.0,105.3 324.0,102.4 324.9,99.3 325.5,96.3 325.9,93.1 326.0,90.0" stroke="#E65100" stroke-width="2"></polyline>
+<line stroke="#1565C0" stroke-width=".7" x1="286.0" x2="286.0" y1="130.0" y2="148.0"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="292.3" x2="289.4" y1="129.5" y2="147.3"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="298.4" x2="292.8" y1="128.0" y2="145.2"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="304.2" x2="296.0" y1="125.6" y2="141.7"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="309.5" x2="298.9" y1="122.4" y2="136.9"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="314.3" x2="301.6" y1="118.3" y2="131.0"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="318.4" x2="303.8" y1="113.5" y2="124.1"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="321.6" x2="305.6" y1="108.2" y2="116.3"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="324.0" x2="306.9" y1="102.4" y2="107.9"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="325.5" x2="307.7" y1="96.3" y2="99.1"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="326.0" x2="308.0" y1="90.0" y2="90.0"></line>
+<circle cx="216" cy="130" fill="none" r=".1"></circle>
+<circle cx="226" cy="130" fill="none" r=".1"></circle>
+<circle cx="236" cy="130" fill="none" r=".1"></circle>
+<circle cx="246" cy="130" fill="none" r=".1"></circle>
+<circle cx="256" cy="130" fill="none" r=".1"></circle>
+<circle cx="266" cy="130" fill="none" r=".1"></circle>
+<circle cx="276" cy="130" fill="none" r=".1"></circle>
+<circle cx="286" cy="130" fill="none" r=".1"></circle>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="middle" x="286" y="160">G1 · tangence</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="286" y="174">même direction, la courbure saute</text>
+<line stroke="#2B2F33" stroke-width="2" x1="412" x2="482" y1="130" y2="130"></line>
+<polyline fill="none" points="482.0,130.0 484.2,130.0 486.4,130.0 488.6,129.9 490.8,129.9 493.0,129.8 495.2,129.7 497.4,129.5 499.6,129.3 501.8,129.1 503.9,128.8 506.1,128.4 508.3,128.0 510.4,127.5 512.5,127.0 514.6,126.3 516.7,125.6 518.8,124.8 520.8,123.8 522.7,122.8 524.6,121.7 526.5,120.6 528.3,119.3 530.0,117.9 531.6,116.4 533.1,114.8 534.5,113.1 535.8,111.3 537.0,109.4 538.0,107.5 538.9,105.5 539.6,103.4 540.2,101.3 540.6,99.1 540.8,96.9" stroke="#2E7D32" stroke-width="2"></polyline>
+<line stroke="#1565C0" stroke-width=".7" x1="482.0" x2="482.0" y1="130.0" y2="130.0"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="488.6" x2="488.6" y1="129.9" y2="131.5"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="495.2" x2="495.0" y1="129.7" y2="132.9"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="501.8" x2="501.2" y1="129.1" y2="133.8"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="508.3" x2="507.0" y1="128.0" y2="134.2"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="514.6" x2="512.3" y1="126.3" y2="133.9"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="520.8" x2="516.8" y1="123.8" y2="132.5"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="526.5" x2="520.4" y1="120.6" y2="129.9"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="531.6" x2="522.9" y1="116.4" y2="125.7"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="535.8" x2="524.3" y1="111.3" y2="119.7"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="538.9" x2="524.3" y1="105.5" y2="111.9"></line>
+<line stroke="#1565C0" stroke-width=".7" x1="540.6" x2="523.3" y1="99.1" y2="102.2"></line>
+<circle cx="412" cy="130" fill="none" r=".1"></circle>
+<circle cx="422" cy="130" fill="none" r=".1"></circle>
+<circle cx="432" cy="130" fill="none" r=".1"></circle>
+<circle cx="442" cy="130" fill="none" r=".1"></circle>
+<circle cx="452" cy="130" fill="none" r=".1"></circle>
+<circle cx="462" cy="130" fill="none" r=".1"></circle>
+<circle cx="472" cy="130" fill="none" r=".1"></circle>
+<circle cx="482" cy="130" fill="none" r=".1"></circle>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="middle" x="482" y="160">G2 · courbure</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="482" y="174">même direction et même courbure</text>
+<text fill="#1565C0" font-size="7.2" font-style="italic" text-anchor="end" x="584" y="40">traits bleus : peigne de courbure</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Deux courbes ou surfaces qui se touchent se raccordent plus ou moins bien : en position (G0), en tangence (G1), en courbure (G2). L'œil voit la différence dans les reflets ; Rhino la mesure.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Le dossier d'un fauteuil rejoint l'assise par un congé de rayon 20. Au rendu, une ligne brillante casse le raccord : le congé est tangent, mais sa courbure saute. Remplacé par une surface de raccord en courbure, le reflet glisse d'une surface à l'autre sans cassure.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>distinguer les continuités G0, G1 et G2 ;</li>
+<li>lire un graphe de courbure et des zébrures ;</li>
+<li>raccorder deux courbes ou surfaces au niveau voulu ;</li>
+<li>choisir la continuité selon l'objet et sa fabrication.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    G0 : les bords se touchent. G1 : ils partent dans la même direction, sans angle. G2 : ils ont aussi la même courbure, sans saut de rayon. Un congé circulaire n'est que G1 : au bord du congé, la courbure passe d'un coup de 0 à 1/R.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 159 · Continuité et qualité des surfaces</div>
+</section>
+<!-- ============ PAGE 2 · LA COURBURE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 159</b></div>
+<p class="rubrique">Schéma 1 · La courbure</p>
+<h2>Ce que le congé ne dit pas</h2>
+<p style="max-width:165mm">La courbure d'une courbe vaut 1/R, R étant le rayon du cercle qui l'épouse au mieux en ce point. Une droite a une courbure nulle. Le graphe de courbure la montre par des traits d'autant plus longs que la courbe tourne.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">La courbure le long du raccord, lue comme un graphe (CurvatureGraph)</text>
+<line stroke="#6B7378" stroke-width=".8" x1="30" x2="280" y1="160" y2="160"></line><line stroke="#6B7378" stroke-width=".8" x1="30" x2="30" y1="160" y2="60"></line>
+<polyline fill="none" points="30.0,160.0 135.0,160.0 135.0,70.0 175.0,70.0 175.0,160.0 280.0,160.0" stroke="#E65100" stroke-width="2"></polyline>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="middle" x="155.0" y="178">congé circulaire · G1</text>
+<text fill="#6B7378" font-size="7.2" text-anchor="end" x="24" y="70">1/R</text>
+<text fill="#6B7378" font-size="7" text-anchor="end" x="280" y="192">position le long des courbes →</text>
+<line stroke="#6B7378" stroke-width=".8" x1="320" x2="570" y1="160" y2="160"></line><line stroke="#6B7378" stroke-width=".8" x1="320" x2="320" y1="160" y2="60"></line>
+<polyline fill="none" points="320.0,160.0 324.2,160.0 328.3,160.0 332.5,160.0 336.7,160.0 340.8,160.0 345.0,160.0 349.2,160.0 353.3,160.0 357.5,160.0 361.7,160.0 365.8,160.0 370.0,160.0 374.2,160.0 378.3,160.0 382.5,160.0 386.7,160.0 390.8,160.0 395.0,160.0 399.2,158.5 403.3,154.0 407.5,146.8 411.7,137.5 415.8,126.6 420.0,115.0 424.2,103.4 428.3,92.5 432.5,83.2 436.7,76.0 440.8,71.5 445.0,70.0 449.2,71.5 453.3,76.0 457.5,83.2 461.7,92.5 465.8,103.4 470.0,115.0 474.2,126.6 478.3,137.5 482.5,146.8 486.7,154.0 490.8,158.5 495.0,160.0 499.2,160.0 503.3,160.0 507.5,160.0 511.7,160.0 515.8,160.0 520.0,160.0 524.2,160.0 528.3,160.0 532.5,160.0 536.7,160.0 540.8,160.0 545.0,160.0 549.2,160.0 553.3,160.0 557.5,160.0 561.7,160.0 565.8,160.0 570.0,160.0" stroke="#2E7D32" stroke-width="2"></polyline>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="middle" x="445.0" y="178">raccord en courbure · G2</text>
+<text fill="#6B7378" font-size="7.2" text-anchor="end" x="314" y="70">1/R</text>
+<text fill="#6B7378" font-size="7" text-anchor="end" x="570" y="192">position le long des courbes →</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="middle" x="150" y="52">saut : 0 puis 1/R</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="middle" x="440" y="52">montée progressive depuis 0</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, mesurer un raccord entre deux courbes</span>Vector3d ta = a.TangentAt(a.Domain.T1), tb = b.TangentAt(b.Domain.T0);
+bool g1 = ta.IsParallelTo(tb, RhinoMath.ToRadians(1)) == 1;      // même direction, à 1° près
+double ka = a.CurvatureAt(a.Domain.T1).Length, kb = b.CurvatureAt(b.Domain.T0).Length;  // G2 si égales</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le saut du congé</h3>
+<p>Sur un congé circulaire entre deux plans, la courbure vaut 0, puis 1/R tout le long du congé, puis 0. Le graphe dessine deux marches : c'est la signature d'un raccord G1.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>La montée du raccord</h3>
+<p>Une courbe de raccord en courbure part d'une courbure nulle et y revient. Le graphe monte et redescend sans marche : le passage est G2.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire qu'un congé est « lisse » parce qu'il n'a pas d'angle. Il est tangent, mais la courbure saute à ses deux bords, et c'est exactement ce que montrent les reflets sur un objet brillant.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 159 · Continuité et qualité des surfaces</div>
+</section>
+<!-- ============ PAGE 3 · LIRE LES REFLETS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 159</b></div>
+<p class="rubrique">Schéma 2 · Lire les reflets</p>
+<h2>Les zébrures et la carte d'environnement</h2>
+<p style="max-width:165mm">La lumière réfléchie suit la courbure d'une surface. Les analyses de Rhino s'en servent : des bandes parallèles (Zebra) ou une image d'environnement (EMap) reflétées par la surface rendent visibles les défauts de raccord.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 178" width="100%">
+<rect fill="#EFE9E1" height="178" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Des bandes réfléchies (Zebra) qui traversent le bord commun de deux surfaces</text>
+<rect fill="#fff" height="100" stroke="#6B7378" width="170" x="24" y="40"></rect>
+<line stroke="#6B7378" stroke-dasharray="3 2" x1="109.0" x2="109.0" y1="40" y2="140"></line>
+<path d="M24 54 L109.0 54 M109.0 62 L194 62" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M24 72 L109.0 72 M109.0 80 L194 80" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M24 90 L109.0 90 M109.0 98 L194 98" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M24 108 L109.0 108 M109.0 116 L194 116" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M24 126 L109.0 126 M109.0 134 L194 134" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="middle" x="109.0" y="160">G0 : les bandes se décalent</text>
+<rect fill="#fff" height="100" stroke="#6B7378" width="170" x="216" y="40"></rect>
+<line stroke="#6B7378" stroke-dasharray="3 2" x1="301.0" x2="301.0" y1="40" y2="140"></line>
+<path d="M216 54 L301.0 54 L386 70" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M216 72 L301.0 72 L386 88" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M216 90 L301.0 90 L386 106" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M216 108 L301.0 108 L386 124" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M216 126 L301.0 126 L386 142" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<text fill="#E65100" font-size="7.8" font-weight="700" text-anchor="middle" x="301.0" y="160">G1 : elles se suivent, avec un coude</text>
+<rect fill="#fff" height="100" stroke="#6B7378" width="170" x="408" y="40"></rect>
+<line stroke="#6B7378" stroke-dasharray="3 2" x1="493.0" x2="493.0" y1="40" y2="140"></line>
+<path d="M408 54 L468.0 54 Q503.0 54 578 70" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M408 72 L468.0 72 Q503.0 72 578 88" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M408 90 L468.0 90 Q503.0 90 578 106" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M408 108 L468.0 108 Q503.0 108 578 124" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<path d="M408 126 L468.0 126 Q503.0 126 578 142" fill="none" opacity=".85" stroke="#2B2F33" stroke-linecap="butt" stroke-width="5"></path>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="493.0" y="160">G2 : elles se prolongent sans coude</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · les commandes d'analyse</span>Zebra               bandes réfléchies : G0 décalées, G1 coudées, G2 prolongées
+EMap                une image reflétée, proche d'un rendu
+CurvatureAnalysis   des couleurs selon la courbure de la surface
+CurvatureGraph      le peigne de courbure d'une courbe ou d'une isocourbe</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Juger un bord</h3>
+<p>On regarde comment les bandes traversent le bord commun : décalées (G0), alignées mais avec un coude (G1), ou prolongées sans coude (G2).</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Juger une surface</h3>
+<p>Des bandes qui ondulent au milieu d'une surface révèlent des bosses : trop de points de contrôle, ou des courbes d'entrée irrégulières (cours 158).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Juger les zébrures sur un maillage d'analyse grossier : les bandes se brisent sur les facettes et font croire à des défauts. On affine d'abord le maillage depuis le panneau de l'analyse.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 159 · Continuité et qualité des surfaces</div>
+</section>
+<!-- ============ PAGE 4 · RACCORDER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 159</b></div>
+<p class="rubrique">Schéma 3 · Raccorder</p>
+<h2>Choisir l'outil et le niveau</h2>
+<p style="max-width:165mm">Rhino raccorde de deux façons : en créant une nouvelle surface entre deux bords (congé, raccord), ou en déformant une surface existante pour l'accorder à l'autre. Chaque commande a son plafond de continuité.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Les commandes de raccord, et la continuité qu'elles atteignent</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="42">commande</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="130" y="42">ce qu'elle fait</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="42">continuité</text>
+<rect fill="#fff" height="24" opacity=".6" width="580" x="10" y="50"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="16" y="66">BlendCrv</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="130" y="66">une courbe de raccord entre deux courbes</text>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="start" x="400" y="66">jusqu'à G4</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="16" y="90">FilletSrf</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="130" y="90">un congé circulaire entre deux surfaces</text>
+<text fill="#E65100" font-size="8.2" font-weight="700" text-anchor="start" x="400" y="90">G1</text>
+<rect fill="#fff" height="24" opacity=".6" width="580" x="10" y="98"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="16" y="114">FilletEdge</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="130" y="114">des congés sur les arêtes d'une polysurface</text>
+<text fill="#E65100" font-size="8.2" font-weight="700" text-anchor="start" x="400" y="114">G1</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="16" y="138">BlendSrf</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="130" y="138">une surface de raccord entre deux bords</text>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="start" x="400" y="138">jusqu'à G4</text>
+<rect fill="#fff" height="24" opacity=".6" width="580" x="10" y="146"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="16" y="162">MatchSrf</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="130" y="162">déforme une surface pour l'accorder à un bord</text>
+<text fill="#1565C0" font-size="8.2" font-weight="700" text-anchor="start" x="400" y="162">G0, G1 ou G2</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="16" y="186">GCon</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="130" y="186">mesure la continuité entre deux courbes</text>
+<text fill="#6B7378" font-size="8.2" font-weight="700" text-anchor="start" x="400" y="186">dit G0, G1 ou G2</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="206">G3 et G4 prolongent l'idée : la variation de courbure elle-même devient continue.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, une courbe de raccord en courbure</span>Curve r = Curve.CreateBlendCurve(a, b, BlendContinuity.Curvature);   // G2 aux deux bouts</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Quel niveau pour quoi</h3>
+<p>Un meuble, une pièce usinée ou découpée : G1 suffit souvent, et les congés se fabriquent bien. Un objet brillant, une coque, une carrosserie : G2 au moins, car les reflets ne pardonnent rien.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le prix de la continuité</h3>
+<p>Plus de continuité demande plus de points et des bords propres. Les bords non coupés de zones à quatre côtés (cours 158) se raccordent bien mieux que des bords de coupe.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Lancer MatchSrf sur un bord coupé. La surface de base s'étend sous la coupe : l'accorder le long d'une courbe de coupe ne donne pas la continuité promise. On raccorde des bords non coupés, ou l'on crée une surface de raccord.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 159 · Continuité et qualité des surfaces</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 159</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Un congé, puis un raccord en courbure</h2>
+<p style="max-width:165mm; font-size:9pt">Tu raccordes deux droites puis deux surfaces, d'abord par un congé, ensuite en courbure, et tu compares ce que disent les mesures et les reflets.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Fichier en millimètres, vue Dessus. <span class="cmd">Line</span> de <span class="cmd">0,0</span> à <span class="cmd">100,0</span>, puis de <span class="cmd">120,20</span> à <span class="cmd">120,120</span>.</li>
+<li>Copie les deux lignes à côté (<span class="cmd">Copy</span>, <span class="cmd">r0,-200</span>) pour garder un jeu intact.</li>
+<li>Sur le premier jeu, <span class="cmd">Fillet</span> rayon 20. Sur le second, <span class="cmd">BlendCrv</span> en continuité Courbure.</li>
+<li>Lance <span class="cmd">GCon</span> sur chaque raccord, puis <span class="cmd">CurvatureGraph</span>.</li>
+<li>Extrude chaque jeu de deux droites de 50 (<span class="cmd">ExtrudeCrv</span>), puis : <span class="cmd">FilletSrf</span> rayon 20 sur le premier, <span class="cmd">BlendSrf</span> en Courbure sur le second.</li>
+<li>Affiche <span class="cmd">Zebra</span> sur les deux résultats.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        GCon annonce une continuité <b>G1</b> pour le congé et <b>G2</b> pour le raccord. Le graphe du congé fait deux marches ; celui du raccord monte depuis zéro. Sous Zebra, les bandes <b>se coudent</b> au bord du congé et <b>se prolongent</b> à travers le raccord.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Obtiens un raccord G2 qui reste dans un carré de 10 mm autour du coin, au lieu de 20 mm, sans toucher aux lignes de départ.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ <b>GCon</b> donne deux verdicts différents pour les deux raccords.</li>
+<li style="margin-bottom:1.6mm">☐ Le graphe du congé montre deux marches nettes.</li>
+<li style="margin-bottom:1.6mm">☐ Les zébrures du raccord ne montrent ni décalage ni coude.</li>
+<li style="margin-bottom:1.6mm">☐ Tu as affiné le maillage d'analyse si les bandes paraissent brisées.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 159 · Continuité et qualité des surfaces</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 159</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">La continuité dit comment deux bords se raccordent : G0 en position, G1 en tangence, G2 en courbure. Un congé circulaire est G1 ; son saut de courbure se voit dans les reflets. On mesure avec GCon et CurvatureGraph, on observe avec Zebra et EMap, et l'on raccorde avec BlendCrv, BlendSrf ou MatchSrf au niveau que demandent l'objet et sa fabrication.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Le raccord relie des bords : pour le resserrer, il faut des bords plus proches du coin. Copie les lignes, prolonge chaque copie de 10 mm vers le coin avec Extend, jusqu'à 110,0 et 120,10. Lance ensuite BlendCrv, ou BlendSrf après extrusion, en Courbure. GCon dit toujours G2, et le graphe monte plus haut : un raccord plus serré tourne plus vite.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">GCon</td><td>mesurer la continuité entre deux courbes</td><td>après un raccord de courbes</td></tr>
+<tr><td class="c">CurvatureGraph</td><td>afficher le peigne de courbure</td><td>repérer un saut</td></tr>
+<tr><td class="c">Zebra  EMap</td><td>observer les reflets d'une surface</td><td>juger un bord ou une bosse</td></tr>
+<tr><td class="c">Fillet  FilletSrf  FilletEdge</td><td>congés circulaires (G1)</td><td>pièces fabriquées, chants</td></tr>
+<tr><td class="c">BlendCrv  BlendSrf</td><td>raccords jusqu'à G4</td><td>objets brillants, transitions douces</td></tr>
+<tr><td class="c">MatchSrf</td><td>accorder un bord de surface à un autre</td><td>corriger un raccord existant</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Continuité</dt><dd>Le degré d'accord entre deux courbes ou surfaces à leur jonction : G0, G1, G2…</dd>
+<dt>Courbure</dt><dd>1/R : l'inverse du rayon du cercle qui épouse la courbe en un point.</dd>
+<dt>Congé</dt><dd>Un arrondi de rayon constant entre deux surfaces ; il est tangent (G1).</dd>
+<dt>Raccord (blend)</dt><dd>Une surface ou une courbe de transition, réglable jusqu'à G4.</dd>
+<dt>Zébrures</dt><dd>Des bandes réfléchies qui rendent visibles les défauts de continuité.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 160, « Le Brep de l'intérieur ». Dans l'aide de Rhino, la page « Continuity » et celles de BlendSrf et Zebra.</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 160</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 159 · Continuité et qualité des surfaces</div>
+</section>
+</body>
+</html>

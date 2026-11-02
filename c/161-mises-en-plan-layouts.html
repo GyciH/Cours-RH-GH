@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>161 · Mises en plan et layouts</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 161</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Mises en plan et layouts</h1>
+<p class="chapeau">Un modèle juste ne suffit pas : l'atelier, le client ou le découpeur attendent une feuille. Rhino la construit sans aplatir le modèle : une mise en plan pose des fenêtres à l'échelle sur la 3D, puis on cote, on hiérarchise les traits et l'on sort un PDF.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>débutant à intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>157</b></span>
+<span class="pastille">Exemples · <b>Rhino 8, Layout, Detail, Make2D, Print</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 200" width="100%">
+<rect fill="#EFE9E1" height="200" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Le modèle reste en 3D ; la feuille le montre à travers des fenêtres à l'échelle</text>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="middle" x="110" y="46">espace modèle · mm réels</text>
+<polygon fill="#fff" points="110.0,150.0 203.5,96.0 203.5,88.8 110.0,142.8" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<polygon fill="#F4F1EA" points="110.0,150.0 47.6,114.0 47.6,106.8 110.0,142.8" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<polygon fill="#fff" points="110.0,142.8 203.5,88.8 141.2,52.8 47.6,106.8" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<line stroke="#1F5F7A" stroke-width="1.6" x1="215" x2="285" y1="110" y2="110"></line><polygon fill="#1F5F7A" points="285,110 278.6,112.7 278.6,107.3"></polygon>
+<text fill="#1F5F7A" font-size="7.8" font-weight="700" text-anchor="middle" x="250" y="100">détail 1:10</text>
+<rect fill="#fff" height="150" stroke="#2B2F33" width="270" x="300" y="40"></rect>
+<text fill="#6B7378" font-size="7.8" font-style="italic" text-anchor="middle" x="435" y="34">espace papier · feuille A3, mm de papier</text>
+<rect fill="none" height="110" stroke="#1565C0" stroke-width="1.6" width="150" x="316" y="54"></rect>
+<rect fill="#F4F1EA" height="64" stroke="#2B2F33" width="96" x="341" y="79"></rect>
+<line stroke="#E65100" x1="341" x2="437" y1="152" y2="152"></line><line stroke="#E65100" x1="341" x2="341" y1="148" y2="156"></line><line stroke="#E65100" x1="437" x2="437" y1="148" y2="156"></line>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="middle" x="389" y="162">1200</text>
+<rect fill="none" height="42" stroke="#2B2F33" stroke-width=".8" width="82" x="480" y="140"></rect>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="486" y="154">Plateau</text>
+<text fill="#2B2F33" font-size="7" text-anchor="start" x="486" y="166">éch. 1:10</text>
+<text fill="#2B2F33" font-size="7" text-anchor="start" x="486" y="177">A3 · mm</text>
+<circle cx="316" cy="54" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="316" y="57.2">1</text>
+<circle cx="437" cy="152" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="437" y="155.2">2</text>
+<circle cx="562" cy="140" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="562" y="143.2">3</text>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="start" x="480" y="62">1 détail</text>
+<text fill="#1565C0" font-size="7.4" font-weight="700" text-anchor="start" x="480" y="74">2 cote</text>
+<text fill="#7B1FA2" font-size="7.4" font-weight="700" text-anchor="start" x="480" y="86">3 cartouche</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Le modèle reste en 3D et en vraie grandeur ; la mise en plan est une feuille en millimètres de papier, où des détails montrent ce modèle à une échelle choisie.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Un menuisier demande le plan d'un plateau de 1200 × 800 mm sur une feuille A3. Une capture d'écran n'a pas d'échelle : ses cotes ne se mesurent pas. Une mise en plan au 1:10 donne un plateau de 120 mm sur le papier, coté, avec un cartouche, exporté en PDF.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>créer une feuille et y placer des détails à l'échelle ;</li>
+<li>coter et annoter dans la feuille ;</li>
+<li>projeter le modèle en dessin plat avec Make2D ;</li>
+<li>exporter une feuille en PDF, aux bonnes épaisseurs de trait.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Deux espaces : le modèle, en vraie grandeur ; la feuille, en millimètres de papier. Un détail relie les deux par une échelle : longueur sur la feuille = longueur réelle ÷ échelle. On verrouille chaque détail une fois réglé.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 161 · Mises en plan et layouts</div>
+</section>
+<!-- ============ PAGE 2 · DEUX ESPACES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 161</b></div>
+<p class="rubrique">Schéma 1 · Deux espaces</p>
+<h2>La feuille et ses détails</h2>
+<p style="max-width:165mm">Layout crée une feuille au format choisi, A4, A3 ou autre. Detail y découpe des fenêtres : chacune a sa vue (dessus, face, perspective), son mode d'affichage et son échelle. Double-cliquer dans un détail l'active ; double-cliquer dehors revient à la feuille.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une échelle de détail : combien de mm de modèle pour 1 mm de papier</text>
+<text fill="#2E7D32" font-size="10" font-weight="700" text-anchor="start" x="20" y="70">1:5</text>
+<rect fill="#fff" height="22" stroke="#2E7D32" stroke-width="1.6" width="180" x="70" y="56"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="260" y="71">240 mm sur la feuille</text>
+<text fill="#1565C0" font-size="10" font-weight="700" text-anchor="start" x="20" y="114">1:10</text>
+<rect fill="#fff" height="22" stroke="#1565C0" stroke-width="1.6" width="90" x="70" y="100"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="170" y="115">120 mm sur la feuille</text>
+<text fill="#7B1FA2" font-size="10" font-weight="700" text-anchor="start" x="20" y="158">1:20</text>
+<rect fill="#fff" height="22" stroke="#7B1FA2" stroke-width="1.6" width="45" x="70" y="144"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="125" y="159">60 mm sur la feuille</text>
+<text fill="#1F5F7A" font-size="8.4" font-weight="700" text-anchor="start" x="370" y="60">le même plateau de 1200 mm</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="370" y="76">longueur papier = longueur réelle ÷ échelle</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="370" y="98">Une feuille A3 fait 420 × 297 mm : à 1:5,</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="370" y="111">le plateau (240 mm) tient ; à 1:2, il ne tient plus.</text>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="start" x="370" y="140">Verrouiller le détail fige sa vue et son échelle :</text>
+<text fill="#C62828" font-size="7.8" text-anchor="start" x="370" y="153">la molette ne la change plus par accident.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · régler un détail</span>Detail            tracer le cadre sur la feuille
+double-clic       activer le détail, choisir la vue (Dessus, Face…)
+Propriétés        Échelle : 1 mm sur la feuille = 10 mm dans le modèle
+Propriétés        Verrouillé : coché</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Échelle et format</h3>
+<p>On choisit l'échelle d'après la place : la pièce divisée par l'échelle doit tenir dans le cadre. On préfère les échelles usuelles, 1:2, 1:5, 1:10, 1:20, qu'un lecteur reconnaît.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Plusieurs vues</h3>
+<p>Une feuille d'atelier montre souvent dessus, face et côté à la même échelle, alignés, plus une perspective sans échelle pour comprendre la pièce.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier de verrouiller un détail. Un coup de molette en le survolant actif change son zoom, et l'échelle notée dans le cartouche devient fausse sans prévenir.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 161 · Mises en plan et layouts</div>
+</section>
+<!-- ============ PAGE 3 · ANNOTER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 161</b></div>
+<p class="rubrique">Schéma 2 · Annoter</p>
+<h2>Cotes, textes et cartouche</h2>
+<p style="max-width:165mm">Une cote posée dans la feuille vit en millimètres de papier : son texte garde la même taille, quelle que soit l'échelle du détail. Le style de cote (DimStyle) fixe une fois pour toutes la taille du texte, les flèches et les unités.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 200" width="100%">
+<rect fill="#EFE9E1" height="200" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une feuille annotée : traits hiérarchisés, cotes et cartouche en mm de papier</text>
+<rect fill="#fff" height="154" stroke="#2B2F33" width="380" x="40" y="36"></rect>
+<rect fill="none" height="94" stroke="#2B2F33" stroke-width="2.6" width="200" x="90" y="62"></rect>
+<circle cx="190" cy="109" fill="none" r="14" stroke="#2B2F33" stroke-width="1"></circle>
+<line stroke="#1565C0" stroke-width=".8" x1="90" x2="290" y1="172" y2="172"></line><line stroke="#1565C0" stroke-width=".6" x1="90" x2="90" y1="160" y2="176"></line><line stroke="#1565C0" stroke-width=".6" x1="290" x2="290" y1="160" y2="176"></line>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="middle" x="190" y="168">1200</text>
+<line stroke="#1565C0" stroke-width=".8" x1="306" x2="306" y1="62" y2="156"></line>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="start" x="312" y="112">800</text>
+<rect fill="none" height="36" stroke="#2B2F33" stroke-width="1.2" width="86" x="330" y="150"></rect>
+<text fill="#2B2F33" font-size="7.4" font-weight="700" text-anchor="start" x="336" y="163">Plateau · 1:10</text>
+<text fill="#2B2F33" font-size="7" text-anchor="start" x="336" y="176">A3 · 02/11/2026</text>
+<circle cx="90" cy="62" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="90" y="65.2">1</text>
+<circle cx="290" cy="172" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="290" y="175.2">2</text>
+<circle cx="416" cy="150" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="416" y="153.2">3</text>
+<circle cx="440" cy="60" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="440" y="63.2">1</text>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="454" y="63">Contour fort</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="454" y="76">épaisseur d'impression du calque</text>
+<circle cx="440" cy="100" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="440" y="103.2">2</text>
+<text fill="#1565C0" font-size="8.6" font-weight="700" text-anchor="start" x="454" y="103">Cotes fines</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="454" y="116">texte en mm de papier, via DimStyle</text>
+<circle cx="440" cy="140" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="440" y="143.2">3</text>
+<text fill="#7B1FA2" font-size="8.6" font-weight="700" text-anchor="start" x="454" y="143">Cartouche</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="454" y="156">titre, échelle, format, date</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · ce qui va où</span>dans la feuille     cotes du plan, textes, cartouche, cadre
+dans le modèle      ce qui doit voyager avec la 3D (repères de pièces)
+DimStyle            hauteur de texte en mm de papier, unités, arrondi</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le cartouche</h3>
+<p>Un cadre fixe, en bas à droite : titre, échelle, format, date, auteur. Il se dessine une fois, puis la feuille sert de modèle aux suivantes.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>La hiérarchie des traits</h3>
+<p>Les épaisseurs d'impression se règlent par calque : contours forts, arêtes et cotes fines, lignes cachées fines et pointillées. L'œil lit la pièce avant les détails.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Coter une capture d'écran ou une vue sans échelle. Les chiffres sont justes, mais rien sur le papier ne se mesure : un plan doit pouvoir se lire à la règle.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 161 · Mises en plan et layouts</div>
+</section>
+<!-- ============ PAGE 4 · SORTIR LE PLAN ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 161</b></div>
+<p class="rubrique">Schéma 3 · Sortir le plan</p>
+<h2>Make2D et l'export</h2>
+<p style="max-width:165mm">Un détail montre le modèle vivant. Make2D, lui, projette le modèle depuis une vue et crée des courbes planes, rangées en lignes vues et cachées : c'est un dessin, prêt pour un DXF ou une retouche à la main.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Make2D : un dessin plat, lignes vues et lignes cachées séparées</text>
+<polygon fill="#fff" points="120.0,170.0 208.3,119.0 208.3,76.5 120.0,127.5" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<polygon fill="#F4F1EA" points="120.0,170.0 68.5,140.2 68.5,97.8 120.0,127.5" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<polygon fill="#fff" points="120.0,127.5 208.3,76.5 156.8,46.8 68.5,97.8" stroke="#2B2F33" stroke-width="1.2"></polygon>
+<line stroke="#6B7378" stroke-dasharray="3 2" x1="156.8" x2="156.8" y1="89.2" y2="46.8"></line>
+<line stroke="#6B7378" stroke-dasharray="3 2" x1="156.8" x2="68.5" y1="89.2" y2="140.2"></line>
+<line stroke="#6B7378" stroke-dasharray="3 2" x1="156.8" x2="208.3" y1="89.2" y2="119.0"></line>
+<line stroke="#1F5F7A" stroke-width="1.6" x1="250" x2="300" y1="110" y2="110"></line><polygon fill="#1F5F7A" points="300,110 293.6,112.7 293.6,107.3"></polygon>
+<rect fill="none" height="70" stroke="#2B2F33" stroke-width="1.6" width="120" x="320" y="50"></rect>
+<text fill="#6B7378" font-size="7.6" text-anchor="middle" x="380" y="136">dessus</text>
+<rect fill="none" height="50" stroke="#2B2F33" stroke-width="1.6" width="120" x="460" y="70"></rect>
+<text fill="#6B7378" font-size="7.6" text-anchor="middle" x="520" y="136">face</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="start" x="320" y="162">trait plein : Make2D::Visible</text>
+<text class="mono" fill="#6B7378" font-size="7.6" style="font-size:7.6px" text-anchor="start" x="320" y="176">pointillé : Make2D::Hidden</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, une feuille vers un PDF</span>var pdf = Rhino.FileIO.FilePdf.Create();
+pdf.AddPage(new Rhino.Display.ViewCaptureSettings(pageView, 300));   // 300 dpi
+pdf.Write(chemin);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Détail ou Make2D ?</h3>
+<p>Le détail se met à jour quand le modèle change ; le Make2D est une copie figée, à refaire. On choisit Make2D quand le destinataire veut des courbes : découpe, DXF, retouche.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le PDF</h3>
+<p>Print vers PDF, échelle 1:1 de la feuille, sortie vectorielle : le menuisier imprime en A3 et peut mesurer au réglet.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Imprimer la feuille « ajustée à la page ». L'imprimante réduit tout, et l'échelle 1:10 annoncée devient fausse. On imprime à 100 %.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 161 · Mises en plan et layouts</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 161</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Le plan d'un plateau au 1:10</h2>
+<p style="max-width:165mm; font-size:9pt">Tu mets en plan un plateau de table sur une feuille A3, tu vérifies l'échelle par une mesure sur le papier, puis tu exportes un PDF.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Fichier en millimètres. <span class="cmd">Box</span> de <span class="cmd">0,0,0</span> à <span class="cmd">1200,800,25</span>.</li>
+<li><span class="cmd">Layout</span> : nom « Plateau », A3 paysage, un détail.</li>
+<li>Double-clic dans le détail, vue <span class="cmd">Dessus</span>. Dans ses Propriétés : échelle 1 mm = 10 mm, puis Verrouillé.</li>
+<li>Double-clic hors du détail. <span class="cmd">Distance</span> entre deux coins du plateau, accrochés dans le détail.</li>
+<li><span class="cmd">DimLinear</span> sur la longueur, puis un texte « Plateau · 1:10 » en bas à droite.</li>
+<li><span class="cmd">Print</span> : destination PDF, la feuille entière, échelle 100 %.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        La distance mesurée dans la feuille vaut <b>120 mm</b> en longueur et <b>80 mm</b> en profondeur : l'échelle est bien 1:10. Le détail verrouillé ne bouge plus à la molette. Le PDF A3 montre le plateau coté, et imprimé à 100 %, il mesure 120 mm au réglet.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Ajoute sous la vue de dessus une vue de face à la même échelle, alignée sur elle, et prévois l'épaisseur du plateau sur le papier.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Magpie fabrique ses certificats ainsi : un modèle Rhino contient une feuille ; le plugin remplit ses textes puis l'exporte en PDF.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">magpie/plugin/Core/MagpieCertificateGenerator.cs</span></div>
+<div class="l k1"><span class="n">74</span>var pageViews = doc.Views.GetPageViews();<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">75</span>if (pageViews == null || pageViews.Length == 0)<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">76</span>    throw new InvalidOperationException(…);<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">83</span>var pdf = Rhino.FileIO.FilePdf.Create();<span class="rep r3">3</span></div>
+<div class="l k4"><span class="n">84</span>var captureSettings = new …(pageViews[0], 300);<span class="rep r4">4</span></div>
+<div class="l k4"><span class="n">85</span>pdf.AddPage(captureSettings);<span class="rep r4">4</span></div>
+<div class="l k3"><span class="n">86</span>pdf.Write(outputPath);<span class="rep r3">3</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Les feuilles</b>Les layouts du document.</li>
+<li><span class="rep r2">2</span><b>Aucune feuille</b>Une erreur claire.</li>
+<li><span class="rep r3">3</span><b>Un PDF</b>Créé, puis écrit.</li>
+<li><span class="rep r4">4</span><b>Une page</b>La feuille, à 300 dpi.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ Le détail est verrouillé.</li>
+<li style="margin-bottom:1.6mm">☐ La mesure dans la feuille donne 120 mm.</li>
+<li style="margin-bottom:1.6mm">☐ Le texte de cartouche annonce la bonne échelle.</li>
+<li style="margin-bottom:1.6mm">☐ L'impression est réglée à 100 %, pas « ajustée ».</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 161 · Mises en plan et layouts</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 161</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Le modèle reste en 3D et en vraie grandeur ; la mise en plan est une feuille en millimètres de papier. Des détails y montrent le modèle à une échelle choisie, puis verrouillée. On cote et l'on pose un cartouche dans la feuille, on règle les épaisseurs par calque, on projette avec Make2D quand il faut des courbes, et l'on imprime en PDF à 100 %.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Detail sous le premier cadre ; active-le, vue Face, échelle 1 mm = 10 mm, verrouillé. Déplace le cadre avec Ortho pour aligner les bords gauches des deux vues. Le plateau de 25 mm y fait 2,5 mm de haut : à cette échelle, on cote l'épaisseur plutôt que de la mesurer à l'œil.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">Layout</td><td>créer une feuille</td><td>début de mise en plan</td></tr>
+<tr><td class="c">Detail  (double-clic)</td><td>fenêtre sur le modèle ; l'activer</td><td>chaque vue</td></tr>
+<tr><td class="c">Propriétés du détail</td><td>échelle, vue, verrou</td><td>après chaque détail</td></tr>
+<tr><td class="c">Dim  DimStyle</td><td>coter ; régler le style</td><td>dans la feuille</td></tr>
+<tr><td class="c">Make2D</td><td>dessin plat, vues et cachées</td><td>DXF, découpe</td></tr>
+<tr><td class="c">Print  →  PDF à 100 %</td><td>sortir la feuille</td><td>à la fin</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Layout (mise en plan)</dt><dd>Une feuille en unités de papier, qui regarde le modèle par des détails.</dd>
+<dt>Détail</dt><dd>Une fenêtre de la feuille sur le modèle, avec sa vue et son échelle.</dd>
+<dt>Échelle</dt><dd>Le rapport entre longueur sur la feuille et longueur réelle : 1:10.</dd>
+<dt>Cartouche</dt><dd>Le cadre d'identification du dessin : titre, échelle, format, date.</dd>
+<dt>Make2D</dt><dd>La projection du modèle en courbes planes, vues et cachées.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · la fiche récap de la partie 3. Dans l'aide de Rhino, les pages « Layout », « Detail » et « Make2D ».</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : fiche récap de la partie 3</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 161 · Mises en plan et layouts</div>
+</section>
+</body>
+</html>

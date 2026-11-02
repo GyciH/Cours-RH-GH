@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>158 · Stratégies de surfaçage</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 158</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Stratégies de surfaçage</h1>
+<p class="chapeau">Rhino offre une dizaine de commandes pour créer une surface. Le choix n'est pas affaire de goût : il dépend des courbes dont tu disposes, et il décide de la qualité de tout ce qui suivra. Ce cours donne une méthode : préparer les courbes, choisir la commande, découper la forme.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>157</b>, <b>52</b>, <b>9</b></span>
+<span class="pastille">Exemples · <b>Rhino 8, Loft, Sweep2, EdgeSrf</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">La même forme, en une surface forcée ou en zones à quatre côtés</text>
+<ellipse cx="150" cy="105" fill="#fff" rx="110" ry="58" stroke="#C62828" stroke-width="2"></ellipse>
+<circle cx="109.9" cy="59.3" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="179.3" cy="98.6" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="73.5" cy="126.5" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="111.9" cy="139.9" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="133.9" cy="95.2" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="206.3" cy="129.5" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="177.3" cy="109.1" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="82.8" cy="79.4" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="132.3" cy="103.2" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="134.1" cy="96.4" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="133.8" cy="92.7" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="114.6" cy="145.9" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="220.1" cy="136.1" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="234.2" cy="129.2" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="199.0" cy="134.7" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="163.9" cy="58.6" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="128.8" cy="70.5" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="115.8" cy="138.1" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="193.5" cy="87.6" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="145.9" cy="146.6" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="203.1" cy="80.9" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="138.9" cy="86.0" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="124.8" cy="77.9" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="146.1" cy="71.4" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="177.4" cy="138.2" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="158.8" cy="118.3" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="67.8" cy="120.7" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="165.5" cy="115.0" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="135.5" cy="121.2" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="203.9" cy="137.5" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="217.9" cy="85.3" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="68.3" cy="122.3" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="167.5" cy="102.6" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="169.1" cy="111.9" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="230.3" cy="128.1" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="233.0" cy="91.4" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="127.2" cy="117.2" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="182.0" cy="135.2" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="75.6" cy="116.9" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="101.3" cy="126.5" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="71.5" cy="110.7" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="146.8" cy="151.9" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="166.9" cy="127.6" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="202.4" cy="91.2" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="108.4" cy="135.4" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="144.8" cy="120.3" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="91.6" cy="143.8" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="233.5" cy="116.4" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="166.6" cy="114.5" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="115.3" cy="78.3" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="124.0" cy="67.8" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="176.2" cy="135.1" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="228.7" cy="121.7" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="194.1" cy="86.8" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="154.8" cy="73.5" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="195.1" cy="65.0" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="91.8" cy="98.4" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="140.4" cy="98.9" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="190.3" cy="116.8" fill="#C62828" opacity=".7" r="1.6"></circle>
+<circle cx="183.6" cy="140.8" fill="#C62828" opacity=".7" r="1.6"></circle>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="middle" x="150" y="180">une seule surface approchée : beaucoup de points, bords flous</text>
+<ellipse cx="450" cy="105" fill="#fff" rx="110" ry="58" stroke="#2E7D32" stroke-width="2"></ellipse>
+<rect fill="none" height="48" stroke="#2E7D32" stroke-width="1.6" width="90" x="405" y="81"></rect>
+<line stroke="#2E7D32" stroke-width="1.6" x1="405" x2="372" y1="81" y2="64"></line>
+<line stroke="#2E7D32" stroke-width="1.6" x1="495" x2="528" y1="81" y2="64"></line>
+<line stroke="#2E7D32" stroke-width="1.6" x1="405" x2="372" y1="129" y2="146"></line>
+<line stroke="#2E7D32" stroke-width="1.6" x1="495" x2="528" y1="129" y2="146"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="427.5" x2="427.5" y1="81" y2="129"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="450.0" x2="450.0" y1="81" y2="129"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="472.5" x2="472.5" y1="81" y2="129"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="405" x2="495" y1="97.0" y2="97.0"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="405" x2="495" y1="113.0" y2="113.0"></line>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="middle" x="450" y="180">cinq surfaces simples : peu de points, bords nets</text>
+<line stroke="#6B7378" stroke-width="1.4" x1="276" x2="326" y1="105" y2="105"></line><polygon fill="#6B7378" points="326,105 319.6,107.7 319.6,102.3"></polygon>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Une surface se construit à partir de ses courbes : on choisit la commande d'après les courbes qu'on a, et l'on compose une forme complexe de plusieurs surfaces simples à quatre côtés plutôt que d'une seule surface forcée.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Tu modélises l'assise galbée d'une chaise. Un Patch sur tout le contour donne une surface bosselée et lourde, dont le bord ne suit pas tes courbes. En partant de trois profils et d'un Loft, puis de deux rails et d'un Sweep2, l'assise est lisse, légère et passe exactement par ce que tu as dessiné.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>associer une commande de surface aux courbes disponibles ;</li>
+<li>préparer des courbes compatibles : sens, coutures, points ;</li>
+<li>découper une forme en zones à quatre côtés ;</li>
+<li>lire la structure d'une surface : isocourbes, points de contrôle.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Une surface NURBS est un rectangle déformé : quatre côtés, deux directions. Les meilleures surfaces suivent cette structure. Une forme compliquée se compose de plusieurs surfaces simples, raccordées, plutôt que d'une seule surface qui fait tout.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 158 · Stratégies de surfaçage</div>
+</section>
+<!-- ============ PAGE 2 · QUELLE COMMANDE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 158</b></div>
+<p class="rubrique">Schéma 1 · Quelle commande</p>
+<h2>Partir des courbes qu'on a</h2>
+<p style="max-width:165mm">Chaque commande attend un jeu de courbes précis. Les premières passent exactement par leurs courbes ; les dernières approchent un ensemble de courbes à une tolérance près, au prix de plus de points et de moins de contrôle.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 244" width="100%">
+<rect fill="#EFE9E1" height="244" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Partir des courbes qu'on a</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="42">tu as…</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="220" y="42">commande</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="330" y="42">la surface passe par les courbes ?</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="50"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="16" y="65">un profil et une direction</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="220" y="65">ExtrudeCrv</text>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="start" x="330" y="65">oui, exactement</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="16" y="87">un profil et un axe</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="220" y="87">Revolve</text>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="start" x="330" y="87">oui, exactement</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="94"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="16" y="109">des profils successifs</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="220" y="109">Loft</text>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="start" x="330" y="109">oui, par chaque profil</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="16" y="131">des profils et un rail</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="220" y="131">Sweep1</text>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="start" x="330" y="131">oui, profils le long du rail</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="138"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="16" y="153">des profils et deux rails</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="220" y="153">Sweep2</text>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="start" x="330" y="153">oui, les rails sont tenus</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="16" y="175">deux à quatre bords</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="220" y="175">EdgeSrf</text>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="start" x="330" y="175">oui, par les bords</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="182"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="16" y="197">un réseau dans deux directions</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="220" y="197">NetworkSrf</text>
+<text fill="#E65100" font-size="8" font-weight="700" text-anchor="start" x="330" y="197">à la tolérance près</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="16" y="219">des courbes ou points épars</text>
+<text class="mono" fill="#1F5F7A" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="220" y="219">Patch</text>
+<text fill="#C62828" font-size="8" font-weight="700" text-anchor="start" x="330" y="219">approchée, par ajustement</text>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="start" x="16" y="236">Plus on descend dans le tableau, plus la commande est souple, et moins la surface est maîtrisée.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, la même chose en RhinoCommon</span>Brep[] b = Brep.CreateFromLoft(profils, Point3d.Unset, Point3d.Unset, LoftType.Normal, false);
+Brep e = Brep.CreateEdgeSurface(new[] { c1, c2, c3, c4 });   // deux à quatre bords</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Exacte ou approchée</h3>
+<p>Loft, Sweep, EdgeSrf, Revolve passent par leurs courbes. NetworkSrf les approche avec une tolérance réglable sur les bords et à l'intérieur. Patch ajuste une surface sur des courbes ou des points épars.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Peu de courbes</h3>
+<p>Chaque courbe ajoutée impose ses propres points. Pour une même forme, trois profils bien choisis donnent souvent une surface plus lisse que dix profils mesurés partout.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Prendre Patch pour tout. La surface est approchée, lourde en points, et son bord ne suit pas exactement tes courbes : chaque raccord ultérieur devient un combat.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 158 · Stratégies de surfaçage</div>
+</section>
+<!-- ============ PAGE 3 · PRÉPARER LES COURBES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 158</b></div>
+<p class="rubrique">Schéma 2 · Préparer les courbes</p>
+<h2>Sens, coutures et points</h2>
+<p style="max-width:165mm">Une commande relie les courbes point à point, dans l'ordre où elle les lit. Deux courbes de sens opposés, ou deux courbes fermées dont les coutures ne se font pas face, donnent une surface tordue.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 206" width="100%">
+<rect fill="#EFE9E1" height="206" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Loft de deux courbes fermées : la couture et le sens décident de la forme</text>
+<ellipse cx="150" cy="64" fill="none" rx="80" ry="18" stroke="#2B2F33" stroke-width="1.6"></ellipse>
+<ellipse cx="150" cy="150" fill="none" rx="80" ry="18" stroke="#2B2F33" stroke-width="1.6"></ellipse>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="230.0" x2="120.0" y1="64.0" y2="166.7"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="219.3" x2="87.0" y1="73.0" y2="161.1"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="190.0" x2="70.8" y1="79.6" y2="152.5"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="150.0" x2="75.8" y1="82.0" y2="143.3"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="110.0" x2="100.7" y1="79.6" y2="135.8"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="80.7" x2="138.9" y1="73.0" y2="132.2"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="70.0" x2="180.0" y1="64.0" y2="133.3"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="80.7" x2="213.0" y1="55.0" y2="138.9"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="110.0" x2="229.2" y1="48.4" y2="147.5"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="150.0" x2="224.2" y1="46.0" y2="156.7"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="190.0" x2="199.3" y1="48.4" y2="164.2"></line>
+<line opacity=".7" stroke="#C62828" stroke-width=".8" x1="219.3" x2="161.1" y1="55.0" y2="167.8"></line>
+<circle cx="230" cy="64" fill="#C62828" r="4"></circle>
+<circle cx="120.0" cy="166.7" fill="#C62828" r="4"></circle>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="middle" x="150" y="192">coutures décalées : la surface se vrille</text>
+<ellipse cx="450" cy="64" fill="none" rx="80" ry="18" stroke="#2B2F33" stroke-width="1.6"></ellipse>
+<ellipse cx="450" cy="150" fill="none" rx="80" ry="18" stroke="#2B2F33" stroke-width="1.6"></ellipse>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="530.0" x2="530.0" y1="64.0" y2="150.0"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="519.3" x2="519.3" y1="73.0" y2="159.0"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="490.0" x2="490.0" y1="79.6" y2="165.6"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="450.0" x2="450.0" y1="82.0" y2="168.0"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="410.0" x2="410.0" y1="79.6" y2="165.6"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="380.7" x2="380.7" y1="73.0" y2="159.0"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="370.0" x2="370.0" y1="64.0" y2="150.0"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="380.7" x2="380.7" y1="55.0" y2="141.0"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="410.0" x2="410.0" y1="48.4" y2="134.4"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="450.0" x2="450.0" y1="46.0" y2="132.0"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="490.0" x2="490.0" y1="48.4" y2="134.4"></line>
+<line opacity=".7" stroke="#2E7D32" stroke-width=".8" x1="519.3" x2="519.3" y1="55.0" y2="141.0"></line>
+<circle cx="530" cy="64" fill="#2E7D32" r="4"></circle>
+<circle cx="530.0" cy="150.0" fill="#2E7D32" r="4"></circle>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="450" y="192">coutures alignées, même sens : surface droite</text>
+<text fill="#6B7378" font-size="7.4" text-anchor="end" x="560" y="62">• couture</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, rendre des profils compatibles</span>for (int i = 0; i &lt; profils.Count; i++)
+    profils[i] = profils[i].Rebuild(8, 3, true);   // 8 points, degré 3, tangentes gardées</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Coutures et sens</h3>
+<p>Loft affiche les coutures et le sens de chaque courbe fermée : on les aligne avant de valider. La commande CrvSeam déplace une couture, Dir inverse un sens.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Rails qui touchent</h3>
+<p>Pour Sweep2 et NetworkSrf, les courbes doivent se croiser ou se toucher à la tolérance près. Une accroche Fin ou Inter au moment du dessin évite ces écarts invisibles (cours 157).</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Valider un Loft sans regarder les coutures : la surface se vrille sur elle-même. Le défaut se voit à peine en vue ombrée, mais il casse tous les raccords et les épaisseurs.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 158 · Stratégies de surfaçage</div>
+</section>
+<!-- ============ PAGE 4 · DÉCOUPER LA FORME ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 158</b></div>
+<p class="rubrique">Schéma 3 · Découper la forme</p>
+<h2>Des zones à quatre côtés</h2>
+<p style="max-width:165mm">Une forme ronde, un trou, une bifurcation ne tiennent pas dans un seul rectangle déformé. Deux voies : couper une grande surface (trim), ou découper la forme en plusieurs zones dont chacune a quatre côtés.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 200" width="100%">
+<rect fill="#EFE9E1" height="200" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Un disque : une surface coupée, ou cinq surfaces à quatre côtés</text>
+<rect fill="none" height="120" stroke="#6B7378" stroke-dasharray="4 3" width="180" x="60" y="44"></rect>
+<line opacity=".5" stroke="#6B7378" stroke-width=".7" x1="90.0" x2="90.0" y1="44" y2="164"></line>
+<line opacity=".5" stroke="#6B7378" stroke-width=".7" x1="120.0" x2="120.0" y1="44" y2="164"></line>
+<line opacity=".5" stroke="#6B7378" stroke-width=".7" x1="150.0" x2="150.0" y1="44" y2="164"></line>
+<line opacity=".5" stroke="#6B7378" stroke-width=".7" x1="180.0" x2="180.0" y1="44" y2="164"></line>
+<line opacity=".5" stroke="#6B7378" stroke-width=".7" x1="210.0" x2="210.0" y1="44" y2="164"></line>
+<line opacity=".5" stroke="#6B7378" stroke-width=".7" x1="60" x2="240" y1="74.0" y2="74.0"></line>
+<line opacity=".5" stroke="#6B7378" stroke-width=".7" x1="60" x2="240" y1="104.0" y2="104.0"></line>
+<line opacity=".5" stroke="#6B7378" stroke-width=".7" x1="60" x2="240" y1="134.0" y2="134.0"></line>
+<circle cx="150" cy="104" fill="#1565C0" fill-opacity=".12" r="54" stroke="#1565C0" stroke-width="2"></circle>
+<text fill="#1565C0" font-size="7.4" font-weight="700" text-anchor="middle" x="150" y="182">la surface de base reste un rectangle ; le cercle</text>
+<text fill="#1565C0" font-size="7.4" font-weight="700" text-anchor="middle" x="150" y="194">n'est qu'une courbe de coupe (trim)</text>
+<circle cx="450" cy="104" fill="#fff" r="54" stroke="#2E7D32" stroke-width="2"></circle>
+<rect fill="none" height="44" stroke="#2E7D32" stroke-width="1.6" width="44" x="428" y="82"></rect>
+<line stroke="#2E7D32" stroke-width="1.6" x1="428" x2="411.8" y1="82" y2="65.8"></line>
+<line stroke="#2E7D32" stroke-width="1.6" x1="472" x2="488.2" y1="82" y2="65.8"></line>
+<line stroke="#2E7D32" stroke-width="1.6" x1="472" x2="488.2" y1="126" y2="142.2"></line>
+<line stroke="#2E7D32" stroke-width="1.6" x1="428" x2="411.8" y1="126" y2="142.2"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="442.7" x2="442.7" y1="82" y2="126"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="457.3" x2="457.3" y1="82" y2="126"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="428" x2="472" y1="96.7" y2="96.7"></line>
+<line opacity=".55" stroke="#2E7D32" stroke-width=".7" x1="428" x2="472" y1="111.3" y2="111.3"></line>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="middle" x="450" y="182">chaque zone a quatre bords qui sont</text>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="middle" x="450" y="194">des isocourbes : bords nets, raccords faciles</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · ce que montre Rhino</span>PointsOn          les points de contrôle : peu, et bien rangés
+Propriétés        isocourbes visibles : elles suivent les bords d'une zone à quatre côtés
+Untrim            retire une coupe : la surface de base réapparaît</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>La surface coupée</h3>
+<p>Simple à faire et souvent suffisante, pour un trou par exemple. Mais son bord est une courbe de coupe, pas une isocourbe : la raccorder en continuité est plus délicat.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Les zones à quatre côtés</h3>
+<p>Plus de travail au départ, mais chaque bord est une isocourbe. Les raccords et les congés se règlent bien le long de ces bords, sujet du cours 159.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Fermer une zone en écrasant un de ses côtés en un point pour en faire un triangle. Ce point singulier pince la surface et crée des défauts de reflet et de congé autour de lui.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 158 · Stratégies de surfaçage</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 158</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Une assise galbée, par Loft puis Sweep2</h2>
+<p style="max-width:165mm; font-size:9pt">Tu construis la même assise de deux façons, à partir de courbes tapées, et tu compares les surfaces obtenues.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Fichier en millimètres, vue Face active (le plan de construction est alors XZ).</li>
+<li>Lance <span class="cmd">InterpCrv</span> et tape <span class="cmd">0,0</span>, <span class="cmd">200,-40</span>, <span class="cmd">400,0</span>, puis Entrée. Recommence avec <span class="cmd">0,0</span>, <span class="cmd">200,-60</span>, <span class="cmd">400,0</span>, puis avec la première série.</li>
+<li>En vue Dessus, déplace la 2ᵉ courbe avec <span class="cmd">Move</span> de <span class="cmd">r0,200</span> et la 3ᵉ de <span class="cmd">r0,400</span>.</li>
+<li>Lance <span class="cmd">Loft</span> sur les trois courbes, style Normal. Vérifie que les flèches de sens vont toutes du même côté.</li>
+<li>Contrôle avec <span class="cmd">What</span> et <span class="cmd">PointsOn</span>.</li>
+<li>Sur les mêmes courbes, essaie <span class="cmd">Patch</span> et compare son nombre de points et son bord.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Le Loft donne <b>une surface non coupée</b> qui passe exactement par les trois profils ; ses isocourbes suivent les courbes et ses points sont rangés en grille régulière. Le Patch donne une surface ajustée, plus chargée en points, dont le bord ne coïncide pas exactement avec les courbes.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Refais l'assise avec <span class="cmd">Sweep2</span> : deux rails droits le long des bords, et les trois profils. Les profils doivent toucher les rails. Compare la surface au Loft.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ <b>What</b> annonce une surface non coupée, pas une polysurface.</li>
+<li style="margin-bottom:1.6mm">☐ Les isocourbes suivent les trois profils, sans croisement ni pli.</li>
+<li style="margin-bottom:1.6mm">☐ Les flèches de sens du Loft pointaient toutes du même côté.</li>
+<li style="margin-bottom:1.6mm">☐ <b>PointsOn</b> montre une grille régulière, sans amas de points.</li>
+<li style="margin-bottom:1.6mm">☐ Avec <b>Distance</b> et l'accroche Proche, le bord du Patch s'écarte un peu des courbes ; celui du Loft, non.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 158 · Stratégies de surfaçage</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3C</b> · Modéliser dans Rhino</span><b>Cours 158</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Une surface se choisit d'après ses courbes : un profil et une direction, un axe, des profils successifs, un ou deux rails, des bords, un réseau, des points épars. Les courbes se préparent (sens, coutures, nombre de points, contacts) avant la commande. Une forme complexe se découpe en zones à quatre côtés, ou se coupe quand la qualité du bord compte peu.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Trace les rails avec Line, en vue Dessus : 0,0 vers 0,400, puis 400,0 vers 400,400. Les extrémités des profils sont alors sur les rails, car elles sont toutes à Z = 0 et en X = 0 ou 400. Lance Sweep2 : les rails d'abord, puis les trois profils. La surface est semblable au Loft, mais ses bords latéraux suivent exactement les rails, ce que le Loft ne garantit pas entre deux profils.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">ExtrudeCrv  Revolve</td><td>un profil, une direction ou un axe</td><td>pièces prismatiques, tournées</td></tr>
+<tr><td class="c">Loft</td><td>des profils successifs</td><td>coques, carènes</td></tr>
+<tr><td class="c">Sweep1  Sweep2</td><td>des profils le long d'un ou deux rails</td><td>moulures, assises</td></tr>
+<tr><td class="c">EdgeSrf</td><td>une surface par deux à quatre bords</td><td>boucher une zone à quatre côtés</td></tr>
+<tr><td class="c">NetworkSrf  Patch</td><td>approcher un réseau ou des courbes éparses</td><td>formes libres, en dernier recours</td></tr>
+<tr><td class="c">Rebuild  CrvSeam  Dir</td><td>préparer : points, couture, sens</td><td>avant un Loft ou un Sweep</td></tr>
+<tr><td class="c">PointsOn  Untrim</td><td>voir la structure, retirer une coupe</td><td>contrôler une surface</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Isocourbe</dt><dd>Une courbe de la surface à u ou v constant ; elle montre sa structure.</dd>
+<dt>Surface coupée</dt><dd>Une surface dont une partie est masquée par une courbe de coupe (trim).</dd>
+<dt>Couture</dt><dd>Le point de départ d'une courbe fermée.</dd>
+<dt>Rail</dt><dd>La courbe le long de laquelle un profil est balayé.</dd>
+<dt>Point singulier</dt><dd>Un bord de surface écrasé en un point.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 159, « Continuité et qualité des surfaces ». L'aide de Rhino consacre une page à chaque commande citée ; celle de NetworkSrf détaille ses tolérances.</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 159</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 158 · Stratégies de surfaçage</div>
+</section>
+</body>
+</html>
