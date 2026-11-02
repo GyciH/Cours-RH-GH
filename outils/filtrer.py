@@ -7,12 +7,11 @@ from PIL import Image, ImageDraw
 
 SRC, OUT = sys.argv[1], sys.argv[2]
 
-# Chapitres gardés : None = le chapitre entier, sinon la liste des cours gardés.
+# Parties gardées en entier, y compris leurs futurs chapitres (3C « Modéliser dans Rhino »…).
+PARTIES_ENTIERES = {3, 4, 5}
+# Autres chapitres gardés : None = le chapitre entier, sinon la liste des cours gardés.
 GARDE = {
     "2B": [49],                 # nombres flottants : tolérances et précision géométrique
-    "3A": None, "3B": None,     # Rhino et Grasshopper
-    "4A": None, "4B": None,     # maths de la géométrie, géométrie algorithmique
-    "5A": None, "5B": None,     # génératif et optimisation de forme
     "6A": None,                 # dessiner sur le canvas Grasshopper
     "7A": [53, 85, 86, 90],     # caméra, maillages, normales, profondeur (sans GPU, transparence, gamma)
 }
@@ -22,8 +21,9 @@ parties = []
 for p in cat["parties"]:
     chs = []
     for ch in p["chs"]:
-        if ch["id"] not in GARDE: continue
-        g = GARDE[ch["id"]]
+        if p["p"] in PARTIES_ENTIERES: g = None
+        elif ch["id"] in GARDE: g = GARDE[ch["id"]]
+        else: continue
         l = [n for n in ch["cours"] if g is None or n in g]
         assert g is None or len(l) == len(g), ch["id"]
         chs.append({**ch, "cours": l})

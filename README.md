@@ -26,4 +26,4 @@ git clone --depth 1 https://github.com/GyciH/cours ../cours
 python3 outils/filtrer.py ../cours .
 ```
 
-La liste des chapitres gardés est en tête de `outils/filtrer.py` (`GARDE`).
+Les parties 3, 4 et 5 sont gardées en entier, nouveaux chapitres compris (`PARTIES_ENTIERES`) ; les autres chapitres gardés sont listés dans `GARDE`, en tête de `outils/filtrer.py`.
