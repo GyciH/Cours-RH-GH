@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>164 · Une commande Rhino</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 164</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Une commande Rhino</h1>
+<p class="chapeau">Grasshopper n'est pas la seule façon d'automatiser Rhino. Une commande, c'est le geste le plus naturel de Rhino : un nom tapé, quelques questions à la ligne de commande, et le document change. En écrire une, c'est respecter ce dialogue que tout utilisateur connaît.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>9</b>, <b>157</b></span>
+<span class="pastille">Exemples · <b>RhinoCommon, Script Editor, GetPoint</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 186" width="100%">
+<rect fill="#EFE9E1" height="186" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une commande : un dialogue court entre la ligne de commande et le code</text>
+<rect fill="#fff" height="88" rx="4" stroke="#6B7378" width="552" x="24" y="40"></rect>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="start" x="36" y="58">Commande : Plateau</text>
+<text class="mono" fill="#1565C0" font-size="8" style="font-size:8px" text-anchor="start" x="36" y="73">Coin du plateau ( Largeur=1200  Profondeur=800 ) :  L</text>
+<text class="mono" fill="#1565C0" font-size="8" style="font-size:8px" text-anchor="start" x="36" y="88">Largeur &lt;1200&gt; :  1500</text>
+<text class="mono" fill="#2E7D32" font-size="8" style="font-size:8px" text-anchor="start" x="36" y="103">Coin du plateau ( Largeur=1500  Profondeur=800 ) :  clic</text>
+<text class="mono" fill="#7B1FA2" font-size="8" style="font-size:8px" text-anchor="start" x="36" y="118">Plateau ajouté : 1500 × 800 × 25 mm.</text>
+<circle cx="560" cy="70" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="560" y="73.2">2</text>
+<circle cx="560" cy="103" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="560" y="106.2">1</text>
+<circle cx="560" cy="118" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="560" y="121.2">3</text>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="start" x="36" y="148">2 une option, choisie par sa lettre</text>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="start" x="236" y="148">1 la saisie attendue</text>
+<text fill="#7B1FA2" font-size="7.6" font-weight="700" text-anchor="start" x="406" y="148">3 le compte rendu</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="middle" x="300" y="172">Échap à n'importe quelle invite : rien n'est ajouté au document.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Une commande est une classe que Rhino appelle par son nom ; elle demande ce qu'il lui faut à la ligne de commande, modifie le document, puis dit si elle a abouti. Rhino s'occupe de l'annulation et de la répétition.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Chaque jour, un plateau de 1200 × 800 × 25 mm se dessine en quatre commandes et autant de coordonnées. Une commande Plateau demande un coin, propose la largeur et la profondeur en options, et pose le volume. Ctrl+Z l'annule d'un geste.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>décrire le trajet d'une commande, du nom tapé au document modifié ;</li>
+<li>demander un point, un objet, une option, et traiter Échap ;</li>
+<li>respecter les conventions de la ligne de commande ;</li>
+<li>essayer une commande depuis le Script Editor de Rhino 8.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Une commande : RunCommand reçoit le document, demande ses saisies par des invites, ajoute ou modifie des objets, redessine, puis rend Success ou Cancel. Chaque invite peut rendre un point, une option, une annulation ou rien : on traite chaque cas.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 164 · Une commande Rhino</div>
+</section>
+<!-- ============ PAGE 2 · LE SQUELETTE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 164</b></div>
+<p class="rubrique">Schéma 1 · Le squelette</p>
+<h2>Du nom tapé au document modifié</h2>
+<p style="max-width:165mm">Une commande RhinoCommon dérive de la classe Command. Elle déclare son nom anglais et écrit RunCommand, que Rhino appelle avec le document actif. Le plugin (.rhp) qui la contient est chargé une fois ; ses commandes deviennent alors disponibles.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 204" width="100%">
+<rect fill="#EFE9E1" height="204" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Le trajet d'une commande, du nom tapé au document modifié</text>
+<rect fill="#fff" height="52" rx="4" stroke="#2E7D32" stroke-width="1.3" width="106" x="16" y="50"></rect>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="24" y="65">1 · nom tapé</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="24" y="78">Rhino trouve</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="24" y="89">la commande</text>
+<line stroke="#6B7378" stroke-width="1" x1="122" x2="132" y1="76" y2="76"></line><polygon fill="#6B7378" points="132,76 125.6,78.7 125.6,73.3"></polygon>
+<rect fill="#fff" height="52" rx="4" stroke="#1565C0" stroke-width="1.3" width="106" x="132" y="50"></rect>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="start" x="140" y="65">2 · RunCommand</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="140" y="78">reçoit le</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="140" y="89">document</text>
+<line stroke="#6B7378" stroke-width="1" x1="238" x2="248" y1="76" y2="76"></line><polygon fill="#6B7378" points="248,76 241.6,78.7 241.6,73.3"></polygon>
+<rect fill="#fff" height="52" rx="4" stroke="#7B1FA2" stroke-width="1.3" width="106" x="248" y="50"></rect>
+<text fill="#7B1FA2" font-size="8.4" font-weight="700" text-anchor="start" x="256" y="65">3 · demander</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="256" y="78">invites, options,</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="256" y="89">Entrée, Échap</text>
+<line stroke="#6B7378" stroke-width="1" x1="354" x2="364" y1="76" y2="76"></line><polygon fill="#6B7378" points="364,76 357.6,78.7 357.6,73.3"></polygon>
+<rect fill="#fff" height="52" rx="4" stroke="#E65100" stroke-width="1.3" width="106" x="364" y="50"></rect>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="372" y="65">4 · agir</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="372" y="78">ajouter, modifier</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="372" y="89">doc.Objects</text>
+<line stroke="#6B7378" stroke-width="1" x1="470" x2="480" y1="76" y2="76"></line><polygon fill="#6B7378" points="480,76 473.6,78.7 473.6,73.3"></polygon>
+<rect fill="#fff" height="52" rx="4" stroke="#00838F" stroke-width="1.3" width="106" x="480" y="50"></rect>
+<text fill="#00838F" font-size="8.4" font-weight="700" text-anchor="start" x="488" y="65">5 · conclure</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="488" y="78">Redraw, puis</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="488" y="89">Success ou Cancel</text>
+<rect fill="#fff" height="56" rx="4" stroke="#C62828" stroke-dasharray="4 2" width="568" x="16" y="124"></rect>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="start" x="28" y="142">Ce que Rhino fait autour, sans une ligne de ton code</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="28" y="158">un seul enregistrement d'annulation pour toute la commande · la commande dans l'historique et dans Répéter</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="start" x="28" y="171">le nom anglais et le nom traduit · l'appel par un script ou une macro</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, le squelette d'une commande</span>public class PlateauCommand : Command
+{
+    public override string EnglishName =&gt; "Plateau";
+    protected override Result RunCommand(RhinoDoc doc, RunMode mode)
+    {
+        if (RhinoGet.GetPoint("Coin du plateau", false, out Point3d coin) != Result.Success)
+            return Result.Cancel;
+        var b = new Box(new Plane(coin, Vector3d.ZAxis),
+                        new Interval(0, 1200), new Interval(0, 800), new Interval(0, 25));
+        doc.Objects.AddBrep(b.ToBrep()); doc.Views.Redraw(); return Result.Success;
+    }
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le document reçu</h3>
+<p>RunCommand reçoit le document sur lequel travailler : on ajoute par doc.Objects, on lit les unités et la tolérance dans le document, jamais dans des valeurs codées en dur.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le résultat rendu</h3>
+<p>Success dit que la commande a abouti ; Cancel qu'elle a été abandonnée. L'historique, la répétition et les scripts s'en servent.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier doc.Views.Redraw(). Les objets sont bien dans le document, mais la vue ne les montre qu'au prochain rafraîchissement : on croit que la commande n'a rien fait et on la relance.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 164 · Une commande Rhino</div>
+</section>
+<!-- ============ PAGE 3 · DEMANDER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 164</b></div>
+<p class="rubrique">Schéma 2 · Demander</p>
+<h2>Les invites et leurs résultats</h2>
+<p style="max-width:165mm">Pour demander un point, un objet, un nombre, RhinoCommon fournit des invites (GetPoint, GetObject, GetNumber). Elles affichent un message, des options cliquables, et rendent un résultat qu'il faut examiner.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une invite rend un résultat : il faut traiter chacun</text>
+<rect fill="#EFE9E1" height="52" rx="4" stroke="#1F5F7A" stroke-width="1.3" width="160" x="24" y="48"></rect>
+<text fill="#1F5F7A" font-size="8.4" font-weight="700" text-anchor="start" x="32" y="63">gp.Get()</text>
+<text class="mono" fill="#2B2F33" font-size="7.2" style="font-size:7.2px" text-anchor="start" x="32" y="76">attend une saisie</text>
+<text class="mono" fill="#2B2F33" font-size="7.2" style="font-size:7.2px" text-anchor="start" x="32" y="87">à la ligne de commande</text>
+<line stroke="#2E7D32" stroke-width="1.1" x1="186" x2="250" y1="74" y2="54"></line><polygon fill="#2E7D32" points="250,54 244.7,58.5 243.0,53.3"></polygon>
+<rect fill="#fff" height="28" rx="4" stroke="#2E7D32" width="320" x="254" y="40"></rect>
+<text class="mono" fill="#2E7D32" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="264" y="58">Point</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="340" y="58">la saisie attendue : on continue</text>
+<line stroke="#1565C0" stroke-width="1.1" x1="186" x2="250" y1="74" y2="90"></line><polygon fill="#1565C0" points="250,90 243.1,91.1 244.4,85.8"></polygon>
+<rect fill="#fff" height="28" rx="4" stroke="#1565C0" width="320" x="254" y="76"></rect>
+<text class="mono" fill="#1565C0" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="264" y="94">Option</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="340" y="94">une option a changé : on redemande</text>
+<line stroke="#C62828" stroke-width="1.1" x1="186" x2="250" y1="74" y2="126"></line><polygon fill="#C62828" points="250,126 243.3,124.0 246.7,119.8"></polygon>
+<rect fill="#fff" height="28" rx="4" stroke="#C62828" width="320" x="254" y="112"></rect>
+<text class="mono" fill="#C62828" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="264" y="130">Cancel</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="340" y="130">Échap : on sort sans rien ajouter</text>
+<line stroke="#E65100" stroke-width="1.1" x1="186" x2="250" y1="74" y2="162"></line><polygon fill="#E65100" points="250,162 244.0,158.4 248.4,155.2"></polygon>
+<rect fill="#fff" height="28" rx="4" stroke="#E65100" width="320" x="254" y="148"></rect>
+<text class="mono" fill="#E65100" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="start" x="264" y="166">Nothing</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="340" y="166">Entrée seule : valeur par défaut</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, une option dans une invite</span>var gp = new GetPoint(); gp.SetCommandPrompt("Coin du plateau");
+var largeur = new OptionDouble(1200); gp.AddOptionDouble("Largeur", ref largeur);
+while (true) {
+    GetResult r = gp.Get();
+    if (r == GetResult.Option) continue;           // l'option a changé : on redemande
+    if (r != GetResult.Point) return Result.Cancel; // Échap ou autre
+    break;
+}</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Des valeurs par défaut</h3>
+<p>Une option affiche sa valeur courante : Entrée l'accepte. L'utilisateur qui tape la même chaque jour ne tape plus rien.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Choisir un objet</h3>
+<p>GetObject filtre par type (courbe, surface…) et peut accepter une présélection : l'utilisateur qui a déjà sélectionné n'a pas à recommencer.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Ne tester que le cas « point ». Si l'utilisateur clique une option ou appuie sur Échap, le code continue avec un point vide, à l'origine, et ajoute un objet au mauvais endroit.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 164 · Une commande Rhino</div>
+</section>
+<!-- ============ PAGE 4 · LES CONVENTIONS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 164</b></div>
+<p class="rubrique">Schéma 3 · Les conventions</p>
+<h2>Ce que l'utilisateur attend</h2>
+<p style="max-width:165mm">Un utilisateur de Rhino a des réflexes : Entrée pour valider ou répéter, Échap pour sortir, des options à la ligne de commande, Ctrl+Z pour tout annuler. Une commande qui les respecte s'apprend sans mode d'emploi.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Les conventions qu'un utilisateur de Rhino attend d'une commande</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="42">geste</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="150" y="42">ce qu'il fait</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="380" y="42">pourquoi</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="50"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="65">Entrée</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="65">valide, ou accepte la valeur par défaut</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="380" y="65">aller vite</text>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="87">Échap</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="87">annule la commande en cours</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="380" y="87">sortir sans dégâts</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="94"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="109">Option=Valeur</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="109">options cliquables ou à taper</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="380" y="109">pas de fenêtre</text>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="131">_Commande</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="131">force le nom anglais</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="380" y="131">macros dans toutes les langues</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="138"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="153">-Commande</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="153">version sans boîte de dialogue</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="380" y="153">scripts et macros</text>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="175">Ctrl+Z</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="175">annule toute la dernière commande</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="380" y="175">un geste, une annulation</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="182"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8.2" font-weight="700" style="font-size:8.2px" text-anchor="start" x="16" y="197">Entrée à vide</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="150" y="197">répète la dernière commande</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="380" y="197">enchaîner</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · essayer sans Visual Studio (Rhino 8)</span>ScriptEditor            ouvrir l'éditeur, nouveau script C#
+F5                      exécuter le script dans le document courant
+projet du Script Editor publier les scripts comme commandes d'un plugin</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Une annulation par commande</h3>
+<p>Rhino ouvre un enregistrement d'annulation avant RunCommand et le ferme après : tout ce que la commande a fait s'annule d'un seul Ctrl+Z.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Scripts et macros</h3>
+<p>Les commandes s'enchaînent dans des macros (_Plateau _Enter) et des scripts. Une commande qui pose ses questions par la ligne de commande s'y prête naturellement.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Ouvrir une fenêtre pour chaque valeur. La commande devient lente au clavier, et impossible à piloter depuis une macro : on garde les fenêtres pour les réglages complexes.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 164 · Une commande Rhino</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 164</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Un plateau en une commande</h2>
+<p style="max-width:165mm; font-size:9pt">Tu écris dans le Script Editor de Rhino 8 un script qui se comporte comme une commande : il demande un coin, propose une option et pose un plateau.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Fichier en millimètres. Lance <span class="cmd">ScriptEditor</span>, crée un script C#.</li>
+<li>Recopie le corps de RunCommand du schéma 1 : ajoute <span class="cmd">var doc = RhinoDoc.ActiveDoc;</span> au début, et remplace chaque return … par <span class="cmd">return;</span></li>
+<li>Exécute (<span class="cmd">F5</span>), clique un point dans la vue Dessus.</li>
+<li>Relance, puis appuie sur <span class="cmd">Échap</span> à l'invite.</li>
+<li>Remplace RhinoGet.GetPoint par la boucle du schéma 2, et utilise largeur.CurrentValue pour l'intervalle en X.</li>
+<li>Exécute, choisis l'option Largeur, tape <span class="cmd">1500</span>, puis clique un point.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Au premier essai, un plateau de <b>1200 × 800 × 25 mm</b> apparaît, son coin au point cliqué. Avec Échap, <b>rien n'est ajouté</b>. Avec l'option, la ligne de commande affiche <b>Largeur=1500</b> et le plateau fait 1500 mm de large.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Transforme le script : au lieu d'un coin, il demande une courbe plane fermée et l'extrude de 25 mm, en refusant tout autre type d'objet.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">SnapSet n'a pas de commande, mais suit la même règle : un message pour l'utilisateur passe par la ligne de commande, pas par une fenêtre qui interrompt.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">SnapSet/src/SnapSet.Constituants/Execution/CapsuleExecution.cs</span></div>
+<div class="l k1"><span class="n">1075</span>private void Proteger(Action action)<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n">1079</span>        action();<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">1081</span>    catch (Exception ex)<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">1083</span>        Signaler(ex);<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">1087</span>private void Signaler(Exception ex)<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">1089</span>    Rhino.RhinoApp.WriteLine(Owner.NickName + " — " + …);<span class="rep r3">3</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Une action protégée</b>Un clic de l'utilisateur.</li>
+<li><span class="rep r2">2</span><b>Une erreur attrapée</b>Rhino ne s'arrête pas.</li>
+<li><span class="rep r3">3</span><b>Un message à la ligne de commande</b>Visible, sans interrompre.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ Le plateau est posé exactement au point cliqué.</li>
+<li style="margin-bottom:1.6mm">☐ Échap n'ajoute rien au document.</li>
+<li style="margin-bottom:1.6mm">☐ L'option affiche sa valeur courante à l'invite.</li>
+<li style="margin-bottom:1.6mm">☐ La vue montre le plateau sans avoir à la rafraîchir.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 164 · Une commande Rhino</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 164</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Une commande RhinoCommon dérive de Command, déclare son nom et écrit RunCommand, qui reçoit le document. Elle demande ses saisies par des invites dont elle traite chaque résultat (point, option, annulation, rien), ajoute ses objets par doc.Objects, redessine et rend Success ou Cancel. Rhino lui offre l'annulation d'un geste, la répétition et l'appel par macro.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">RhinoGet.GetOneObject("Contour du plateau", false, ObjectType.Curve, out ObjRef r) ; si le résultat n'est pas Success, on sort. r.Curve() donne la courbe ; si elle n'est ni fermée ni plane, on écrit un message et l'on sort. Sinon Extrusion.Create(courbe, 25, true) crée un volume fermé, ajouté par doc.Objects.AddExtrusion, puis Redraw.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">Command  RunCommand</td><td>déclarer une commande, son corps</td><td>dans un plugin .rhp</td></tr>
+<tr><td class="c">RhinoGet.GetPoint  GetOneObject</td><td>demander un point, un objet</td><td>saisie simple</td></tr>
+<tr><td class="c">GetPoint  AddOptionDouble</td><td>invite avec options</td><td>valeurs réglables</td></tr>
+<tr><td class="c">doc.Objects.Add…</td><td>ajouter au document</td><td>agir</td></tr>
+<tr><td class="c">doc.Views.Redraw()</td><td>rafraîchir les vues</td><td>à la fin</td></tr>
+<tr><td class="c">RhinoApp.WriteLine</td><td>écrire à la ligne de commande</td><td>informer sans fenêtre</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Commande</dt><dd>Une classe que Rhino appelle quand l'utilisateur tape son nom.</dd>
+<dt>Invite</dt><dd>Une question posée à la ligne de commande, avec options.</dd>
+<dt>Option de commande</dt><dd>Un réglage cliquable ou tapé sans quitter la commande.</dd>
+<dt>Plugin Rhino (.rhp)</dt><dd>Une assembly qui ajoute des commandes à Rhino.</dd>
+<dt>Résultat de commande</dt><dd>Success, Cancel… : ce que la commande rend à Rhino.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 165, « Dessiner dans la vue : les display conduits ». Dans le guide RhinoCommon de McNeel, « Your first plugin » et « Getting points ».</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : fiche récap de la partie 3</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 164 · Une commande Rhino</div>
+</section>
+</body>
+</html>

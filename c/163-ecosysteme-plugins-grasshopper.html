@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>163 · L'écosystème des plugins Grasshopper</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 163</b></div>
+<p class="rubrique">Le concept</p>
+<h1>L'écosystème des plugins Grasshopper</h1>
+<p class="chapeau">Grasshopper seul fait beaucoup ; ses plugins font le reste : physique, climat, structure, maillages. Les installer est facile. Les choisir, les garder à jour et partager un fichier qui en dépend demande de savoir où ils vivent et ce que le fichier .gh retient d'eux.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>débutant à intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>7</b></span>
+<span class="pastille">Exemples · <b>Package Manager, Food4Rhino, Libraries</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 190" width="100%">
+<rect fill="#EFE9E1" height="190" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Un fichier .gh voyage ; les plugins qu'il utilise, non</text>
+<rect fill="#fff" height="120" rx="4" stroke="#2E7D32" stroke-width="1.3" width="170" x="24" y="44"></rect>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="32" y="59">ton poste</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="32" y="72">Rhino 8 + Grasshopper</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="32" y="83">Pufferfish 3.0</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="32" y="94">Weaverbird</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="32" y="105">définition.gh</text>
+<rect fill="#fff" height="120" rx="4" stroke="#E65100" stroke-width="1.3" width="170" x="404" y="44"></rect>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="412" y="59">le poste d'un collègue</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="412" y="72">Rhino 8 + Grasshopper</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="412" y="83">Pufferfish : absent</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="412" y="94">Weaverbird</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="412" y="105">définition.gh</text>
+<line stroke="#1F5F7A" stroke-width="1.6" x1="200" x2="398" y1="104" y2="104"></line><polygon fill="#1F5F7A" points="398,104 391.6,106.7 391.6,101.3"></polygon>
+<text fill="#1F5F7A" font-size="8" font-weight="700" text-anchor="middle" x="299" y="96">définition.gh</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="299" y="124">le fichier retient le nom,</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="299" y="135">l'identifiant et la version du plugin</text>
+<rect fill="#C62828" height="14" opacity=".15" rx="2" width="110" x="410" y="75"></rect>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="middle" x="489" y="182">→ composants non reconnus</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un plugin est une dépendance : le fichier .gh ne garde que son nom, son identifiant et sa version. Celui qui ouvre le fichier doit avoir le même plugin, installé depuis une source sûre.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Une définition envoyée à un collègue s'ouvre chez lui avec des composants rouges et un message d'objets non reconnus. Il lui manque Pufferfish. Installé par le Package Manager dans la même version, le fichier s'ouvre comme chez toi.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>installer un plugin par le Package Manager ou à la main ;</li>
+<li>savoir où il est rangé et comment Grasshopper le reconnaît ;</li>
+<li>comprendre ce qui se passe quand un plugin manque ;</li>
+<li>choisir un plugin pour un projet qui dure.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Le Package Manager installe des versions identifiées, par version de Rhino ; un .gha copié à la main va dans Libraries, après déblocage. Le .gh retient le GUID et la version de chaque composant : sans le plugin, il s'ouvre avec des objets non reconnus.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 163 · L'écosystème des plugins Grasshopper</div>
+</section>
+<!-- ============ PAGE 2 · INSTALLER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 163</b></div>
+<p class="rubrique">Schéma 1 · Installer</p>
+<h2>D'où viennent les plugins</h2>
+<p style="max-width:165mm">Depuis Rhino 7, la plupart des plugins se trouvent dans le Package Manager, le gestionnaire de paquets de Rhino (Yak). Food4Rhino, la vitrine des plugins, renvoie souvent vers lui. Le .gha copié à la main reste possible.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 204" width="100%">
+<rect fill="#EFE9E1" height="204" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Trois façons d'installer un plugin, deux dossiers où il atterrit</text>
+<rect fill="#fff" height="44" rx="4" stroke="#2E7D32" stroke-width="1.3" width="170" x="20" y="40"></rect>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="28" y="55">Package Manager (Yak)</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="28" y="68">commande PackageManager dans Rhino</text>
+<rect fill="#fff" height="44" rx="4" stroke="#1565C0" stroke-width="1.3" width="170" x="20" y="94"></rect>
+<text fill="#1565C0" font-size="8.4" font-weight="700" text-anchor="start" x="28" y="109">Food4Rhino</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="28" y="122">page du plugin : souvent un lien Yak</text>
+<rect fill="#fff" height="44" rx="4" stroke="#E65100" stroke-width="1.3" width="170" x="20" y="148"></rect>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="28" y="163">un .gha téléchargé</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="28" y="176">à débloquer dans Windows, puis copier</text>
+<rect fill="#EFE9E1" height="54" rx="4" stroke="#2E7D32" stroke-width="1.3" width="250" x="330" y="52"></rect>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="338" y="67">dossier des paquets</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="338" y="80">%APPDATA%\McNeel\Rhinoceros\packages\8.0\</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="338" y="91">un sous-dossier par paquet et par version</text>
+<rect fill="#EFE9E1" height="54" rx="4" stroke="#E65100" stroke-width="1.3" width="250" x="330" y="128"></rect>
+<text fill="#E65100" font-size="8.4" font-weight="700" text-anchor="start" x="338" y="143">dossier Libraries de Grasshopper</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="338" y="156">%APPDATA%\Grasshopper\Libraries\</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="338" y="167">File › Special Folders › Components Folder</text>
+<line stroke="#2E7D32" stroke-width="1.3" x1="192" x2="326" y1="62" y2="76"></line><polygon fill="#2E7D32" points="326,76 319.3,78.0 319.9,72.6"></polygon>
+<line stroke="#1565C0" stroke-width="1.1" x1="192" x2="326" y1="116" y2="82"></line><polygon fill="#1565C0" points="326,82 320.4,86.2 319.1,80.9"></polygon>
+<line stroke="#E65100" stroke-width="1.3" x1="192" x2="326" y1="170" y2="156"></line><polygon fill="#E65100" points="326,156 319.9,159.4 319.3,154.0"></polygon>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · trois chemins d'installation</span>PackageManager           chercher, installer, mettre à jour, désinstaller
+Food4Rhino               fiche du plugin, documentation, lien de téléchargement
+Components Folder        File › Special Folders : y copier un .gha débloqué</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le Package Manager</h3>
+<p>Il range chaque paquet par version de Rhino et par version du plugin. Il sait ce qui est installé, propose les mises à jour et désinstalle proprement.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le .gha à la main</h3>
+<p>Un fichier téléchargé depuis Internet peut être bloqué par Windows : Propriétés › Débloquer, puis copie dans Libraries et redémarrage.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Installer le même plugin des deux façons. Deux copies chargées à deux endroits entrent en conflit, et l'on ne sait plus laquelle répond. On garde une seule source.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 163 · L'écosystème des plugins Grasshopper</div>
+</section>
+<!-- ============ PAGE 3 · LE FICHIER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 163</b></div>
+<p class="rubrique">Schéma 2 · Le fichier</p>
+<h2>Ce que le .gh retient</h2>
+<p style="max-width:165mm">Le fichier .gh ne contient pas le code des plugins. Pour chaque composant, il enregistre son identifiant, la bibliothèque d'où il vient, sa version et ses réglages. À l'ouverture, Grasshopper recrée le composant d'après cet identifiant.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Ce que le fichier .gh enregistre pour chaque composant de plugin</text>
+<rect fill="#fff" height="138" rx="6" stroke="#6B7378" width="250" x="24" y="40"></rect>
+<circle cx="42" cy="59" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="42" y="62.2">1</text>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="start" x="56" y="62">Identifiant</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="56" y="74">un GUID propre au composant</text>
+<circle cx="42" cy="89" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="42" y="92.2">2</text>
+<text fill="#1565C0" font-size="8.2" font-weight="700" text-anchor="start" x="56" y="92">Bibliothèque</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="56" y="104">le nom et l'identifiant du plugin</text>
+<circle cx="42" cy="119" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="42" y="122.2">3</text>
+<text fill="#7B1FA2" font-size="8.2" font-weight="700" text-anchor="start" x="56" y="122">Version</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="56" y="134">la version du plugin utilisée</text>
+<circle cx="42" cy="149" fill="#E65100" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="42" y="152.2">4</text>
+<text fill="#E65100" font-size="8.2" font-weight="700" text-anchor="start" x="56" y="152">Réglages</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="56" y="164">valeurs et données internes</text>
+<line stroke="#1F5F7A" stroke-width="1.4" x1="280" x2="330" y1="108" y2="108"></line><polygon fill="#1F5F7A" points="330,108 323.6,110.7 323.6,105.3"></polygon>
+<rect fill="#fff" height="54" rx="4" stroke="#2E7D32" stroke-width="1.3" width="236" x="340" y="48"></rect>
+<text fill="#2E7D32" font-size="8.4" font-weight="700" text-anchor="start" x="348" y="63">plugin présent</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="348" y="76">le composant est recréé</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="348" y="87">à l'identique (même GUID)</text>
+<rect fill="#fff" height="54" rx="4" stroke="#C62828" stroke-width="1.3" width="236" x="340" y="116"></rect>
+<text fill="#C62828" font-size="8.4" font-weight="700" text-anchor="start" x="348" y="131">plugin absent</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="348" y="144">objet non reconnu, signalé à l'ouverture</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="348" y="155">le dialogue nomme le plugin manquant</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · avant d'envoyer un fichier</span>1. lister les plugins utilisés et leurs versions
+2. les écrire dans le fichier (Scribble ou Panel) ou dans le message
+3. pour une fonction simple, préférer un composant natif ou un script</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Quand un plugin manque</h3>
+<p>Le fichier s'ouvre quand même. Les composants absents deviennent des objets non reconnus, et le dialogue qui s'affiche nomme le plugin à installer.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Les objets utilisateur</h3>
+<p>Un cluster ou un composant réglé peut être enregistré en objet utilisateur (.ghuser). Lui aussi dépend des plugins qu'il contient.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Renommer ou réinstaller un plugin « équivalent » en espérant que le fichier s'y retrouve. Seul l'identifiant compte : un autre plugin aux composants homonymes ne les remplace pas.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 163 · L'écosystème des plugins Grasshopper</div>
+</section>
+<!-- ============ PAGE 4 · CHOISIR ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 163</b></div>
+<p class="rubrique">Schéma 3 · Choisir</p>
+<h2>Un plugin pour un projet qui dure</h2>
+<p style="max-width:165mm">Un plugin ajouté à une définition devient une dépendance pour tous ceux qui l'ouvriront, et pour toi à chaque mise à jour de Rhino. On le choisit comme une bibliothèque de code.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 226" width="100%">
+<rect fill="#EFE9E1" height="226" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Quelques familles de plugins répandues</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="42">plugin</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="160" y="42">domaine</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="42">à savoir</text>
+<rect fill="#fff" height="21" opacity=".6" width="580" x="10" y="50"></rect>
+<text fill="#1F5F7A" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="64">Kangaroo 2</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="160" y="64">simulation physique, form-finding</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="64">livré avec Rhino depuis la v7</text>
+<text fill="#1F5F7A" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="85">Galapagos</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="160" y="85">optimisation par solveur évolutif</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="85">livré avec Grasshopper</text>
+<rect fill="#fff" height="21" opacity=".6" width="580" x="10" y="92"></rect>
+<text fill="#1F5F7A" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="106">Ladybug Tools</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="160" y="106">climat, soleil, énergie</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="106">écosystème de plusieurs plugins</text>
+<text fill="#1F5F7A" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="127">Karamba3D</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="160" y="127">calcul de structure</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="127">licence commerciale</text>
+<rect fill="#fff" height="21" opacity=".6" width="580" x="10" y="134"></rect>
+<text fill="#1F5F7A" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="148">Weaverbird</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="160" y="148">subdivision et lissage de maillages</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="148">gratuit</text>
+<text fill="#1F5F7A" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="169">Pufferfish</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="160" y="169">morphing, interpolation de formes</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="169">gratuit</text>
+<rect fill="#fff" height="21" opacity=".6" width="580" x="10" y="176"></rect>
+<text fill="#1F5F7A" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="190">Elefront</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="160" y="190">attributs et objets du document Rhino</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="190">gratuit</text>
+<text fill="#1F5F7A" font-size="8.2" font-weight="700" text-anchor="start" x="16" y="211">Hops</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="160" y="211">appeler une définition comme une fonction</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="211">cours 8C, Rhino Compute</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · les questions à se poser</span>maintenu ?        dernière version, compatible avec ta version de Rhino
+licence ?         gratuit, commercial, conditions d'usage
+nécessaire ?      un composant natif ou un script suffirait-il ?
+partageable ?     tes destinataires pourront-ils l'installer ?</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Rhino 8 et .NET</h3>
+<p>Rhino 8 tourne par défaut sur un .NET récent. Un plugin ancien, compilé pour .NET Framework, peut ne pas se charger ; la commande SetDotNetRuntime permet de revenir à l'ancien environnement.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le forum et la documentation</h3>
+<p>Un plugin vivant a des exemples, une documentation et des réponses sur le forum de McNeel. C'est souvent le meilleur indice de sa durée de vie.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Construire une définition centrale sur un plugin abandonné. À la prochaine version de Rhino, il ne se charge plus, et toute la chaîne s'arrête avec lui.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 163 · L'écosystème des plugins Grasshopper</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 163</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Installer, perdre, retrouver un plugin</h2>
+<p style="max-width:165mm; font-size:9pt">Tu installes un plugin, tu l'utilises dans une définition, puis tu le retires pour voir ce que voit un collègue qui ne l'a pas.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Dans Rhino, <span class="cmd">PackageManager</span> : cherche un petit plugin gratuit (par exemple <b>Pufferfish</b>), installe-le, redémarre Rhino.</li>
+<li>Dans Grasshopper : <span class="cmd">File › Special Folders › Components Folder</span>. Note le chemin, puis repère le nouvel onglet.</li>
+<li>Pose un composant du plugin, relie-le à une géométrie simple, et enregistre le fichier.</li>
+<li>Dans <span class="cmd">PackageManager</span>, onglet des paquets installés : désinstalle le plugin, puis redémarre Rhino.</li>
+<li>Rouvre le fichier et lis le dialogue affiché.</li>
+<li>Réinstalle le plugin, redémarre, rouvre le fichier.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Sans le plugin, le fichier s'ouvre avec un dialogue d'<b>objets non reconnus</b> qui nomme le plugin manquant ; ses composants ne calculent plus. Une fois le plugin réinstallé, le fichier se rouvre <b>comme avant</b> : les composants retrouvent leurs réglages, puisqu'ils sont stockés dans le .gh.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Prépare ce fichier pour un collègue qui n'a jamais utilisé ce plugin, sans lui envoyer autre chose que le .gh.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Chaque plugin déclare ses informations dans une classe unique. Celle de Cuttlefish montre ce que Grasshopper affiche et ce qu'il utilise pour le reconnaître.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/CuttlefishInfo.cs</span></div>
+<div class="l k1"><span class="n">8</span>public class CuttlefishInfo : GH_AssemblyInfo<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">10</span>public override string Name =&gt; "Cuttlefish";<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">18</span>public override Guid Id =&gt; new Guid("4f000575-…");<span class="rep r3">3</span></div>
+<div class="l k2"><span class="n">21</span>public override string AuthorName =&gt; "Carolus Jérémy";<span class="rep r2">2</span></div>
+<div class="l k4"><span class="n">27</span>public override string AssemblyVersion =&gt; …;<span class="rep r4">4</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Une classe par plugin</b>Lue au chargement.</li>
+<li><span class="rep r2">2</span><b>Ce qui s'affiche</b>Nom, auteur.</li>
+<li><span class="rep r3">3</span><b>L'identité du plugin</b>Un GUID qui ne change jamais.</li>
+<li><span class="rep r4">4</span><b>La version</b>Celle de l'assembly (GetName().Version).</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ Tu sais dire dans quel dossier le plugin s'est installé.</li>
+<li style="margin-bottom:1.6mm">☐ Le dialogue d'ouverture nomme bien le plugin retiré.</li>
+<li style="margin-bottom:1.6mm">☐ Les réglages du composant sont revenus après réinstallation.</li>
+<li style="margin-bottom:1.6mm">☐ Tu n'as qu'une seule copie du plugin installée.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 163 · L'écosystème des plugins Grasshopper</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 163</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Un plugin s'installe par le Package Manager, qui range des versions identifiées par version de Rhino, ou à la main dans Libraries après déblocage. Le .gh retient l'identifiant, le nom et la version de chaque composant, jamais son code : sans le plugin, il s'ouvre avec des objets non reconnus. On choisit un plugin comme une bibliothèque : maintenu, sous licence claire, et seulement s'il est utile.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Ajoute dans le fichier un Scribble ou un Panel bien visible : le nom du plugin, sa version, la façon de l'installer (Package Manager) et la version de Rhino utilisée. Si le composant ne fait qu'une opération simple, remplace-le par des composants natifs ou un petit script : le fichier n'a plus de dépendance.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">PackageManager</td><td>installer, mettre à jour, retirer</td><td>toujours en premier</td></tr>
+<tr><td class="c">Food4Rhino</td><td>fiche, documentation, téléchargement</td><td>découvrir un plugin</td></tr>
+<tr><td class="c">Components Folder</td><td>le dossier Libraries</td><td>installation manuelle</td></tr>
+<tr><td class="c">Propriétés › Débloquer</td><td>autoriser un .gha téléchargé</td><td>avant de le copier</td></tr>
+<tr><td class="c">SetDotNetRuntime</td><td>choisir le runtime .NET de Rhino 8</td><td>plugin ancien</td></tr>
+<tr><td class="c">Scribble  Panel</td><td>noter les plugins requis</td><td>avant de partager</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Plugin (.gha)</dt><dd>Une assembly .NET qui ajoute des composants à Grasshopper.</dd>
+<dt>Package Manager (Yak)</dt><dd>Le gestionnaire de paquets de Rhino : versions, installation, mise à jour.</dd>
+<dt>Libraries</dt><dd>Le dossier où Grasshopper charge les .gha installés à la main.</dd>
+<dt>Objet non reconnu</dt><dd>Un composant dont le plugin manque à l'ouverture du fichier.</dd>
+<dt>Objet utilisateur (.ghuser)</dt><dd>Un composant ou cluster réglé, enregistré pour être réutilisé.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 09, « La géométrie RhinoCommon ». Sur le site de McNeel, la page du Package Manager et le guide « Creating a Yak package ».</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 09</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 163 · L'écosystème des plugins Grasshopper</div>
+</section>
+</body>
+</html>

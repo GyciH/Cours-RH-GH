@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>162 · Les arbres de données en pratique</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 162</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Les arbres de données en pratique</h1>
+<p class="chapeau">Le cours 08 a posé le vocabulaire : chemins, branches, accès item, list ou tree. Ici, on met les mains dans l'arbre : le lire, prévoir ce qu'un composant fera de deux arbres, et lui donner la forme dont la suite de la définition a besoin.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>8</b>, <b>11</b></span>
+<span class="pastille">Exemples · <b>Grasshopper, Param Viewer, Flip Matrix</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une grille de 5 × 4 points : la même donnée, rangée en colonnes ou en rangées</text>
+<circle cx="40" cy="156" fill="#2B2F33" r="4"></circle>
+<circle cx="40" cy="124" fill="#2B2F33" r="4"></circle>
+<circle cx="40" cy="92" fill="#2B2F33" r="4"></circle>
+<circle cx="40" cy="60" fill="#2B2F33" r="4"></circle>
+<circle cx="74" cy="156" fill="#1565C0" r="4"></circle>
+<circle cx="74" cy="124" fill="#1565C0" r="4"></circle>
+<circle cx="74" cy="92" fill="#1565C0" r="4"></circle>
+<circle cx="74" cy="60" fill="#1565C0" r="4"></circle>
+<circle cx="108" cy="156" fill="#2B2F33" r="4"></circle>
+<circle cx="108" cy="124" fill="#2B2F33" r="4"></circle>
+<circle cx="108" cy="92" fill="#2B2F33" r="4"></circle>
+<circle cx="108" cy="60" fill="#2B2F33" r="4"></circle>
+<circle cx="142" cy="156" fill="#2B2F33" r="4"></circle>
+<circle cx="142" cy="124" fill="#2B2F33" r="4"></circle>
+<circle cx="142" cy="92" fill="#2B2F33" r="4"></circle>
+<circle cx="142" cy="60" fill="#2B2F33" r="4"></circle>
+<circle cx="176" cy="156" fill="#2B2F33" r="4"></circle>
+<circle cx="176" cy="124" fill="#2B2F33" r="4"></circle>
+<circle cx="176" cy="92" fill="#2B2F33" r="4"></circle>
+<circle cx="176" cy="60" fill="#2B2F33" r="4"></circle>
+<rect fill="none" height="124" rx="6" stroke="#1565C0" stroke-dasharray="3 2" width="20" x="64" y="46"></rect>
+<text fill="#6B7378" font-size="7.4" font-style="italic" text-anchor="middle" x="130" y="188">x en colonnes, y en rangées</text>
+<line stroke="#1F5F7A" stroke-width="1.5" x1="222" x2="262" y1="110" y2="110"></line><polygon fill="#1F5F7A" points="262,110 255.6,112.7 255.6,107.3"></polygon>
+<text fill="#1565C0" font-size="8.2" font-weight="700" text-anchor="middle" x="330" y="44">5 branches de 4 points (colonnes)</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1F5F7A" stroke-width="1.2" width="130" x="270" y="52"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="276" y="66">{0;0}</text>
+<circle cx="332" cy="62" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="332" y="65">0</text>
+<circle cx="350" cy="62" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="350" y="65">1</text>
+<circle cx="368" cy="62" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="368" y="65">2</text>
+<circle cx="386" cy="62" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="386" y="65">3</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1565C0" stroke-width="1.2" width="130" x="270" y="78"></rect>
+<text class="mono" fill="#1565C0" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="276" y="92">{0;1}</text>
+<circle cx="332" cy="88" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="332" y="91">0</text>
+<circle cx="350" cy="88" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="350" y="91">1</text>
+<circle cx="368" cy="88" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="368" y="91">2</text>
+<circle cx="386" cy="88" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="386" y="91">3</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1F5F7A" stroke-width="1.2" width="130" x="270" y="104"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="276" y="118">{0;2}</text>
+<circle cx="332" cy="114" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="332" y="117">0</text>
+<circle cx="350" cy="114" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="350" y="117">1</text>
+<circle cx="368" cy="114" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="368" y="117">2</text>
+<circle cx="386" cy="114" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="386" y="117">3</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1F5F7A" stroke-width="1.2" width="130" x="270" y="130"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="276" y="144">{0;3}</text>
+<circle cx="332" cy="140" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="332" y="143">0</text>
+<circle cx="350" cy="140" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="350" y="143">1</text>
+<circle cx="368" cy="140" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="368" y="143">2</text>
+<circle cx="386" cy="140" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="386" y="143">3</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1F5F7A" stroke-width="1.2" width="130" x="270" y="156"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="276" y="170">{0;4}</text>
+<circle cx="332" cy="166" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="332" y="169">0</text>
+<circle cx="350" cy="166" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="350" y="169">1</text>
+<circle cx="368" cy="166" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="368" y="169">2</text>
+<circle cx="386" cy="166" fill="#1F5F7A" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="386" y="169">3</text>
+<text fill="#7B1FA2" font-size="8.2" font-weight="700" text-anchor="middle" x="500" y="44">Flip Matrix : 4 branches de 5</text>
+<rect fill="#fff" height="20" rx="3" stroke="#7B1FA2" stroke-width="1.2" width="160" x="420" y="52"></rect>
+<text class="mono" fill="#7B1FA2" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="426" y="66">rangée 1</text>
+<circle cx="482" cy="62" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="482" y="65">0</text>
+<circle cx="500" cy="62" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="500" y="65">1</text>
+<circle cx="518" cy="62" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="518" y="65">2</text>
+<circle cx="536" cy="62" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="536" y="65">3</text>
+<circle cx="554" cy="62" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="554" y="65">4</text>
+<rect fill="#fff" height="20" rx="3" stroke="#7B1FA2" stroke-width="1.2" width="160" x="420" y="78"></rect>
+<text class="mono" fill="#7B1FA2" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="426" y="92">rangée 2</text>
+<circle cx="482" cy="88" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="482" y="91">0</text>
+<circle cx="500" cy="88" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="500" y="91">1</text>
+<circle cx="518" cy="88" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="518" y="91">2</text>
+<circle cx="536" cy="88" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="536" y="91">3</text>
+<circle cx="554" cy="88" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="554" y="91">4</text>
+<rect fill="#fff" height="20" rx="3" stroke="#7B1FA2" stroke-width="1.2" width="160" x="420" y="104"></rect>
+<text class="mono" fill="#7B1FA2" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="426" y="118">rangée 3</text>
+<circle cx="482" cy="114" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="482" y="117">0</text>
+<circle cx="500" cy="114" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="500" y="117">1</text>
+<circle cx="518" cy="114" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="518" y="117">2</text>
+<circle cx="536" cy="114" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="536" y="117">3</text>
+<circle cx="554" cy="114" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="554" y="117">4</text>
+<rect fill="#fff" height="20" rx="3" stroke="#7B1FA2" stroke-width="1.2" width="160" x="420" y="130"></rect>
+<text class="mono" fill="#7B1FA2" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="426" y="144">rangée 4</text>
+<circle cx="482" cy="140" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="482" y="143">0</text>
+<circle cx="500" cy="140" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="500" y="143">1</text>
+<circle cx="518" cy="140" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="518" y="143">2</text>
+<circle cx="536" cy="140" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="536" y="143">3</text>
+<circle cx="554" cy="140" fill="#7B1FA2" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="554" y="143">4</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un arbre range les mêmes données selon une intention : par courbe, par colonne, par rangée. Bien travailler avec, c'est choisir cette intention et faire suivre la forme, avant chaque composant qui compte.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Une grille de points doit devenir des lignes. Polyline dessine les colonnes mais pas les rangées, et sur une liste aplatie il trace un zigzag. Flip Matrix range les mêmes points par rangées : la même Polyline dessine alors les lignes horizontales.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>lire un chemin et dire d'où vient une branche ;</li>
+<li>prévoir comment deux arbres s'associent ;</li>
+<li>restructurer un arbre (Flip Matrix, Simplify, Path Mapper…) ;</li>
+<li>garder la structure d'entrée dans un composant écrit en C#.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Un indice s'ajoute au chemin chaque fois qu'un composant rend une liste par élément. Deux arbres s'associent branche à branche, dans l'ordre, la dernière branche répétée. On donne à l'arbre la forme voulue juste avant le composant qui l'exploite.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 162 · Les arbres de données en pratique</div>
+</section>
+<!-- ============ PAGE 2 · LIRE UN ARBRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 162</b></div>
+<p class="rubrique">Schéma 1 · Lire un arbre</p>
+<h2>Le chemin raconte l'histoire</h2>
+<p style="max-width:165mm">Le chemin {0;2;3} se lit de gauche à droite : l'entrée d'origine, puis la troisième courbe, puis son quatrième point. Chaque composant qui rend plusieurs résultats par élément ajoute un indice à droite.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 200" width="100%">
+<rect fill="#EFE9E1" height="200" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Chaque composant qui rend une liste par élément ajoute un niveau au chemin</text>
+<rect fill="#fff" height="34" rx="4" stroke="#2E7D32" stroke-width="1.3" width="250" x="20" y="48"></rect>
+<text fill="#2E7D32" font-size="8.2" font-weight="700" text-anchor="start" x="30" y="62">3 courbes</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="30" y="75">0 1 2</text>
+<text class="mono" fill="#2E7D32" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="290" y="69">{0}</text>
+<line stroke="#6B7378" stroke-width="1" x1="145" x2="145" y1="82" y2="96"></line><polygon fill="#6B7378" points="145,96 142.3,89.6 147.7,89.6"></polygon>
+<rect fill="#fff" height="34" rx="4" stroke="#1565C0" stroke-width="1.3" width="250" x="20" y="96"></rect>
+<text fill="#1565C0" font-size="8.2" font-weight="700" text-anchor="start" x="30" y="110">Divide Curve · 4 points par courbe</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="30" y="123">4 points chacune</text>
+<text class="mono" fill="#1565C0" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="290" y="117">{0;0} {0;1} {0;2}</text>
+<line stroke="#6B7378" stroke-width="1" x1="145" x2="145" y1="130" y2="144"></line><polygon fill="#6B7378" points="145,144 142.3,137.6 147.7,137.6"></polygon>
+<rect fill="#fff" height="34" rx="4" stroke="#7B1FA2" stroke-width="1.3" width="250" x="20" y="144"></rect>
+<text fill="#7B1FA2" font-size="8.2" font-weight="700" text-anchor="start" x="30" y="158">Circle sur chaque point, puis Divide · 6 points</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="30" y="171">12 branches de 6</text>
+<text class="mono" fill="#7B1FA2" font-size="9" font-weight="700" style="font-size:9px" text-anchor="start" x="290" y="165">{0;0;0} … {0;2;3}</text>
+<text class="mono" fill="#1F5F7A" font-size="13" font-weight="700" style="font-size:13px" text-anchor="middle" x="470" y="60">{0;2;3}</text>
+<line stroke="#2E7D32" x1="440" x2="440" y1="68" y2="84"></line><line stroke="#1565C0" x1="462" x2="462" y1="68" y2="104"></line><line stroke="#7B1FA2" x1="484" x2="484" y1="68" y2="124"></line>
+<text fill="#2E7D32" font-size="7.4" text-anchor="start" x="446" y="92">l'entrée d'origine</text>
+<text fill="#1565C0" font-size="7.4" text-anchor="start" x="468" y="112">la 3e courbe</text>
+<text fill="#7B1FA2" font-size="7.4" text-anchor="start" x="490" y="132">son 4e point</text>
+<text fill="#6B7378" font-size="7.6" font-style="italic" text-anchor="start" x="440" y="168">Le chemin raconte d'où vient la branche.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, construire un arbre de colonnes</span>var t = new DataTree&lt;Point3d&gt;();
+for (int i = 0; i &lt; 5; i++)
+    for (int j = 0; j &lt; 4; j++)
+        t.Add(new Point3d(i * 20, j * 20, 0), new GH_Path(0, i));   // une branche par colonne</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Voir la structure</h3>
+<p>Param Viewer affiche les chemins et le nombre d'éléments de chaque branche ; un Panel montre les valeurs sous leur chemin. On les place avant de deviner.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Des chemins qui s'allongent</h3>
+<p>Après quelques opérations, les chemins deviennent longs. Simplify retire les indices communs à toutes les branches, sans changer le rangement.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Aplatir pour « faire marcher » une définition. Flatten fait disparaître l'information de rangement, et plus loin un composant qui avait besoin de savoir à quelle courbe appartient un point ne peut plus le savoir.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 162 · Les arbres de données en pratique</div>
+</section>
+<!-- ============ PAGE 3 · ASSOCIER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 162</b></div>
+<p class="rubrique">Schéma 2 · Associer</p>
+<h2>Deux arbres dans un composant</h2>
+<p style="max-width:165mm">Quand un composant reçoit deux arbres, il associe d'abord les branches, puis les éléments à l'intérieur de chaque paire de branches. Les branches s'associent dans l'ordre, pas par le nom de leur chemin.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Deux arbres en entrée : les branches s'associent dans l'ordre, puis les éléments</text>
+<text fill="#1565C0" font-size="8" font-weight="700" text-anchor="middle" x="110" y="44">A : 3 branches</text>
+<text fill="#E65100" font-size="8" font-weight="700" text-anchor="middle" x="470" y="44">B : 2 branches</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1565C0" stroke-width="1.2" width="140" x="40" y="54"></rect>
+<text class="mono" fill="#1565C0" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="46" y="68">{0;0}</text>
+<circle cx="102" cy="64" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="102" y="67">a</text>
+<circle cx="120" cy="64" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="120" y="67">b</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1565C0" stroke-width="1.2" width="140" x="40" y="88"></rect>
+<text class="mono" fill="#1565C0" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="46" y="102">{0;1}</text>
+<circle cx="102" cy="98" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="102" y="101">a</text>
+<circle cx="120" cy="98" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="120" y="101">b</text>
+<rect fill="#fff" height="20" rx="3" stroke="#1565C0" stroke-width="1.2" width="140" x="40" y="122"></rect>
+<text class="mono" fill="#1565C0" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="46" y="136">{0;2}</text>
+<circle cx="102" cy="132" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="102" y="135">a</text>
+<circle cx="120" cy="132" fill="#1565C0" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="120" y="135">b</text>
+<rect fill="#fff" height="20" rx="3" stroke="#E65100" stroke-width="1.2" width="140" x="400" y="54"></rect>
+<text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="406" y="68">{0}</text>
+<circle cx="462" cy="64" fill="#E65100" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="462" y="67">x</text>
+<circle cx="480" cy="64" fill="#E65100" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="480" y="67">y</text>
+<circle cx="498" cy="64" fill="#E65100" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="498" y="67">z</text>
+<rect fill="#fff" height="20" rx="3" stroke="#E65100" stroke-width="1.2" width="140" x="400" y="88"></rect>
+<text class="mono" fill="#E65100" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="406" y="102">{1}</text>
+<circle cx="462" cy="98" fill="#E65100" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="462" y="101">x</text>
+<circle cx="480" cy="98" fill="#E65100" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="480" y="101">y</text>
+<circle cx="498" cy="98" fill="#E65100" opacity=".85" r="5.5"></circle>
+<text fill="#fff" font-size="6.6" font-weight="700" text-anchor="middle" x="498" y="101">z</text>
+<line stroke="#6B7378" stroke-dasharray="0" stroke-width="1" x1="180" x2="400" y1="64" y2="64"></line>
+<line stroke="#6B7378" stroke-dasharray="0" stroke-width="1" x1="180" x2="400" y1="98" y2="98"></line>
+<line stroke="#C62828" stroke-dasharray="4 2" stroke-width="1.6" x1="180" x2="400" y1="132" y2="98"></line>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="middle" x="290" y="150">la 3e branche de A reçoit la dernière de B, répétée</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="middle" x="290" y="172">les chemins ne sont pas comparés : seul l'ordre compte</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · la règle d'association</span>branches   : 1re avec 1re, 2e avec 2e… ; la dernière de l'arbre le plus court se répète
+éléments   : même règle dans chaque paire de branches (liste la plus longue)
+sortie     : les chemins de l'entrée principale (clic droit sur l'entrée → Principal)</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Préparer l'appariement</h3>
+<p>Pour associer chaque point à sa courbe, les deux arbres doivent avoir autant de branches, dans le même ordre. Graft, Flatten et Simplify servent souvent à ça.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Un élément pour toute une branche</h3>
+<p>Une valeur seule (un rayon, une hauteur) s'applique à tous : une branche d'un élément se répète sur toutes les branches et tous les éléments.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Croire que {0;1} ira avec {0;1}. Si un arbre a ses branches dans un autre ordre, ou une branche de moins, l'association se décale sans aucun message.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 162 · Les arbres de données en pratique</div>
+</section>
+<!-- ============ PAGE 4 · RESTRUCTURER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 162</b></div>
+<p class="rubrique">Schéma 3 · Restructurer</p>
+<h2>Donner la bonne forme</h2>
+<p style="max-width:165mm">Les composants de l'onglet Sets › Tree déplacent les éléments d'une branche à l'autre sans changer leurs valeurs. On les place juste avant le composant qui exploite la structure.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 226" width="100%">
+<rect fill="#EFE9E1" height="226" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Les composants qui changent la forme d'un arbre</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="42">composant</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="140" y="42">ce qu'il fait</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="400" y="42">typique</text>
+<rect fill="#fff" height="21" opacity=".6" width="580" x="10" y="50"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="16" y="64">Flatten  Graft</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="140" y="64">tout dans une branche ; un élément par branche</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="64">changer d'échelle</text>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="16" y="85">Simplify</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="140" y="85">retire les indices communs à toutes les branches</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="85">chemins lisibles</text>
+<rect fill="#fff" height="21" opacity=".6" width="580" x="10" y="92"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="16" y="106">Flip Matrix</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="140" y="106">échange rangées et colonnes</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="106">grilles</text>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="16" y="127">Partition List</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="140" y="127">coupe une liste en paquets de n</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="127">regrouper</text>
+<rect fill="#fff" height="21" opacity=".6" width="580" x="10" y="134"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="16" y="148">Trim Tree</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="140" y="148">retire des niveaux à droite du chemin</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="148">regrouper par parent</text>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="16" y="169">Path Mapper</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="140" y="169">réécrit les chemins par une règle {A;B} → {B}</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="169">cas sur mesure</text>
+<rect fill="#fff" height="21" opacity=".6" width="580" x="10" y="176"></rect>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="16" y="190">Entwine  Explode Tree</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="140" y="190">réunit des listes en arbre ; l'inverse</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="190">assembler, éclater</text>
+<text class="mono" fill="#1F5F7A" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="16" y="211">Tree Branch  Tree Item</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="140" y="211">extrait une branche ou un élément</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="400" y="211">isoler un cas</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · Path Mapper</span>{A;B}(i)  →  {A}        réunit les branches d'un même parent
+{A;B}(i)  →  {B}        regroupe par rang de la sous-liste
+{A;B}(i)  →  {i}        une branche par rang d'élément (un Flip)</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Flip Matrix</h3>
+<p>Dans une grille rangée par colonnes, Flip Matrix met ensemble les éléments de même rang : les colonnes deviennent des rangées. Il suppose des branches de même longueur.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Trim Tree et Partition List</h3>
+<p>Trim Tree retire des niveaux à droite pour regrouper par parent. Partition List coupe une liste en paquets de taille fixe, chacun dans sa branche.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Écrire un Path Mapper sans regarder les chemins réels. La règle doit avoir autant d'indices que le chemin entrant, sinon le résultat ne suit pas l'intention.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 162 · Les arbres de données en pratique</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 162</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Des colonnes et des rangées</h2>
+<p style="max-width:165mm; font-size:9pt">Tu construis une grille de 5 × 4 points, tu dessines ses colonnes, puis ses rangées en changeant seulement la forme de l'arbre.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Deux <span class="cmd">Series</span> : S 0, N 20, C 5 pour X ; S 0, N 20, C 4 pour Y.</li>
+<li>Clic droit sur l'entrée X d'un <span class="cmd">Construct Point</span> → Graft, puis relie les deux séries à X et Y.</li>
+<li>Branche un <span class="cmd">Param Viewer</span> sur les points, puis une <span class="cmd">Polyline</span>.</li>
+<li>Ajoute <span class="cmd">Flip Matrix</span> entre les points et une deuxième <span class="cmd">Polyline</span>.</li>
+<li>Sur une troisième copie, <span class="cmd">Flatten</span> sur l'entrée de la Polyline.</li>
+<li>Compare les trois résultats dans la vue.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Le Param Viewer montre <b>5 branches de 4 points</b>. La première Polyline trace <b>5 colonnes</b> ; après Flip Matrix, la seconde trace <b>4 rangées</b> : ensemble, une grille. La version aplatie trace <b>une seule polyligne</b> en zigzag par les 20 points.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Obtiens les 16 segments horizontaux séparés, rangés par rangée, pour pouvoir les traiter un à un.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Bubble, dans Cuttlefish, lit tout un arbre de points et rend ses cercles sous les mêmes chemins : la sortie reste alignée sur l'entrée.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Bubble.cs</span></div>
+<div class="l k1"><span class="n">72</span>for (int b = 0; b &lt; points.PathCount; b++)<span class="rep r1">1</span></div>
+<div class="l"><span class="n">73</span>{</div>
+<div class="l k2"><span class="n">74</span>    GH_Path path = points.Paths[b];<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">75</span>    result.EnsurePath(path);<span class="rep r3">3</span></div>
+<div class="l k1"><span class="n">76</span>    foreach (GH_Point p in points.Branches[b])<span class="rep r1">1</span></div>
+<div class="l k4"><span class="n">84</span>        result.Add(new Circle(…), path);<span class="rep r4">4</span></div>
+<div class="l k5"><span class="n">88</span>DA.SetDataTree(0, result);<span class="rep r5">5</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Branche par branche</b>Par leur rang.</li>
+<li><span class="rep r2">2</span><b>Le chemin d'entrée</b>Gardé tel quel.</li>
+<li><span class="rep r3">3</span><b>Même vide</b>La branche existe en sortie.</li>
+<li><span class="rep r4">4</span><b>Au même chemin</b>Le cercle suit son point.</li>
+<li><span class="rep r5">5</span><b>Un arbre en sortie</b>Aligné sur l'entrée.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ Tu peux dire combien de branches sort chaque composant avant de regarder.</li>
+<li style="margin-bottom:1.6mm">☐ La grille a 5 lignes verticales et 4 horizontales.</li>
+<li style="margin-bottom:1.6mm">☐ Le zigzag passe par les 20 points, colonne après colonne.</li>
+<li style="margin-bottom:1.6mm">☐ Tu as retiré le Graft une fois pour voir ce qu'il change.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 162 · Les arbres de données en pratique</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3A</b> · Le plugin Grasshopper</span><b>Cours 162</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Un chemin raconte d'où vient une branche ; un indice s'ajoute chaque fois qu'un composant rend une liste par élément. Deux arbres s'associent branche à branche, dans l'ordre, la dernière répétée. Flatten, Graft, Simplify, Flip Matrix, Trim Tree et Path Mapper donnent à l'arbre la forme voulue, juste avant le composant qui l'exploite. En C#, on recopie les chemins d'entrée pour garder la sortie alignée.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Explode sur les 4 polylignes horizontales : chaque polyligne rend ses 4 segments dans sa branche, soit 4 branches de 4 segments. List Item ou Tree Item isole ensuite un segment par son rang.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">Param Viewer  Panel</td><td>voir chemins et valeurs</td><td>toujours, avant de deviner</td></tr>
+<tr><td class="c">Flatten  Graft  Simplify</td><td>aplatir, éclater, nettoyer</td><td>changer d'échelle</td></tr>
+<tr><td class="c">Flip Matrix</td><td>rangées ↔ colonnes</td><td>grilles</td></tr>
+<tr><td class="c">Trim Tree  Partition List</td><td>regrouper par parent, par paquets</td><td>réorganiser</td></tr>
+<tr><td class="c">Path Mapper</td><td>réécrire les chemins</td><td>cas sur mesure</td></tr>
+<tr><td class="c">DataTree.Add(x, path)</td><td>ranger un résultat en C#</td><td>garder la structure</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Chemin</dt><dd>La suite d'indices {0;2;3} qui nomme une branche.</dd>
+<dt>Branche</dt><dd>Une liste d'éléments rangée sous un chemin.</dd>
+<dt>Entrée principale</dt><dd>L'entrée dont les chemins sont repris en sortie.</dd>
+<dt>Flip Matrix</dt><dd>L'échange des rangées et des colonnes d'un arbre.</dd>
+<dt>Path Mapper</dt><dd>Un composant qui réécrit les chemins selon une règle.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 163, « L'écosystème des plugins Grasshopper ». Dans l'aide de Grasshopper, l'onglet Sets › Tree.</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 163</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 162 · Les arbres de données en pratique</div>
+</section>
+</body>
+</html>

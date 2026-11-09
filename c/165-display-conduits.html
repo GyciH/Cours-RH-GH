@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>165 · Dessiner dans la vue : les display conduits</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 165</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Dessiner dans la vue : les display conduits</h1>
+<p class="chapeau">Une cote provisoire, l'aperçu d'un résultat, une pastille qui suit la souris : tout ce qui se montre sans exister vraiment dans le modèle. Rhino le permet par les conduits d'affichage, qui dessinent par-dessus la vue à chaque image, sans rien ajouter au document.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>164</b>, <b>53</b></span>
+<span class="pastille">Exemples · <b>RhinoCommon, DisplayConduit, DynamicDraw</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Ce qui est dans le document, et ce qui est seulement dessiné par-dessus</text>
+<rect fill="#fff" height="148" rx="4" stroke="#6B7378" width="330" x="24" y="36"></rect>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="32" y="50">Perspective</text>
+<polygon fill="#F4F1EA" points="70,140 170,110 270,140 170,170" stroke="#2B2F33" stroke-width="1.4"></polygon>
+<line stroke="#E65100" stroke-dasharray="5 3" stroke-width="2" x1="110" x2="250" y1="128" y2="92"></line>
+<circle cx="110" cy="128" fill="#E65100" r="3"></circle><circle cx="250" cy="92" fill="#E65100" r="3"></circle>
+<rect fill="#E65100" height="14" rx="3" width="44" x="160" y="96"></rect>
+<text fill="#fff" font-size="7.4" font-weight="700" text-anchor="middle" x="182" y="106">152,3</text>
+<text fill="#7B1FA2" font-size="8" font-weight="700" text-anchor="end" x="300" y="64">Plateau · 1200 × 800</text>
+<circle cx="80" cy="156" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="80" y="159.2">1</text>
+<circle cx="264" cy="86" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="264" y="89.2">2</text>
+<circle cx="312" cy="60" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="312" y="63.2">3</text>
+<circle cx="380" cy="60" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="380" y="63.2">1</text>
+<text fill="#2E7D32" font-size="8.6" font-weight="700" text-anchor="start" x="394" y="63">Objet du document</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="394" y="76">sélectionnable, enregistré, annulable</text>
+<circle cx="380" cy="100" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="380" y="103.2">2</text>
+<text fill="#1565C0" font-size="8.6" font-weight="700" text-anchor="start" x="394" y="103">Dessin d'un conduit</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="394" y="116">redessiné à chaque image, jamais enregistré</text>
+<circle cx="380" cy="140" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="380" y="143.2">3</text>
+<text fill="#7B1FA2" font-size="8.6" font-weight="700" text-anchor="start" x="394" y="143">Texte en 2D</text>
+<text fill="#2B2F33" font-size="7.2" text-anchor="start" x="394" y="156">posé sur l'écran, à taille fixe</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un conduit d'affichage dessine à chaque image, par-dessus ou sous les objets, ce qui n'a pas sa place dans le document : aperçus, mesures, repères. Rien de ce qu'il dessine n'est sélectionnable ni enregistré.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Pendant une commande, l'utilisateur veut voir la distance entre deux points avant de cliquer. Ajouter une ligne et un texte au document à chaque mouvement remplirait l'annulation. Un dessin dynamique les montre, les suit, et disparaît à la fin.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>distinguer un objet du document d'un dessin temporaire ;</li>
+<li>écrire un conduit : canaux, boîte englobante, méthodes de dessin ;</li>
+<li>montrer un aperçu pendant une invite ;</li>
+<li>relier tout cela à l'aperçu des composants Grasshopper.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Le document garde ce qui doit durer ; un conduit dessine ce qui est provisoire. Il déclare sa boîte englobante, dessine dans les canaux utiles avec e.Display, et ne calcule rien de lourd : ses méthodes tournent à chaque image.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 165 · Dessiner dans la vue : les display conduits</div>
+</section>
+<!-- ============ PAGE 2 · LES CANAUX ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 165</b></div>
+<p class="rubrique">Schéma 1 · Les canaux</p>
+<h2>Un conduit, plusieurs moments de dessin</h2>
+<p style="max-width:165mm">Un conduit est une classe dérivée de DisplayConduit. Rhino l'appelle à plusieurs moments de chaque image : pour connaître son étendue, avant les objets, après eux, puis au premier plan en 2D. On redéfinit seulement les moments utiles.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">À chaque image, Rhino appelle les canaux du conduit dans cet ordre</text>
+<rect fill="#fff" height="56" rx="4" stroke="#2E7D32" stroke-width="1.3" width="90" x="14" y="60"></rect>
+<text class="mono" fill="#2E7D32" font-size="6.9" font-weight="700" style="font-size:6.9px" text-anchor="middle" x="59" y="82">CalculateBoundingBox</text>
+<text fill="#2B2F33" font-size="7" text-anchor="middle" x="59" y="100">dire où l'on dessine</text>
+<line stroke="#6B7378" stroke-width="1" x1="104" x2="111" y1="88" y2="88"></line><polygon fill="#6B7378" points="111,88 104.6,90.7 104.6,85.3"></polygon>
+<rect fill="#fff" height="56" rx="4" stroke="#1565C0" stroke-width="1.3" width="90" x="111" y="60"></rect>
+<text class="mono" fill="#1565C0" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="156" y="82">PreDrawObjects</text>
+<text fill="#2B2F33" font-size="7" text-anchor="middle" x="156" y="100">sous les objets</text>
+<line stroke="#6B7378" stroke-width="1" x1="201" x2="208" y1="88" y2="88"></line><polygon fill="#6B7378" points="208,88 201.6,90.7 201.6,85.3"></polygon>
+<rect fill="#F4F1EA" height="56" rx="4" stroke="#6B7378" stroke-width="1.3" width="90" x="208" y="60"></rect>
+<text class="mono" fill="#6B7378" font-size="6.9" font-weight="700" style="font-size:6.9px" text-anchor="middle" x="253" y="82">objets du document</text>
+<text fill="#2B2F33" font-size="7" text-anchor="middle" x="253" y="100">dessinés par Rhino</text>
+<line stroke="#6B7378" stroke-width="1" x1="298" x2="305" y1="88" y2="88"></line><polygon fill="#6B7378" points="305,88 298.6,90.7 298.6,85.3"></polygon>
+<rect fill="#fff" height="56" rx="4" stroke="#7B1FA2" stroke-width="1.3" width="90" x="305" y="60"></rect>
+<text class="mono" fill="#7B1FA2" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="350" y="82">PostDrawObjects</text>
+<text fill="#2B2F33" font-size="7" text-anchor="middle" x="350" y="100">par-dessus, en 3D</text>
+<line stroke="#6B7378" stroke-width="1" x1="395" x2="402" y1="88" y2="88"></line><polygon fill="#6B7378" points="402,88 395.6,90.7 395.6,85.3"></polygon>
+<rect fill="#fff" height="56" rx="4" stroke="#E65100" stroke-width="1.3" width="90" x="402" y="60"></rect>
+<text class="mono" fill="#E65100" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="447" y="82">DrawForeground</text>
+<text fill="#2B2F33" font-size="7" text-anchor="middle" x="447" y="100">texte et repères 2D</text>
+<line stroke="#6B7378" stroke-width="1" x1="492" x2="499" y1="88" y2="88"></line><polygon fill="#6B7378" points="499,88 492.6,90.7 492.6,85.3"></polygon>
+<rect fill="#fff" height="56" rx="4" stroke="#00838F" stroke-width="1.3" width="90" x="499" y="60"></rect>
+<text class="mono" fill="#00838F" font-size="7.6" font-weight="700" style="font-size:7.6px" text-anchor="middle" x="544" y="82">DrawOverlay</text>
+<text fill="#2B2F33" font-size="7" text-anchor="middle" x="544" y="100">tout au-dessus</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="middle" x="300" y="146">On redéfinit seulement les canaux utiles ; tous reçoivent e.Display pour dessiner.</text>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="middle" x="300" y="166">Ces méthodes tournent à chaque rafraîchissement : rien de lourd dedans.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, un conduit qui montre une pastille</span>class Mesure : DisplayConduit
+{
+    public Point3d A, B;
+    protected override void CalculateBoundingBox(CalculateBoundingBoxEventArgs e)
+        =&gt; e.IncludeBoundingBox(new BoundingBox(A, B));
+    protected override void PostDrawObjects(DrawEventArgs e)
+    {
+        e.Display.DrawLine(A, B, Color.OrangeRed, 2);
+        e.Display.DrawDot((A + B) / 2, A.DistanceTo(B).ToString("0.0"));
+    }
+}
+// var m = new Mesure { A = a, B = b, Enabled = true }; doc.Views.Redraw();</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Allumer, éteindre</h3>
+<p>Enabled = true branche le conduit sur toutes les vues ; false le débranche. Dans les deux cas, on demande un Redraw pour que la vue suive.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Calculer avant</h3>
+<p>Le conduit garde des données prêtes (points, maillages, textes). Le calcul se fait quand elles changent, pas dans les méthodes de dessin.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Créer des maillages ou des courbes dans PostDrawObjects. La méthode tourne à chaque image ; la vue rame dès qu'on tourne la caméra.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 165 · Dessiner dans la vue : les display conduits</div>
+</section>
+<!-- ============ PAGE 3 · L'ÉTENDUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 165</b></div>
+<p class="rubrique">Schéma 2 · L'étendue</p>
+<h2>La boîte englobante et le découpage</h2>
+<p style="max-width:165mm">Pour régler ses plans de découpe, la caméra a besoin de connaître l'étendue de la scène. Les objets du document la donnent d'eux-mêmes ; un conduit doit déclarer la sienne dans CalculateBoundingBox.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">La boîte englobante déclarée règle les plans de découpe de la caméra</text>
+<polygon fill="none" points="40,110 300,40 300,180" stroke="#6B7378"></polygon>
+<circle cx="40" cy="110" fill="#2B2F33" r="5"></circle>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="36" y="132">caméra</text>
+<line stroke="#1565C0" stroke-width="2" x1="110" x2="110" y1="91" y2="129"></line><line stroke="#1565C0" stroke-width="2" x1="250" x2="250" y1="54" y2="166"></line>
+<text fill="#1565C0" font-size="7.4" font-weight="700" text-anchor="middle" x="110" y="84">proche</text>
+<text fill="#1565C0" font-size="7.4" font-weight="700" text-anchor="middle" x="250" y="48">lointain</text>
+<rect fill="none" height="40" stroke="#2E7D32" stroke-dasharray="4 2" width="100" x="130" y="90"></rect>
+<text fill="#2E7D32" font-size="7.4" font-weight="700" text-anchor="middle" x="180" y="146">boîte déclarée</text>
+<line stroke="#E65100" stroke-width="2" x1="150" x2="290" y1="110" y2="110"></line>
+<line stroke="#C62828" stroke-width="3" x1="250" x2="290" y1="110" y2="110"></line>
+<text fill="#C62828" font-size="7.4" font-weight="700" text-anchor="start" x="292" y="100">coupé</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="start" x="340" y="72">Une ligne qui dépasse la boîte déclarée</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="340" y="88">peut être coupée par le plan lointain :</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="340" y="104">Rhino ne sait pas qu'elle va si loin.</text>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="start" x="340" y="132">Déclarer une boîte qui contient tout ce</text>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="start" x="340" y="146">qu'on dessine, et pas plus grande.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · ce que l'on déclare</span>e.IncludeBoundingBox(bbox)     ajoute l'étendue du dessin à celle de la scène
+boîte trop petite              dessin coupé par le plan proche ou lointain
+boîte trop grande              perte de précision de profondeur (cours 90)</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Juste ce qu'il faut</h3>
+<p>La boîte doit contenir tout ce que le conduit dessine en 3D, et pas beaucoup plus : une boîte démesurée écarte les plans et dégrade la profondeur.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le texte 2D à part</h3>
+<p>Ce qui se dessine en coordonnées d'écran, dans DrawForeground, n'a pas besoin d'être dans la boîte : il ne dépend pas de la caméra.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier CalculateBoundingBox. Tant que les objets du document entourent le dessin, tout va bien ; dès que le dessin sort de la scène, il disparaît en partie, selon l'angle de vue.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 165 · Dessiner dans la vue : les display conduits</div>
+</section>
+<!-- ============ PAGE 4 · PENDANT UNE COMMANDE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 165</b></div>
+<p class="rubrique">Schéma 3 · Pendant une commande</p>
+<h2>L'aperçu dynamique et Grasshopper</h2>
+<p style="max-width:165mm">Pendant une invite de point, l'événement DynamicDraw permet de dessiner à chaque mouvement de souris, avec la position courante. C'est le même mécanisme, limité à la durée de l'invite.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 214" width="100%">
+<rect fill="#EFE9E1" height="214" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Dessiner : quelques méthodes de e.Display, et leurs équivalents</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="16" y="42">méthode</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="210" y="42">ce qu'elle dessine</text>
+<text fill="#6B7378" font-size="7.6" font-weight="700" text-anchor="start" x="410" y="42">où</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="50"></rect>
+<text class="mono" fill="#1F5F7A" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="start" x="16" y="65">DrawLine  DrawPolyline</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="210" y="65">segments, polylignes en couleur</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="410" y="65">canaux 3D</text>
+<text class="mono" fill="#1F5F7A" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="start" x="16" y="87">DrawCurve  DrawPoint</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="210" y="87">courbes, points</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="410" y="87">canaux 3D</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="94"></rect>
+<text class="mono" fill="#1F5F7A" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="start" x="16" y="109">DrawMeshShaded</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="210" y="109">un maillage ombré, avec matériau</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="410" y="109">PostDrawObjects</text>
+<text class="mono" fill="#1F5F7A" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="start" x="16" y="131">DrawDot</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="210" y="131">une pastille de texte accrochée en 3D</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="410" y="131">PostDrawObjects</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="138"></rect>
+<text class="mono" fill="#1F5F7A" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="start" x="16" y="153">Draw2dText</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="210" y="153">du texte à position d'écran</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="410" y="153">DrawForeground</text>
+<text class="mono" fill="#1F5F7A" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="start" x="16" y="175">GetPoint.DynamicDraw</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="210" y="175">un aperçu pendant une invite</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="410" y="175">dans une commande</text>
+<rect fill="#fff" height="22" opacity=".6" width="580" x="10" y="182"></rect>
+<text class="mono" fill="#1F5F7A" font-size="7.8" font-weight="700" style="font-size:7.8px" text-anchor="start" x="16" y="197">DrawViewportWires / Meshes</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="210" y="197">l'aperçu d'un composant</text>
+<text fill="#6B7378" font-size="7.8" text-anchor="start" x="410" y="197">Grasshopper</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, un aperçu pendant une invite</span>var gp = new GetPoint(); gp.SetCommandPrompt("Second point");
+gp.DynamicDraw += (s, e) =&gt; {
+    e.Display.DrawLine(a, e.CurrentPoint, Color.OrangeRed, 2);
+    e.Display.DrawDot((a + e.CurrentPoint) / 2, a.DistanceTo(e.CurrentPoint).ToString("0.0"));
+};
+gp.Get();</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Dans Grasshopper</h3>
+<p>L'aperçu d'un composant passe par DrawViewportWires et DrawViewportMeshes, avec une ClippingBox : c'est un conduit que Grasshopper gère pour tous les composants.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Cuire, c'est passer au document</h3>
+<p>Bake transforme l'aperçu en objets du document : à partir de là, ils sont sélectionnables, enregistrés et annulables.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Faire un aperçu en ajoutant et supprimant des objets du document à chaque mouvement. L'annulation se remplit, les événements du document se déclenchent sans fin, et tout ralentit.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 165 · Dessiner dans la vue : les display conduits</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 165</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Une mesure qui suit la souris</h2>
+<p style="max-width:165mm; font-size:9pt">Tu écris un script qui demande deux points et montre, pendant le second, une ligne et sa longueur, sans rien ajouter au document avant le clic.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Lance <span class="cmd">ScriptEditor</span>, nouveau script C#. Ajoute <span class="cmd">using System.Drawing;</span>.</li>
+<li>Demande un premier point : <span class="cmd">RhinoGet.GetPoint("Premier point", false, out Point3d a)</span>.</li>
+<li>Recopie l'aperçu dynamique du schéma 3, et ajoute <span class="cmd">gp.SetBasePoint(a, true);</span> avant gp.Get().</li>
+<li>Exécute, clique un premier point, puis déplace la souris sans cliquer.</li>
+<li>Clique le second point, puis vérifie qu'aucun objet n'a été ajouté.</li>
+<li>Ajoute après gp.Get() : <span class="cmd">doc.Objects.AddLine(a, gp.Point()); doc.Views.Redraw();</span>, puis relance.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Pendant le déplacement, une <b>ligne orange</b> relie le premier point au curseur, avec une <b>pastille</b> qui affiche sa longueur. Au clic, l'aperçu <b>disparaît</b> et le document reste vide. Avec AddLine, une ligne ordinaire, sélectionnable et annulable, reste dans le document.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Fais rester la ligne orange et sa pastille après la fin du script, sans rien ajouter au document, puis prévois comment l'effacer.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Dans SnapSet, les constituants n'ont aucune géométrie à montrer dans la vue : ils le déclarent, et Grasshopper n'affiche alors pas d'état d'aperçu pour eux.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">SnapSet/src/SnapSet.Conception/Noyau/Constituant.cs</span></div>
+<div class="l k1"><span class="n">118</span>/// &lt;summary&gt;Pas de géométrie à prévisualiser : …<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">119</span>/// comme GH_ComponentAttributes… le fait …&lt;/summary&gt;<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">120</span>public override bool IsPreviewCapable =&gt; false;<span class="rep r3">3</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Pas d'aperçu</b>Rien à dessiner dans la vue.</li>
+<li><span class="rep r2">2</span><b>Le natif comme modèle</b>Grasshopper fait pareil.</li>
+<li><span class="rep r3">3</span><b>Une déclaration</b>Lue par Grasshopper.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ La pastille change de valeur pendant le déplacement.</li>
+<li style="margin-bottom:1.6mm">☐ Échap au second point ne laisse rien dans la vue.</li>
+<li style="margin-bottom:1.6mm">☐ La ligne finale se sélectionne et s'annule par Ctrl+Z.</li>
+<li style="margin-bottom:1.6mm">☐ La vue reste fluide en tournant la caméra.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 165 · Dessiner dans la vue : les display conduits</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 165</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Un conduit d'affichage dessine à chaque image, sans rien ajouter au document. Il déclare sa boîte englobante, dessine dans les canaux utiles (PreDrawObjects, PostDrawObjects, DrawForeground) avec e.Display, et calcule ses données avant, pas pendant. Dans une commande, DynamicDraw montre un aperçu pendant une invite ; dans Grasshopper, l'aperçu des composants suit le même principe, et Bake passe au document.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Utilise la classe Mesure du schéma 1 : après les deux points, crée un Mesure avec A et B, mets Enabled à true, puis Redraw. Le dessin reste, puisque le conduit est branché sur les vues. Pour l'effacer, il faut garder la référence du conduit (dans un plugin, un champ de la commande) et remettre Enabled à false, puis Redraw.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">DisplayConduit  Enabled</td><td>créer, brancher un conduit</td><td>dessin durable mais provisoire</td></tr>
+<tr><td class="c">CalculateBoundingBox</td><td>déclarer l'étendue du dessin</td><td>toujours</td></tr>
+<tr><td class="c">PostDrawObjects  DrawForeground</td><td>dessiner en 3D, en 2D</td><td>selon le dessin</td></tr>
+<tr><td class="c">e.Display.DrawLine  DrawDot</td><td>lignes, pastilles de texte</td><td>mesures, repères</td></tr>
+<tr><td class="c">GetPoint.DynamicDraw</td><td>aperçu pendant une invite</td><td>dans une commande</td></tr>
+<tr><td class="c">doc.Views.Redraw()</td><td>rafraîchir après un changement</td><td>allumer, éteindre</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Conduit d'affichage</dt><dd>Une classe qui dessine dans les vues à chaque image, hors du document.</dd>
+<dt>Canal</dt><dd>Un moment du dessin d'une image : avant, après les objets, premier plan.</dd>
+<dt>Boîte englobante</dt><dd>L'étendue déclarée du dessin, qui règle la découpe de la caméra.</dd>
+<dt>Aperçu dynamique</dt><dd>Un dessin qui suit la souris pendant une invite.</dd>
+<dt>Cuire (Bake)</dt><dd>Transformer l'aperçu Grasshopper en objets du document.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 166, « Eto.Forms ». Dans le guide RhinoCommon de McNeel, « Display Conduits » et l'exemple « Dynamic Draw ».</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : fiche récap de la partie 3</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 165 · Dessiner dans la vue : les display conduits</div>
+</section>
+</body>
+</html>
