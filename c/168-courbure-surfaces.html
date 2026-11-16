@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>168 · La courbure des surfaces</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 168</b></div>
+<p class="rubrique">Le concept</p>
+<h1>La courbure des surfaces</h1>
+<p class="chapeau">Un profilé ne se cintre pas sous un certain rayon, une tôle ne prend pas n'importe quelle forme, un reflet trahit une bosse. Derrière ces trois soucis, une même grandeur : la courbure. Sur une surface, elle dépend de la direction, et deux nombres la résument.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>50</b>, <b>159</b></span>
+<span class="pastille">Exemples · <b>Rhino, Grasshopper, RhinoCommon</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">La courbure d'une courbe : l'inverse du rayon du cercle qui l'épouse</text>
+<polyline fill="none" points="30.0,120.0 35.0,115.8 40.0,111.7 45.0,107.6 50.0,103.6 55.0,99.8 60.0,96.0 65.0,92.5 70.0,89.1 75.0,85.9 80.0,83.0 85.0,80.3 90.0,77.9 95.0,75.8 100.0,74.0 105.0,72.6 110.0,71.4 115.0,70.6 120.0,70.1 125.0,70.0 130.0,70.2 135.0,70.8 140.0,71.7 145.0,73.0 150.0,74.5 155.0,76.4 160.0,78.6 165.0,81.1 170.0,83.8 175.0,86.8 180.0,90.1 185.0,93.5 190.0,97.1 195.0,100.9 200.0,104.8 205.0,108.8 210.0,112.9 215.0,117.1 220.0,121.3 225.0,125.4 230.0,129.5 235.0,133.6 240.0,137.5 245.0,141.4 250.0,145.1 255.0,148.6 260.0,151.9 265.0,155.0 270.0,157.8 275.0,160.4 280.0,162.7 285.0,164.7 290.0,166.5 295.0,167.8 300.0,168.9 305.0,169.6 310.0,169.9 315.0,170.0 320.0,169.6 325.0,169.0 330.0,167.9 335.0,166.6 340.0,164.9 345.0,162.9" stroke="#2B2F33" stroke-width="1.8"></polyline>
+<circle cx="125" cy="94" fill="none" r="24" stroke="#C62828" stroke-dasharray="3 2"></circle>
+<circle cx="125" cy="70" fill="#C62828" r="3"></circle>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="middle" x="125" y="132">petit rayon : courbure forte</text>
+<circle cx="300" cy="-60" fill="none" opacity=".0" r="250" stroke="#1565C0" stroke-dasharray="3 2"></circle>
+<circle cx="220" cy="121" fill="#1565C0" r="3"></circle>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="end" x="212" y="156">presque droit : courbure faible</text>
+<circle cx="118" cy="56" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="118" y="59.2">1</text>
+<circle cx="232" cy="108" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="232" y="111.2">2</text>
+<text class="mono" fill="#1F5F7A" font-size="13" font-weight="700" style="font-size:13px" text-anchor="start" x="370" y="70">κ = 1 / R</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="370" y="96">R en mm, κ en 1/mm</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="370" y="120">droite : R infini, κ = 0</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="370" y="140">cercle de 10 : κ = 0,1 partout</text>
+<text fill="#E65100" font-size="8" font-weight="700" text-anchor="start" x="370" y="168">Courbure et rayon varient en sens inverse.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>La courbure d'une courbe vaut l'inverse du rayon du cercle qui l'épouse. Sur une surface, elle varie avec la direction : ses extrêmes k1 et k2 donnent la courbure gaussienne (leur produit) et la moyenne ; le signe de la gaussienne dit dôme, selle ou surface développable.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Une façade en tôle d'aluminium doit être découpée à plat puis cintrée. Le dessin est beau, mais certaines zones sont en dôme : impossible sans emboutir. Une analyse de courbure gaussienne les montre en couleur avant d'envoyer quoi que ce soit à l'atelier.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>relier courbure et rayon d'une courbe ;</li>
+<li>définir les courbures principales d'une surface ;</li>
+<li>lire le signe de la courbure gaussienne ;</li>
+<li>relier courbure nulle et fabrication à plat.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    κ = 1/R : plus c'est serré, plus la courbure est forte. Sur une surface, K = k1 × k2 : positive en dôme, négative en selle, nulle pour une surface développable, la seule qui se déroule à plat sans déformation.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 168 · La courbure des surfaces</div>
+</section>
+<!-- ============ PAGE 2 · COURBES ET SURFACES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 168</b></div>
+<p class="rubrique">Schéma 1 · Courbes et surfaces</p>
+<h2>Les courbures principales</h2>
+<p style="max-width:165mm">En un point d'une surface, on coupe par des plans contenant la normale : chaque coupe donne une courbe et sa courbure. En tournant, cette courbure passe par un maximum k1 et un minimum k2, dans deux directions perpendiculaires.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">En un point d'une surface, la courbure dépend de la direction</text>
+<ellipse cx="150" cy="110" fill="#F4F1EA" rx="110" ry="40" stroke="#6B7378"></ellipse>
+<path d="M50,120 Q150,50 250,120" fill="none" stroke="#C62828" stroke-width="2"></path>
+<path d="M120,148 Q150,90 180,72" fill="none" stroke="#1565C0" stroke-width="2"></path>
+<line stroke="#2B2F33" stroke-width="1.2" x1="150" x2="150" y1="96" y2="40"></line>
+<text fill="#2B2F33" font-size="7.4" text-anchor="start" x="156" y="46">normale</text>
+<circle cx="150" cy="96" fill="#2B2F33" r="3"></circle>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="start" x="54" y="138">k1 : la plus forte</text>
+<text fill="#1565C0" font-size="7.6" font-weight="700" text-anchor="start" x="186" y="74">k2 : la plus faible</text>
+<circle cx="46" cy="112" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="46" y="115.2">1</text>
+<circle cx="180" cy="60" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="180" y="63.2">2</text>
+<text fill="#2B2F33" font-size="9" font-weight="700" text-anchor="start" x="330" y="62">Courbures principales k1, k2</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="330" y="80">le maximum et le minimum, sur toutes</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="330" y="94">les directions autour de la normale ;</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="330" y="108">leurs directions sont perpendiculaires.</text>
+<text class="mono" fill="#7B1FA2" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="330" y="136">Gaussienne  K = k1 × k2</text>
+<text class="mono" fill="#E65100" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="330" y="156">Moyenne     H = (k1 + k2) / 2</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, lire la courbure en un point</span>SurfaceCurvature c = srf.CurvatureAt(u, v);
+double k1 = c.Kappa(0), k2 = c.Kappa(1);     // courbures principales
+Vector3d d1 = c.Direction(0);                // direction de k1
+double K = c.Gaussian, H = c.Mean;            // k1×k2 et (k1+k2)/2
+// sur une courbe : crv.CurvatureAt(t).Length vaut κ, et 1/κ le rayon</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Pas le paramétrage</h3>
+<p>Les courbures principales ne dépendent pas des directions u et v de la surface : elles sont celles de la forme elle-même.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Les unités</h3>
+<p>Une courbure s'exprime en inverse de longueur : en 1/mm dans un modèle en millimètres. Rayon et courbure changent avec l'unité.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Lire la courbure le long des isocourbes u et v et la prendre pour les courbures principales. Les directions extrêmes ne suivent pas le paramétrage.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 168 · La courbure des surfaces</div>
+</section>
+<!-- ============ PAGE 3 · LE SIGNE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 168</b></div>
+<p class="rubrique">Schéma 2 · Le signe</p>
+<h2>Gaussienne et moyenne</h2>
+<p style="max-width:165mm">La courbure gaussienne K = k1 × k2 dit la forme locale par son signe. La moyenne H = (k1 + k2)/2 mesure plutôt l'effort de courbure global, et s'annule sur les surfaces minimales, celles des films de savon.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Le signe de la courbure gaussienne dit la forme locale</text>
+<rect fill="#fff" height="146" rx="6" stroke="#2E7D32" stroke-width="1.4" width="180" x="20" y="40"></rect>
+<path d="M60,120 Q110,50 160,120 Z" fill="#E8F5E9" stroke="#2E7D32"></path>
+<text class="mono" fill="#2E7D32" font-size="10" font-weight="700" style="font-size:10px" text-anchor="middle" x="110" y="144">K &gt; 0</text>
+<text fill="#2B2F33" font-size="8.2" font-weight="700" text-anchor="middle" x="110" y="160">en dôme</text>
+<text fill="#6B7378" font-size="7.4" text-anchor="middle" x="110" y="176">sphère, coque</text>
+<rect fill="#fff" height="146" rx="6" stroke="#1565C0" stroke-width="1.4" width="180" x="212" y="40"></rect>
+<rect fill="#E3F2FD" height="44" stroke="#1565C0" width="100" x="252" y="72"></rect><line stroke="#1565C0" stroke-width=".6" x1="252" x2="352" y1="80" y2="80"></line><line stroke="#1565C0" stroke-width=".6" x1="252" x2="352" y1="108" y2="108"></line>
+<text class="mono" fill="#1565C0" font-size="10" font-weight="700" style="font-size:10px" text-anchor="middle" x="302" y="144">K = 0</text>
+<text fill="#2B2F33" font-size="8.2" font-weight="700" text-anchor="middle" x="302" y="160">développable</text>
+<text fill="#6B7378" font-size="7.4" text-anchor="middle" x="302" y="176">cylindre, cône, plan</text>
+<rect fill="#fff" height="146" rx="6" stroke="#C62828" stroke-width="1.4" width="180" x="404" y="40"></rect>
+<path d="M444,84 Q494,124 544,84" fill="none" stroke="#C62828" stroke-width="1.6"></path><path d="M460,116 Q494,70 528,116" fill="none" stroke="#C62828" stroke-width="1.6"></path>
+<text class="mono" fill="#C62828" font-size="10" font-weight="700" style="font-size:10px" text-anchor="middle" x="494" y="144">K &lt; 0</text>
+<text fill="#2B2F33" font-size="8.2" font-weight="700" text-anchor="middle" x="494" y="160">en selle</text>
+<text fill="#6B7378" font-size="7.4" text-anchor="middle" x="494" y="176">col, hyperboloïde</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · ce que dit chaque grandeur</span>K &gt; 0     dôme : k1 et k2 de même signe (sphère, coque)
+K = 0     développable : une direction droite (cylindre, cône, plan)
+K &lt; 0     selle : k1 et k2 de signes opposés (col, hyperboloïde)
+H = 0     surface minimale : les courbures se compensent (film de savon)</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le sens de la normale</h3>
+<p>Retourner la normale change le signe de k1, k2 et de la moyenne, mais pas celui de la gaussienne : le produit de deux signes inversés reste le même.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Une analyse, pas un réglage</h3>
+<p>La commande CurvatureAnalysis colore la surface selon K, H ou le rayon minimal : on lit, on corrige le dessin, on relit.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Juger une selle à son aspect. Une surface peut paraître douce et contenir une zone en selle que seule une analyse gaussienne révèle.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 168 · La courbure des surfaces</div>
+</section>
+<!-- ============ PAGE 4 · LA FABRICATION ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 168</b></div>
+<p class="rubrique">Schéma 3 · La fabrication</p>
+<h2>Développable ou non</h2>
+<p style="max-width:165mm">Une surface de courbure gaussienne nulle partout se déroule à plat sans étirer : c'est le cas des cylindres, cônes et surfaces réglées développables. Les autres demandent d'emboutir, de mouler ou de découper en facettes.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">K = 0 partout : la surface se déroule à plat sans déformation</text>
+<ellipse cx="90" cy="70" fill="#fff" rx="40" ry="12" stroke="#1565C0"></ellipse><path d="M50,70 L50,150 A40,12 0 0 0 130,150 L130,70" fill="#E3F2FD" stroke="#1565C0"></path>
+<text fill="#1565C0" font-size="7.8" font-weight="700" text-anchor="middle" x="90" y="178">cylindre</text>
+<line stroke="#1565C0" stroke-width="1.4" x1="146" x2="196" y1="110" y2="110"></line><polygon fill="#1565C0" points="196,110 189.6,112.7 189.6,107.3"></polygon>
+<text class="mono" fill="#1565C0" font-size="7.4" font-weight="700" style="font-size:7.4px" text-anchor="middle" x="171" y="102">Unroll</text>
+<rect fill="#E3F2FD" height="60" stroke="#1565C0" width="150" x="204" y="80"></rect>
+<text fill="#1565C0" font-size="7.8" font-weight="700" text-anchor="middle" x="279" y="158">une tôle plane, découpée</text>
+<path d="M420,120 Q460,50 500,120 Z" fill="#FFEBEE" stroke="#C62828"></path>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="middle" x="460" y="140">dôme : K &gt; 0</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="460" y="160">ne s'aplatit pas sans</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="460" y="174">étirer ni déchirer</text>
+<circle cx="42" cy="62" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="42" y="65.2">1</text>
+<circle cx="412" cy="60" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="412" y="63.2">2</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · de la forme au procédé</span>K = 0 partout     tôle cintrée, contreplaqué : patron à plat (Unroll)
+K faible          panneaux légèrement déformés, à valider
+K fort            moulage, emboutissage, ou découpe en facettes planes
+κ max d'un tracé  rayon de cintrage minimal à respecter</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Unroll et Smash</h3>
+<p>Unroll déroule une surface développable sans déformation. Smash aplatit une surface quelconque en acceptant une déformation.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le théorème</h3>
+<p>Gauss a montré que K ne change pas quand on plie sans étirer. Une sphère ne peut donc pas devenir plane sans déformation.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Aplatir une surface en dôme avec Smash et prendre le résultat pour un patron. Il est déformé : à l'assemblage, la tôle ne revient pas à la forme dessinée.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 168 · La courbure des surfaces</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 168</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Trois surfaces, trois signes</h2>
+<p style="max-width:165mm; font-size:9pt">Tu dessines une sphère, un cylindre et une selle, puis tu compares leurs analyses de courbure gaussienne et le résultat d'un déroulé.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Dessine une <span class="cmd">Sphere</span> et un <span class="cmd">Cylinder</span> côte à côte.</li>
+<li>Pour la selle : <span class="cmd">SrfPt</span> sur quatre points, deux opposés relevés de 20 en Z.</li>
+<li>Sélectionne les trois, lance <span class="cmd">CurvatureAnalysis</span>, style Gaussienne, puis Plage automatique.</li>
+<li>Relève la couleur de chaque surface et le signe affiché à côté de l'échelle.</li>
+<li>Passe le style à Courbure moyenne, puis inverse la normale de la sphère avec <span class="cmd">Flip</span>.</li>
+<li>Lance <span class="cmd">Unroll</span> sur le cylindre, puis sur la sphère.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        La sphère prend une couleur <b>uniforme</b> du côté positif, le cylindre la couleur du <b>zéro</b>, la selle passe du côté <b>négatif</b>. En moyenne, inverser la normale de la sphère change le signe. Unroll déroule le cylindre en rectangle ; sur la sphère, il refuse.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Dans Grasshopper, trouve sur une surface libre le point de plus forte courbure gaussienne, et donne le rayon équivalent 1/√K.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Un exercice Magpie demande le rayon de cintrage au point le plus serré d'un tracé ; sa fiche prévoit l'erreur la plus fréquente.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">magpie/pedagogie/…/LOT A - Composants natifs/A-48/A-48.json</span></div>
+<div class="l k1"><span class="n">5</span>"resultat_attendu": "Le point de courbure maximale …",<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">17</span>"contexte_metier": "Un profilé cintré ne peut descendre …<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">36</span>"erreur_attendue": "Confondre courbure et rayon, …<span class="rep r3">3</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>La grandeur</b>Courbure max, rayon min.</li>
+<li><span class="rep r2">2</span><b>Le métier</b>Le cintrage.</li>
+<li><span class="rep r3">3</span><b>L'erreur</b>Inverser les deux.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ La sphère a une gaussienne constante et positive.</li>
+<li style="margin-bottom:1.6mm">☐ Le cylindre est à zéro partout.</li>
+<li style="margin-bottom:1.6mm">☐ La selle est négative au centre.</li>
+<li style="margin-bottom:1.6mm">☐ Le flip ne change que la courbure moyenne.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 168 · La courbure des surfaces</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4A</b> · Les maths de la géométrie</span><b>Cours 168</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">La courbure d'une courbe vaut 1/R. Sur une surface, elle dépend de la direction : ses extrêmes, k1 et k2, sont les courbures principales. La gaussienne K = k1 × k2 dit la forme locale (dôme, développable, selle) et ne dépend pas du sens de la normale ; la moyenne H, si. Une surface de gaussienne nulle se déroule à plat sans déformation : c'est elle qu'on fabrique en tôle.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Divide Surface donne une grille de paramètres uv ; le composant Surface Curvature (onglet Surface, Analysis) rend la gaussienne en chaque point. Bounds donne le maximum, List Item avec l'indice trouvé par Member Index (ou Sort List) donne le point. Le rayon équivalent vaut 1 divisé par la racine carrée de K, défini seulement si K est positif.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">CurvatureAnalysis</td><td>colorer selon K, H, rayon min ou max</td><td>diagnostic avant fabrication</td></tr>
+<tr><td class="c">Curvature  CurvatureGraph</td><td>cercle osculateur, peigne de courbure</td><td>sur une courbe</td></tr>
+<tr><td class="c">srf.CurvatureAt(u, v)</td><td>k1, k2, directions, K, H</td><td>dans un script</td></tr>
+<tr><td class="c">crv.CurvatureAt(t)</td><td>vecteur de longueur κ</td><td>rayon = 1/κ</td></tr>
+<tr><td class="c">Surface Curvature</td><td>gaussienne et moyenne en un point uv</td><td>Grasshopper</td></tr>
+<tr><td class="c">Unroll  Smash</td><td>dérouler sans, aplatir avec déformation</td><td>patrons à plat</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Courbure</dt><dd>L'inverse du rayon du cercle qui épouse la courbe en un point.</dd>
+<dt>Courbures principales</dt><dd>La plus forte et la plus faible courbure autour d'un point d'une surface.</dd>
+<dt>Courbure gaussienne</dt><dd>Le produit des courbures principales ; son signe dit dôme, selle ou développable.</dd>
+<dt>Courbure moyenne</dt><dd>La moyenne des courbures principales ; nulle sur une surface minimale.</dd>
+<dt>Développable</dt><dd>Qui se déroule à plat sans étirer ni déchirer.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · la fiche récap de la partie 4. Dans l'aide de Rhino, « CurvatureAnalysis » ; pour la théorie, tout cours de géométrie différentielle des surfaces (théorème remarquable de Gauss).</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 139</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 168 · La courbure des surfaces</div>
+</section>
+</body>
+</html>

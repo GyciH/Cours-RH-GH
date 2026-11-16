@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>167 · Python dans Rhino 8</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 167</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Python dans Rhino 8</h1>
+<p class="chapeau">Automatiser une tâche répétitive, analyser un modèle, tester une idée en dix lignes : Python est la porte d'entrée la plus courte vers la programmation de Rhino. Rhino 8 la rénove avec un éditeur unique et CPython 3, qui ouvre l'accès aux paquets de tout l'écosystème Python.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>débutant</b></span>
+<span class="pastille">Prérequis · <b>164</b>, <b>9</b></span>
+<span class="pastille">Exemples · <b>Python 3, rhinoscriptsyntax, RhinoCommon</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Rhino 8 : un éditeur de scripts, deux moteurs Python, la même API</text>
+<rect fill="#fff" height="34" rx="5" stroke="#7B1FA2" stroke-width="1.4" width="180" x="210" y="40"></rect>
+<text class="mono" fill="#7B1FA2" font-size="9" font-weight="700" style="font-size:9px" text-anchor="middle" x="300" y="61">ScriptEditor</text>
+<circle cx="202" cy="40" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="202" y="43.2">1</text>
+<rect fill="#fff" height="50" rx="5" stroke="#1565C0" stroke-width="1.4" width="180" x="60" y="96"></rect>
+<text class="mono" fill="#1565C0" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="150" y="114">#! python3</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="middle" x="150" y="128">CPython 3</text>
+<text fill="#6B7378" font-size="7.2" text-anchor="middle" x="150" y="141">paquets pip (numpy…)</text>
+<rect fill="#fff" height="50" rx="5" stroke="#E65100" stroke-width="1.4" width="180" x="360" y="96"></rect>
+<text class="mono" fill="#E65100" font-size="8.4" font-weight="700" style="font-size:8.4px" text-anchor="middle" x="450" y="114">#! python2</text>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="middle" x="450" y="128">IronPython 2.7</text>
+<text fill="#6B7378" font-size="7.2" text-anchor="middle" x="450" y="141">anciens scripts</text>
+<line stroke="#6B7378" stroke-width="1.4" x1="270" x2="170" y1="74" y2="94"></line><polygon fill="#6B7378" points="170,94 175.8,90.1 176.9,95.4"></polygon>
+<line stroke="#6B7378" stroke-width="1.4" x1="330" x2="430" y1="74" y2="94"></line><polygon fill="#6B7378" points="430,94 423.1,95.4 424.2,90.1"></polygon>
+<circle cx="52" cy="96" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="52" y="99.2">2</text>
+<circle cx="352" cy="96" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="352" y="99.2">3</text>
+<rect fill="#F4F1EA" height="24" rx="4" stroke="#6B7378" width="480" x="60" y="160"></rect>
+<text class="mono" fill="#2B2F33" font-size="8" font-weight="700" style="font-size:8px" text-anchor="middle" x="300" y="176">RhinoCommon (.NET)  ·  rhinoscriptsyntax  ·  scriptcontext</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Rhino 8 exécute Python avec deux moteurs, CPython 3 et IronPython 2.7, depuis un même éditeur ; les deux appellent RhinoCommon. rhinoscriptsyntax offre des fonctions simples, RhinoCommon le contrôle complet, et un script peut déclarer ses paquets.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Tu dois placer des points régulièrement sur une centaine de courbes et noter leur longueur. À la main, une heure ; en C#, un projet à créer et compiler. Un script Python de quinze lignes, lancé depuis l'éditeur, le fait en une seconde.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>choisir le moteur Python d'un script ;</li>
+<li>passer de rhinoscriptsyntax à RhinoCommon ;</li>
+<li>déclarer un paquet externe ;</li>
+<li>écrire un composant Python dans Grasshopper.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    #! python3 pour le Python moderne et ses paquets, #! python2 pour les anciens scripts. rhinoscriptsyntax pour aller vite, RhinoCommon pour tout contrôler. Un script de composant rend des sorties, il n'ajoute rien au document.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 167 · Python dans Rhino 8</div>
+</section>
+<!-- ============ PAGE 2 · LES DEUX ÉTAGES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 167</b></div>
+<p class="rubrique">Schéma 1 · Les deux étages</p>
+<h2>rhinoscriptsyntax et RhinoCommon</h2>
+<p style="max-width:165mm">rhinoscriptsyntax rassemble des fonctions simples qui travaillent sur des identifiants d'objets et mettent le document à jour. Elles appellent elles-mêmes RhinoCommon, l'API .NET complète, qu'on importe directement quand on a besoin de plus.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Deux étages d'API : des fonctions simples, sur des objets complets</text>
+<rect fill="#fff" height="52" rx="5" stroke="#2E7D32" stroke-width="1.4" width="520" x="40" y="44"></rect>
+<text class="mono" fill="#2E7D32" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="56" y="64">rhinoscriptsyntax  (import rhinoscriptsyntax as rs)</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="56" y="84">rs.GetObject · rs.DivideCurve · rs.AddPoint : des identifiants (GUID), le document mis à jour</text>
+<line stroke="#6B7378" stroke-width="1.4" x1="300" x2="300" y1="96" y2="116"></line><polygon fill="#6B7378" points="300,116 297.3,109.6 302.7,109.6"></polygon>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="310" y="110">appelle</text>
+<rect fill="#fff" height="52" rx="5" stroke="#1565C0" stroke-width="1.4" width="520" x="40" y="118"></rect>
+<text class="mono" fill="#1565C0" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="56" y="138">RhinoCommon  (import Rhino.Geometry as rg)</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="56" y="158">rg.Curve · rg.Point3d · doc.Objects.Add… : des objets géométriques, tout le contrôle</text>
+<circle cx="32" cy="44" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="32" y="47.2">1</text>
+<circle cx="32" cy="118" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="32" y="121.2">2</text>
+<text fill="#7B1FA2" font-size="7.8" font-weight="700" text-anchor="middle" x="300" y="188">On commence par rs ; on descend à RhinoCommon quand rs ne suffit plus.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · Python 3, les deux étages</span>#! python3
+import rhinoscriptsyntax as rs
+import Rhino.Geometry as rg
+id = rs.GetObject("Courbe", rs.filter.curve)
+pts = rs.DivideCurve(id, 10)          # étage simple : des Point3d
+for p in pts: rs.AddPoint(p)
+crv = rs.coercecurve(id)              # passage à RhinoCommon
+print(crv.GetLength(), crv.IsClosed)</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Identifiants</h3>
+<p>rs manipule des GUID : chaque fonction retrouve l'objet dans le document. Simple, mais chaque appel passe par le document.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Objets</h3>
+<p>RhinoCommon travaille sur la géométrie en mémoire. On calcule tout, puis on n'ajoute au document que le résultat.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Ajouter au document chaque résultat intermédiaire. Le document se remplit, l'annulation aussi ; on calcule en mémoire et on n'ajoute que ce qui doit rester.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 167 · Python dans Rhino 8</div>
+</section>
+<!-- ============ PAGE 3 · LES PAQUETS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 167</b></div>
+<p class="rubrique">Schéma 2 · Les paquets</p>
+<h2>Déclarer ce dont le script a besoin</h2>
+<p style="max-width:165mm">En CPython 3, un commentaire en tête de script déclare un paquet : l'éditeur l'installe avec pip dans l'environnement Python de Rhino au premier lancement. Le script porte ainsi ses dépendances.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Un paquet déclaré en tête de script est installé au premier lancement</text>
+<rect fill="#fff" height="110" rx="5" stroke="#2B2F33" width="230" x="30" y="44"></rect>
+<text class="mono" fill="#7B1FA2" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="44" y="66">#! python3</text>
+<text class="mono" fill="#2E7D32" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="44" y="84"># r: numpy</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="start" x="44" y="102">import numpy as np</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="start" x="44" y="120">import rhinoscriptsyntax as rs</text>
+<text class="mono" fill="#6B7378" font-size="8" style="font-size:8px" text-anchor="start" x="44" y="138">…</text>
+<line stroke="#2E7D32" stroke-width="1.4" x1="264" x2="340" y1="84" y2="84"></line><polygon fill="#2E7D32" points="340,84 333.6,86.7 333.6,81.3"></polygon>
+<text fill="#2E7D32" font-size="7.6" font-weight="700" text-anchor="middle" x="302" y="76">pip</text>
+<rect fill="#fff" height="56" rx="5" stroke="#2E7D32" stroke-width="1.4" width="220" x="344" y="56"></rect>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="middle" x="454" y="78">environnement Python de Rhino</text>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="454" y="96">numpy installé une fois</text>
+<circle cx="36" cy="76" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="36" y="79.2">1</text>
+<circle cx="336" cy="56" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="336" y="59.2">2</text>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="start" x="344" y="138">Seulement en CPython 3 : IronPython ne</text>
+<text fill="#C62828" font-size="7.8" font-weight="700" text-anchor="start" x="344" y="152">charge pas les paquets compilés en C.</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="30" y="182">Le script porte ses dépendances : un collègue qui l'ouvre obtient les mêmes paquets.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · Python 3, un paquet déclaré</span>#! python3
+# r: numpy
+import numpy as np
+import rhinoscriptsyntax as rs
+ids = rs.GetObjects("Courbes", rs.filter.curve)
+L = np.array([rs.CurveLength(i) for i in ids])
+print("moyenne", L.mean(), "écart-type", L.std())</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Bibliothèque standard d'abord</h3>
+<p>math, statistics, json, csv sont déjà là. Un paquet externe se justifie quand il apporte vraiment quelque chose.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>IronPython à part</h3>
+<p>IronPython tourne sur .NET : il ne charge pas les paquets compilés en C comme numpy. Pour eux, #! python3.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Installer un paquet à la main dans un Python du système, puis s'étonner que Rhino ne le trouve pas. Rhino a son propre environnement ; la déclaration en tête de script vise le bon.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 167 · Python dans Rhino 8</div>
+</section>
+<!-- ============ PAGE 4 · DANS GRASSHOPPER ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 167</b></div>
+<p class="rubrique">Schéma 3 · Dans Grasshopper</p>
+<h2>Le composant de script Python</h2>
+<p style="max-width:165mm">Dans Grasshopper, le composant Python 3 Script expose ses entrées comme des variables et lit ses sorties dans des variables. On renomme les entrées, on choisit leur type, et le code ne connaît que ces noms.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Dans Grasshopper : des entrées deviennent des variables, des variables deviennent des sorties</text>
+<rect fill="#F4F1EA" height="110" rx="8" stroke="#2B2F33" stroke-width="1.4" width="160" x="220" y="50"></rect>
+<text fill="#2B2F33" font-size="8.6" font-weight="700" text-anchor="middle" x="300" y="72">Python 3 Script</text>
+<line stroke="#1565C0" stroke-width="1.6" x1="150" x2="220" y1="98" y2="98"></line>
+<text class="mono" fill="#1565C0" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="228" y="101">courbe</text>
+<line stroke="#1565C0" stroke-width="1.6" x1="150" x2="220" y1="128" y2="128"></line>
+<text class="mono" fill="#1565C0" font-size="8" font-weight="700" style="font-size:8px" text-anchor="start" x="228" y="131">n</text>
+<line stroke="#2E7D32" stroke-width="1.6" x1="380" x2="450" y1="112" y2="112"></line>
+<text class="mono" fill="#2E7D32" font-size="8" font-weight="700" style="font-size:8px" text-anchor="end" x="372" y="115">a</text>
+<text fill="#6B7378" font-size="7.6" text-anchor="end" x="140" y="101">Curve</text>
+<text fill="#6B7378" font-size="7.6" text-anchor="end" x="140" y="131">Number Slider</text>
+<text fill="#6B7378" font-size="7.6" text-anchor="start" x="458" y="115">Panel / points</text>
+<rect fill="#fff" height="22" rx="3" stroke="#6B7378" width="520" x="40" y="168"></rect>
+<text class="mono" fill="#2B2F33" font-size="7.8" style="font-size:7.8px" text-anchor="start" x="52" y="183">a = courbe.DivideByCount(int(n), True)   # le code ne connaît que ses variables</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · Python 3, dans un composant</span># entrées : courbe (Curve), n (int) ; sortie : a
+import Rhino.Geometry as rg
+t = courbe.DivideByCount(n, True)
+a = [courbe.PointAt(x) for x in t]</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Recalculé souvent</h3>
+<p>Le composant tourne à chaque changement en amont. Il doit rendre des sorties, pas ajouter des objets au document Rhino.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Et l'existant ?</h3>
+<p>Les composants IronPython (GhPython) restent disponibles : un script qui marche peut y rester, on migre quand un paquet ou Python 3 apporte quelque chose.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Appeler rs.AddPoint dans un composant Grasshopper. À chaque recalcul, de nouveaux points s'ajoutent au document Rhino ; on rend les points en sortie et on cuit (Bake) si besoin.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 167 · Python dans Rhino 8</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 167</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Des points sur une courbe, et sa longueur</h2>
+<p style="max-width:165mm; font-size:9pt">Tu écris un script qui demande une courbe, y place des points régulièrement espacés, et affiche sa longueur et le nombre de points.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Dessine une courbe dans Rhino, puis lance <span class="cmd">ScriptEditor</span>.</li>
+<li>Nouveau script Python 3 ; vérifie que la première ligne est <span class="cmd">#! python3</span>.</li>
+<li>Recopie l'exemple du schéma 1, et exécute avec le bouton de lecture ou F5.</li>
+<li>Sélectionne ta courbe : vérifie les 11 points (10 segments, extrémités comprises sur une courbe ouverte).</li>
+<li>Remplace 10 par <span class="cmd">rs.GetInteger("Segments", 10, 1)</span> et relance.</li>
+<li>Ajoute à la fin <span class="cmd">rs.MessageBox("%.2f" % crv.GetLength())</span>.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Des <b>points</b> apparaissent le long de la courbe, régulièrement espacés, extrémités comprises. La <b>sortie</b> de l'éditeur affiche la longueur et si la courbe est fermée ; une boîte de message rappelle la longueur. Les points sont des objets ordinaires du document.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Fais en sorte qu'Échap à la sélection de la courbe ne provoque pas d'erreur, puis calcule les mêmes points sans rs.DivideCurve, avec RhinoCommon.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Le moteur Magpie qui fabrique les fichiers d'exercice est un script Python lancé dans Rhino 8. Il déclare les bibliothèques .NET dont il a besoin, puis les importe comme des modules.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">magpie/pedagogie/…/Generateurs/GH/gh_engine.py</span></div>
+<div class="l k1"><span class="n">21</span>import clr<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">23</span>clr.AddReference("Grasshopper")<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">25</span>clr.AddReference("RhinoCommon")<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">30</span>import Rhino.Geometry as rg<span class="rep r3">3</span></div>
+<div class="l k3"><span class="n">31</span>import Grasshopper as GH<span class="rep r3">3</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Le pont .NET</b>Le module clr.</li>
+<li><span class="rep r2">2</span><b>Charger</b>Les assemblages de Rhino.</li>
+<li><span class="rep r3">3</span><b>Importer</b>Comme des modules Python.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ Le nombre de points est segments + 1 sur une courbe ouverte.</li>
+<li style="margin-bottom:1.6mm">☐ Sur une courbe fermée, il y en a autant que de segments.</li>
+<li style="margin-bottom:1.6mm">☐ La longueur affichée correspond à la commande Length.</li>
+<li style="margin-bottom:1.6mm">☐ Relancé sur une autre courbe, le script donne une autre longueur.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 167 · Python dans Rhino 8</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 167</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Rhino 8 exécute Python depuis un seul éditeur, avec deux moteurs : CPython 3 (#! python3), qui accède aux paquets pip déclarés en tête par # r:, et IronPython 2.7 (#! python2) pour les anciens scripts. rhinoscriptsyntax offre des fonctions simples sur des identifiants, RhinoCommon le contrôle complet en mémoire. Dans Grasshopper, le composant Python 3 Script expose ses entrées en variables et rend des sorties, sans toucher au document.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">rs.GetObject rend None quand on annule : ajoute <code>if id is None: raise SystemExit</code> (ou mets le code dans une fonction et fais return). Côté RhinoCommon : <code>t = crv.DivideByCount(n, True)</code> rend des paramètres, puis <code>pts = [crv.PointAt(x) for x in t]</code> ; DivideByCount peut rendre None si la division échoue, à tester aussi.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">#! python3  #! python2</td><td>choisir le moteur</td><td>première ligne</td></tr>
+<tr><td class="c"># r: numpy</td><td>déclarer un paquet pip</td><td>CPython 3 seulement</td></tr>
+<tr><td class="c">import rhinoscriptsyntax as rs</td><td>fonctions simples, par GUID</td><td>démarrer vite</td></tr>
+<tr><td class="c">import Rhino.Geometry as rg</td><td>l'API complète</td><td>calcul en mémoire</td></tr>
+<tr><td class="c">rs.coercecurve(id)</td><td>passer d'un GUID à un objet</td><td>entre les deux étages</td></tr>
+<tr><td class="c">Python 3 Script</td><td>composant de script Grasshopper</td><td>entrées = variables</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>CPython</dt><dd>L'interpréteur Python de référence, écrit en C ; celui des paquets scientifiques.</dd>
+<dt>IronPython</dt><dd>Un Python qui tourne sur .NET ; l'ancien moteur de Rhino.</dd>
+<dt>rhinoscriptsyntax</dt><dd>Bibliothèque de fonctions simples pour scripter Rhino.</dd>
+<dt>pip</dt><dd>L'installateur de paquets Python.</dd>
+<dt>clr</dt><dd>Le module qui relie Python aux bibliothèques .NET.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · la fiche récap de la partie 3. Dans la documentation de McNeel, « Rhino 8 Script Editor » et la référence de rhinoscriptsyntax.</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : fiche récap de la partie 3</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 167 · Python dans Rhino 8</div>
+</section>
+</body>
+</html>

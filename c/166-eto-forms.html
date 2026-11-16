@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>166 · Eto.Forms : une fenêtre pour Rhino</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-3">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 166</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Eto.Forms : une fenêtre pour Rhino</h1>
+<p class="chapeau">Une commande demande parfois plus qu'une invite : plusieurs réglages à la fois, une liste, une case à cocher. Rhino construit ses propres fenêtres avec Eto.Forms, une bibliothèque qui écrit l'interface une fois et la montre avec les contrôles natifs de Windows comme de macOS.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>164</b>, <b>165</b></span>
+<span class="pastille">Exemples · <b>Eto.Forms, Rhino.UI, Dialog</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Un seul code d'interface, dessiné par les contrôles natifs de chaque système</text>
+<rect fill="#fff" height="40" rx="5" stroke="#7B1FA2" stroke-width="1.4" width="200" x="200" y="44"></rect>
+<text fill="#7B1FA2" font-size="8.6" font-weight="700" text-anchor="middle" x="300" y="62">ton code Eto.Forms</text>
+<text class="mono" fill="#2B2F33" font-size="7.2" style="font-size:7.2px" text-anchor="middle" x="300" y="76">Dialog, Button, TextBox, layouts</text>
+<circle cx="192" cy="44" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="192" y="47.2">1</text>
+<rect fill="#fff" height="44" rx="5" stroke="#1565C0" stroke-width="1.4" width="100" x="80" y="120"></rect>
+<text fill="#1565C0" font-size="8.6" font-weight="700" text-anchor="middle" x="130" y="138">Windows</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="130" y="154">contrôles WPF</text>
+<rect fill="#fff" height="44" rx="5" stroke="#E65100" stroke-width="1.4" width="100" x="420" y="120"></rect>
+<text fill="#E65100" font-size="8.6" font-weight="700" text-anchor="middle" x="470" y="138">macOS</text>
+<text fill="#2B2F33" font-size="7.4" text-anchor="middle" x="470" y="154">contrôles Cocoa</text>
+<line stroke="#6B7378" stroke-width="1.4" x1="260" x2="150" y1="84" y2="118"></line><polygon fill="#6B7378" points="150,118 155.4,113.5 157.0,118.7"></polygon>
+<line stroke="#6B7378" stroke-width="1.4" x1="340" x2="450" y1="84" y2="118"></line><polygon fill="#6B7378" points="450,118 443.0,118.7 444.6,113.5"></polygon>
+<text fill="#6B7378" font-size="7.4" text-anchor="middle" x="300" y="112">une plateforme par système</text>
+<circle cx="72" cy="120" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="72" y="123.2">2</text>
+<circle cx="412" cy="120" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="412" y="123.2">3</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="middle" x="300" y="186">Rhino lui-même construit ses fenêtres ainsi : un plugin qui fait pareil marche sur les deux.</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Eto.Forms décrit une fenêtre par un arbre de layouts et de contrôles, sans coordonnées ; chaque système la dessine avec ses propres contrôles. Dans Rhino, on la montre modale, semi-modale ou en panneau, et on la relie à un objet de réglages.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Ta commande Cercle demande un rayon, un plan et s'il faut remplir le cercle. Trois invites successives agacent. Une petite boîte, avec OK et Annuler, rassemble les trois réglages, et sur macOS elle a l'air d'une boîte macOS.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>expliquer pourquoi Rhino passe par une bibliothèque multiplateforme ;</li>
+<li>composer une fenêtre avec des layouts, sans coordonnées ;</li>
+<li>choisir entre modale, semi-modale et panneau ;</li>
+<li>relier les contrôles à un objet de réglages.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Une fenêtre Eto est un arbre : layouts qui rangent, contrôles qui saisissent. On lui donne Rhino comme propriétaire, un bouton par défaut et un d'abandon, et on n'applique rien si l'utilisateur annule.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 166 · Eto.Forms : une fenêtre pour Rhino</div>
+</section>
+<!-- ============ PAGE 2 · LA MISE EN PAGE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 166</b></div>
+<p class="rubrique">Schéma 1 · La mise en page</p>
+<h2>Des layouts, pas des coordonnées</h2>
+<p style="max-width:165mm">Eto propose une seule API de contrôles (Dialog, Button, NumericStepper…). On ne les place pas au pixel près : on les range dans des layouts. StackLayout empile, TableLayout aligne en lignes et colonnes. La fenêtre prend la taille de son contenu.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une fenêtre est un arbre : des layouts qui rangent des contrôles</text>
+<rect fill="#fff" height="144" rx="5" stroke="#2B2F33" width="250" x="24" y="38"></rect>
+<rect fill="#F4F1EA" height="18" rx="5" width="250" x="24" y="38"></rect>
+<text fill="#2B2F33" font-size="7.8" font-weight="700" text-anchor="start" x="34" y="51">Cercle</text>
+<rect fill="none" height="74" stroke="#1565C0" stroke-dasharray="4 2" width="230" x="34" y="64"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="42" y="86">Rayon</text>
+<rect fill="#fff" height="18" rx="2" stroke="#6B7378" width="130" x="120" y="74"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="128" y="87">10,0</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="42" y="120">Plan</text>
+<rect fill="#fff" height="18" rx="2" stroke="#6B7378" width="130" x="120" y="108"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="128" y="121">XY  ▾</text>
+<rect fill="none" height="28" stroke="#E65100" stroke-dasharray="4 2" width="230" x="34" y="146"></rect>
+<rect fill="#F4F1EA" height="20" rx="3" stroke="#6B7378" width="60" x="130" y="150"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="160" y="164">OK</text>
+<rect fill="#F4F1EA" height="20" rx="3" stroke="#6B7378" width="60" x="198" y="150"></rect>
+<text fill="#2B2F33" font-size="8" text-anchor="middle" x="228" y="164">Annuler</text>
+<circle cx="30" cy="64" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="30" y="67.2">1</text>
+<circle cx="30" cy="146" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="30" y="149.2">2</text>
+<text class="mono" fill="#7B1FA2" font-size="8.6" font-weight="700" style="font-size:8.6px" text-anchor="start" x="310" y="52">Dialog</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="start" x="324" y="74">└ StackLayout (vertical)</text>
+<text class="mono" fill="#1565C0" font-size="8" style="font-size:8px" text-anchor="start" x="338" y="94">├ TableLayout : 2 lignes × 2 colonnes</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="start" x="352" y="112">Label · NumericStepper</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="start" x="352" y="128">Label · DropDown</text>
+<text class="mono" fill="#E65100" font-size="8" style="font-size:8px" text-anchor="start" x="338" y="150">└ StackLayout horizontal : 2 Button</text>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="start" x="310" y="176">Aucune coordonnée : la taille suit le contenu.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, une grille de réglages</span>var rayon = new NumericStepper { Value = 10, DecimalPlaces = 1, MinValue = 0 };
+var ok = new Button { Text = "OK" }; var non = new Button { Text = "Annuler" };
+var boite = new Dialog&lt;bool&gt; { Title = "Cercle", Padding = 10,
+    DefaultButton = ok, AbortButton = non };
+boite.Content = new StackLayout { Spacing = 8, Items = {
+    new TableLayout(new TableRow("Rayon", rayon)),
+    new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6, Items = { ok, non } } } };
+ok.Click += (s, e) =&gt; boite.Close(true); non.Click += (s, e) =&gt; boite.Close(false);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Padding et Spacing</h3>
+<p>Padding met de l'air autour du contenu ; Spacing, entre les éléments d'un layout. Deux réglages suffisent à une fenêtre régulière.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Entrée et Échap</h3>
+<p>DefaultButton répond à Entrée, AbortButton à Échap : l'utilisateur retrouve les gestes de toutes les boîtes du système.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Fixer la taille de la fenêtre et des contrôles. Une police plus grande, une traduction plus longue ou un écran haute densité, et les textes sont coupés.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 166 · Eto.Forms : une fenêtre pour Rhino</div>
+</section>
+<!-- ============ PAGE 3 · MONTRER LA FENÊTRE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 166</b></div>
+<p class="rubrique">Schéma 2 · Montrer la fenêtre</p>
+<h2>Modale, semi-modale ou panneau</h2>
+<p style="max-width:165mm">Une boîte modale bloque Rhino jusqu'à la réponse ; une semi-modale laisse encore manipuler la vue ; une fenêtre non modale ou un panneau reste ouvert pendant le travail. Dans tous les cas, on donne Rhino comme propriétaire.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Trois façons de montrer une fenêtre dans Rhino</text>
+<rect fill="#fff" height="138" rx="6" stroke="#C62828" stroke-width="1.4" width="180" x="20" y="42"></rect>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="middle" x="110" y="64">Modale</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="middle" x="110" y="84">ShowModal</text>
+<line stroke="#6B7378" stroke-width=".6" x1="34" x2="186" y1="96" y2="96"></line>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="110" y="118">tout Rhino attend la réponse</text>
+<text fill="#6B7378" font-size="7.2" text-anchor="middle" x="110" y="150">pour :</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="middle" x="110" y="166">un réglage avant une commande</text>
+<rect fill="#fff" height="138" rx="6" stroke="#1565C0" stroke-width="1.4" width="180" x="212" y="42"></rect>
+<text fill="#1565C0" font-size="9" font-weight="700" text-anchor="middle" x="302" y="64">Semi-modale</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="middle" x="302" y="84">ShowSemiModal</text>
+<line stroke="#6B7378" stroke-width=".6" x1="226" x2="378" y1="96" y2="96"></line>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="302" y="118">on peut encore pivoter la vue</text>
+<text fill="#6B7378" font-size="7.2" text-anchor="middle" x="302" y="150">pour :</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="middle" x="302" y="166">choisir en regardant le modèle</text>
+<rect fill="#fff" height="138" rx="6" stroke="#2E7D32" stroke-width="1.4" width="180" x="404" y="42"></rect>
+<text fill="#2E7D32" font-size="9" font-weight="700" text-anchor="middle" x="494" y="64">Non modale</text>
+<text class="mono" fill="#2B2F33" font-size="8" style="font-size:8px" text-anchor="middle" x="494" y="84">Form / panneau</text>
+<line stroke="#6B7378" stroke-width=".6" x1="418" x2="570" y1="96" y2="96"></line>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="494" y="118">reste ouverte, Rhino continue</text>
+<text fill="#6B7378" font-size="7.2" text-anchor="middle" x="494" y="150">pour :</text>
+<text fill="#2B2F33" font-size="7.6" font-weight="700" text-anchor="middle" x="494" y="166">palette, outil durable</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, la plus petite boîte</span>using Eto.Forms; using Rhino.UI;
+var boite = new Dialog { Title = "Bonjour", Padding = 10,
+    Content = new Label { Text = "Une fenêtre Eto dans Rhino" } };
+boite.ShowModal(RhinoEtoApp.MainWindow);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le propriétaire</h3>
+<p>RhinoEtoApp.MainWindow donne la fenêtre principale de Rhino comme parent : la boîte reste devant et se centre sur elle.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Semi-modale</h3>
+<p>ShowSemiModal(doc, RhinoEtoApp.MainWindow) laisse pivoter et zoomer pendant que la boîte attend : utile pour choisir en regardant.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Ouvrir la boîte sans propriétaire. Elle peut passer derrière Rhino ; l'utilisateur croit le logiciel figé alors qu'une fenêtre attend sa réponse.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 166 · Eto.Forms : une fenêtre pour Rhino</div>
+</section>
+<!-- ============ PAGE 4 · RELIER LES VALEURS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 166</b></div>
+<p class="rubrique">Schéma 3 · Relier les valeurs</p>
+<h2>La liaison de données</h2>
+<p style="max-width:165mm">Pour lire les valeurs, on peut interroger chaque contrôle après OK. Dès qu'il y a plusieurs réglages, on lie plutôt chaque contrôle à une propriété d'un objet de réglages, donné à la boîte comme DataContext.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">La liaison de données : le contrôle et l'objet restent d'accord tout seuls</text>
+<rect fill="#fff" height="80" rx="6" stroke="#1565C0" stroke-width="1.4" width="160" x="40" y="60"></rect>
+<text fill="#1565C0" font-size="8.6" font-weight="700" text-anchor="middle" x="120" y="80">Contrôles</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="120" y="102">NumericStepper.Value</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="120" y="120">CheckBox.Checked</text>
+<rect fill="#fff" height="80" rx="6" stroke="#7B1FA2" stroke-width="1.4" width="160" x="400" y="60"></rect>
+<text fill="#7B1FA2" font-size="8.6" font-weight="700" text-anchor="middle" x="480" y="80">Modèle (DataContext)</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="480" y="102">Reglages.Rayon</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="480" y="120">Reglages.Remplir</text>
+<line stroke="#2E7D32" stroke-width="1.6" x1="204" x2="396" y1="90" y2="90"></line><polygon fill="#2E7D32" points="396,90 389.6,92.7 389.6,87.3"></polygon>
+<line stroke="#2E7D32" stroke-width="1.6" x1="396" x2="204" y1="112" y2="112"></line><polygon fill="#2E7D32" points="204,112 210.4,109.3 210.4,114.7"></polygon>
+<text fill="#2E7D32" font-size="7.6" text-anchor="middle" x="300" y="84">l'utilisateur tape</text>
+<text fill="#2E7D32" font-size="7.6" text-anchor="middle" x="300" y="128">le code change la valeur</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="middle" x="300" y="170">Sans liaison : lire chaque contrôle à la fermeture, à la main, et ne rien oublier.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, lier un contrôle à un objet</span>class Reglages { public double Rayon { get; set; } = 10; }
+var r = new Reglages();
+rayon.ValueBinding.BindDataContext((Reglages x) =&gt; x.Rayon);
+boite.DataContext = r;
+if (boite.ShowModal(RhinoEtoApp.MainWindow))   // true : OK
+    Ajouter(r.Rayon);                          // false : on ne touche à rien</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Lire à la main</h3>
+<p>Pour deux ou trois champs, lire rayon.Value après OK suffit. La liaison prend l'avantage quand les réglages se multiplient ou se réutilisent.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Annuler, c'est rien</h3>
+<p>Si la boîte rend false, la commande sort sans rien modifier, comme une invite à laquelle on répond Échap.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Appliquer les réglages au fil de la saisie, puis oublier de revenir en arrière si l'utilisateur annule. Le document garde un état que personne n'a validé.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 166 · Eto.Forms : une fenêtre pour Rhino</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 166</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Une boîte de réglages pour un cercle</h2>
+<p style="max-width:165mm; font-size:9pt">Tu écris un script qui ouvre une boîte avec un rayon, OK et Annuler, puis ajoute un cercle seulement si l'utilisateur valide.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Lance <span class="cmd">ScriptEditor</span>, nouveau script C#. Ajoute <span class="cmd">using Eto.Forms; using Rhino.UI;</span>.</li>
+<li>Recopie la grille de réglages du schéma 1 (rayon, OK, Annuler).</li>
+<li>Montre la boîte : <span class="cmd">bool ok = boite.ShowModal(RhinoEtoApp.MainWindow);</span>.</li>
+<li>Si ok, ajoute <span class="cmd">var doc = RhinoDoc.ActiveDoc;</span> puis <span class="cmd">doc.Objects.AddCircle(new Circle(rayon.Value));</span>.</li>
+<li>Termine par <span class="cmd">doc.Views.Redraw();</span> dans le même bloc, puis exécute.</li>
+<li>Relance, tape un rayon, et appuie sur Échap au lieu de cliquer OK.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Une boîte <b>Cercle</b> s'ouvre devant Rhino, avec le champ Rayon et deux boutons. <b>OK</b> ou Entrée ajoute un cercle centré sur l'origine, du rayon saisi. <b>Annuler</b> ou Échap ferme la boîte et le document ne change pas.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Ajoute une case à cocher « Remplir » et, si elle est cochée, ajoute aussi une surface plane bordée par le cercle.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Dans SnapSet, le choix de fichier imite le paramètre natif de Grasshopper. Le commentaire explique pourquoi la bibliothèque ouvre les boîtes de Windows par WinForms alors que le natif passe par Eto.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">SnapSet/src/SnapSet.Constituants/Fichier.cs</span></div>
+<div class="l k1"><span class="n">10</span>// … Le natif passe par Eto (Eto.Forms.<span class="rep r1">1</span></div>
+<div class="l k1"><span class="n">11</span>// OpenFileDialog / SaveFileDialog / … ; on ouvre ici LES<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">12</span>// MÊMES BOÎTES COMMUNES DE WINDOWS par WinForms (…)<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">13</span>// … la boîte de Windows dans les deux cas, et la<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">14</span>// bibliothèque n'ajoute pas de référence à Eto.<span class="rep r3">3</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Le natif</b>Eto, comme Rhino.</li>
+<li><span class="rep r2">2</span><b>Même rendu</b>Sur Windows, la boîte est la même.</li>
+<li><span class="rep r3">3</span><b>Le compromis</b>Une dépendance de moins.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ La boîte reste devant Rhino et se centre sur lui.</li>
+<li style="margin-bottom:1.6mm">☐ Entrée valide, Échap annule.</li>
+<li style="margin-bottom:1.6mm">☐ Le cercle a bien le rayon saisi.</li>
+<li style="margin-bottom:1.6mm">☐ Après Annuler, Ctrl+Z n'a rien à défaire.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 166 · Eto.Forms : une fenêtre pour Rhino</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 3D</b> · Programmer Rhino</span><b>Cours 166</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Eto.Forms écrit une fenêtre une fois et la montre avec les contrôles natifs de chaque système : c'est ce que Rhino utilise. On compose la fenêtre avec des layouts (StackLayout, TableLayout), on lui donne RhinoEtoApp.MainWindow comme propriétaire, un bouton par défaut et un d'abandon. Modale, semi-modale ou panneau selon le besoin ; la liaison de données garde contrôles et réglages d'accord, et Annuler ne modifie rien.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Ajoute <code>var remplir = new CheckBox { Text = "Remplir" };</code> dans une nouvelle ligne du TableLayout. Après OK, si <code>remplir.Checked == true</code> (le type est bool?), construis la surface avec Brep.CreatePlanarBreps à partir de la courbe du cercle (circle.ToNurbsCurve()) et ajoute chaque Brep obtenu au document.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">Dialog&lt;bool&gt;  Close(true)</td><td>une boîte qui rend un résultat</td><td>OK / Annuler</td></tr>
+<tr><td class="c">StackLayout  TableLayout</td><td>empiler, aligner en grille</td><td>toujours, sans coordonnées</td></tr>
+<tr><td class="c">ShowModal(RhinoEtoApp.MainWindow)</td><td>montrer devant Rhino, bloquant</td><td>réglages avant une commande</td></tr>
+<tr><td class="c">ShowSemiModal(doc, …)</td><td>montrer en laissant la vue libre</td><td>choisir en regardant</td></tr>
+<tr><td class="c">DefaultButton  AbortButton</td><td>Entrée, Échap</td><td>toute boîte</td></tr>
+<tr><td class="c">ValueBinding  DataContext</td><td>lier un contrôle à un objet</td><td>plusieurs réglages</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Eto.Forms</dt><dd>Bibliothèque d'interface multiplateforme utilisée par Rhino.</dd>
+<dt>Plateforme</dt><dd>La partie d'Eto qui traduit les contrôles en contrôles natifs d'un système.</dd>
+<dt>Layout</dt><dd>Un conteneur qui range ses contrôles : pile, grille.</dd>
+<dt>Modale</dt><dd>Une fenêtre qui bloque le logiciel jusqu'à sa fermeture.</dd>
+<dt>Liaison de données</dt><dd>Un lien qui garde un contrôle et une propriété d'accord.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 167, « Python dans Rhino 8 ». Le guide « Eto Forms in Rhino » de McNeel et le wiki du projet Eto sur GitHub (picoe/Eto).</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : cours 167</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 166 · Eto.Forms : une fenêtre pour Rhino</div>
+</section>
+</body>
+</html>
