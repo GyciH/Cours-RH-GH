@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>171 · Simuler par la physique</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-5">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 171</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Simuler par la physique</h1>
+<p class="chapeau">Gaudí suspendait des chaînes lestées pour trouver ses voûtes. Le principe n'a pas changé : laisser des forces trouver la forme. Une simulation fait la même chose, pas à pas, avec des points, des ressorts, du poids et des appuis, jusqu'à l'équilibre.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>50</b>, <b>151</b></span>
+<span class="pastille">Exemples · <b>Kangaroo, Grasshopper, C#</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une chaîne qui pend, retournée, donne une arche qui ne travaille qu'en compression</text>
+<polyline fill="none" points="40.0,56.0 51.0,70.8 62.0,83.4 73.0,94.0 84.0,102.9 95.0,110.2 106.0,116.0 117.0,120.4 128.0,123.5 139.0,125.4 150.0,126.0 161.0,125.4 172.0,123.5 183.0,120.4 194.0,116.0 205.0,110.2 216.0,102.9 227.0,94.0 238.0,83.4 249.0,70.8 260.0,56.0" stroke="#1565C0" stroke-width="2"></polyline>
+<circle cx="40" cy="56" fill="#2B2F33" r="4"></circle><circle cx="260" cy="56" fill="#2B2F33" r="4"></circle>
+<line stroke="#E65100" stroke-width="1" x1="51.0" x2="51.0" y1="70.76073826341306" y2="84.76073826341306"></line><polygon fill="#E65100" points="51.0,84.76073826341306 48.3,78.3 53.7,78.3"></polygon>
+<line stroke="#E65100" stroke-width="1" x1="84.0" x2="84.0" y1="102.93334901417025" y2="116.93334901417025"></line><polygon fill="#E65100" points="84.0,116.93334901417025 81.3,110.5 86.7,110.5"></polygon>
+<line stroke="#E65100" stroke-width="1" x1="117.0" x2="117.0" y1="120.44717337028365" y2="134.44717337028365"></line><polygon fill="#E65100" points="117.0,134.44717337028365 114.3,128.0 119.7,128.0"></polygon>
+<line stroke="#E65100" stroke-width="1" x1="150.0" x2="150.0" y1="126.0" y2="140.0"></line><polygon fill="#E65100" points="150.0,140.0 147.3,133.6 152.7,133.6"></polygon>
+<line stroke="#E65100" stroke-width="1" x1="183.0" x2="183.0" y1="120.44717337028365" y2="134.44717337028365"></line><polygon fill="#E65100" points="183.0,134.44717337028365 180.3,128.0 185.7,128.0"></polygon>
+<line stroke="#E65100" stroke-width="1" x1="216.0" x2="216.0" y1="102.93334901417023" y2="116.93334901417023"></line><polygon fill="#E65100" points="216.0,116.93334901417023 213.3,110.5 218.7,110.5"></polygon>
+<line stroke="#E65100" stroke-width="1" x1="249.0" x2="249.0" y1="70.76073826341307" y2="84.76073826341307"></line><polygon fill="#E65100" points="249.0,84.76073826341307 246.3,78.3 251.7,78.3"></polygon>
+<text fill="#1565C0" font-size="7.8" font-weight="700" text-anchor="middle" x="150" y="150">chaîne : tension seule, sous son poids</text>
+<circle cx="32" cy="44" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="32" y="47.2">1</text>
+<line stroke="#6B7378" x1="330" x2="560" y1="176" y2="176"></line>
+<polyline fill="none" points="335.0,176.0 346.0,152.8 357.0,133.0 368.0,116.2 379.0,102.2 390.0,90.8 401.0,81.7 412.0,74.7 423.0,69.9 434.0,67.0 445.0,66.0 456.0,67.0 467.0,69.9 478.0,74.7 489.0,81.7 500.0,90.8 511.0,102.2 522.0,116.2 533.0,133.0 544.0,152.8 555.0,176.0" stroke="#2E7D32" stroke-width="2.4"></polyline>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="445" y="190">arche : la même forme, retournée</text>
+<circle cx="326" cy="164" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="326" y="167.2">2</text>
+<line stroke="#6B7378" stroke-width="1.4" x1="272" x2="320" y1="110" y2="110"></line><polygon fill="#6B7378" points="320,110 313.6,112.7 313.6,107.3"></polygon>
+<text fill="#6B7378" font-size="7.4" text-anchor="middle" x="296" y="102">retourner</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Une simulation avance par petits pas de temps : on calcule les forces, on met à jour vitesses et positions, on amortit, et on recommence jusqu'à ce que plus rien ne bouge. Kangaroo généralise l'idée : chaque objectif propose une position, le solveur les concilie.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Tu dessines une voûte en briques. Une courbe tracée à la main est belle mais travaille en flexion. Une chaîne simulée, pendue entre les deux appuis puis retournée, donne la forme qui ne travaille qu'en compression, celle que la maçonnerie supporte.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>décrire la boucle d'une simulation ;</li>
+<li>régler pas de temps et amortissement ;</li>
+<li>combiner ressorts, poids et appuis ;</li>
+<li>utiliser la recherche de forme avec ses limites.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Forces, vitesses, positions, amortissement : la boucle tourne par petits pas jusqu'à l'équilibre. Un pas trop grand fait exploser la simulation. La forme trouvée est cohérente avec les contraintes données, pas une note de calcul.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 171 · Simuler par la physique</div>
+</section>
+<!-- ============ PAGE 2 · LA BOUCLE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 171</b></div>
+<p class="rubrique">Schéma 1 · La boucle</p>
+<h2>Forces, vitesses, positions</h2>
+<p style="max-width:165mm">Chaque point a une position, une vitesse et une masse. À chaque pas de temps, on additionne les forces qui s'exercent sur lui, on en déduit la nouvelle vitesse, puis la nouvelle position. L'amortissement retire un peu de vitesse pour que le système se pose.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Une simulation est une boucle : forces, vitesses, positions, et on recommence</text>
+<rect fill="#fff" height="40" rx="5" stroke="#E65100" stroke-width="1.4" width="124" x="238.0" y="30.0"></rect>
+<text fill="#E65100" font-size="8.8" font-weight="700" text-anchor="middle" x="300.0" y="47.0">Forces</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="300.0" y="62.0">poids, ressorts, appuis</text>
+<rect fill="#fff" height="40" rx="5" stroke="#1565C0" stroke-width="1.4" width="124" x="380.6" y="92.0"></rect>
+<text fill="#1565C0" font-size="8.8" font-weight="700" text-anchor="middle" x="442.6" y="109.0">Vitesse</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="442.6" y="124.0">v += F/m · dt</text>
+<rect fill="#fff" height="40" rx="5" stroke="#2E7D32" stroke-width="1.4" width="124" x="238.0" y="154.0"></rect>
+<text fill="#2E7D32" font-size="8.8" font-weight="700" text-anchor="middle" x="300.0" y="171.0">Position</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="300.0" y="186.0">p += v · dt</text>
+<rect fill="#fff" height="40" rx="5" stroke="#7B1FA2" stroke-width="1.4" width="124" x="95.4" y="92.00000000000001"></rect>
+<text fill="#7B1FA2" font-size="8.8" font-weight="700" text-anchor="middle" x="157.4" y="109.00000000000001">Amortir</text>
+<text class="mono" fill="#2B2F33" font-size="7.6" style="font-size:7.6px" text-anchor="middle" x="157.4" y="124.00000000000001">v ×= 0,98</text>
+<line stroke="#6B7378" stroke-width="1.4" x1="360" x2="420" y1="56" y2="88"></line><polygon fill="#6B7378" points="420,88 413.0,87.4 415.6,82.6"></polygon>
+<line stroke="#6B7378" stroke-width="1.4" x1="420" x2="360" y1="136" y2="168"></line><polygon fill="#6B7378" points="360,168 364.4,162.6 367.0,167.4"></polygon>
+<line stroke="#6B7378" stroke-width="1.4" x1="240" x2="180" y1="168" y2="136"></line><polygon fill="#6B7378" points="180,136 187.0,136.6 184.4,141.4"></polygon>
+<line stroke="#6B7378" stroke-width="1.4" x1="180" x2="240" y1="88" y2="56"></line><polygon fill="#6B7378" points="240,56 235.6,61.4 233.0,56.6"></polygon>
+<text fill="#2B2F33" font-size="8" font-weight="700" text-anchor="middle" x="300" y="110">pas de temps dt</text>
+<text fill="#6B7378" font-size="7.6" text-anchor="middle" x="300" y="126">jusqu'à l'équilibre</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, un pas de simulation</span>foreach (var p in points) p.F = new Vector3d(0, 0, -p.m * 9.81);   // poids
+foreach (var r in ressorts) {                       // Hooke
+    Vector3d d = r.B.P - r.A.P; double L = d.Length; d.Unitize();
+    Vector3d f = d * r.k * (L - r.L0); r.A.F += f; r.B.F -= f; }
+foreach (var p in points) if (!p.Fixe) {
+    p.V = (p.V + p.F / p.m * dt) * 0.98;            // vitesse, amortie
+    p.P += p.V * dt; }                                // position</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Euler semi-implicite</h3>
+<p>Mettre à jour la vitesse avant la position, comme ici, est plus stable que l'inverse pour le même pas : c'est le choix courant.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>La convergence</h3>
+<p>On mesure le déplacement maximal à chaque pas ; sous un seuil choisi, on considère l'équilibre atteint et on arrête.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Oublier les appuis. Sans point fixe, tout le système tombe sous son poids : la simulation fonctionne parfaitement, mais il n'y a pas d'équilibre à trouver.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 171 · Simuler par la physique</div>
+</section>
+<!-- ============ PAGE 3 · LE PAS DE TEMPS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 171</b></div>
+<p class="rubrique">Schéma 2 · Le pas de temps</p>
+<h2>Stabilité et amortissement</h2>
+<p style="max-width:165mm">Un grand pas de temps va vite, mais chaque correction peut dépasser la position d'équilibre ; la suivante dépasse davantage, et la simulation explose. Un pas plus petit, ou des ressorts moins raides, ou plus d'amortissement, la ramènent au calme.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Le pas de temps : trop grand, la simulation dépasse et explose</text>
+<line stroke="#6B7378" stroke-dasharray="3 3" x1="40" x2="560" y1="110" y2="110"></line>
+<text fill="#6B7378" font-size="7.4" text-anchor="start" x="564" y="113">équilibre</text>
+<polyline fill="none" points="40,50.0 46,55.0 52,62.9 58,72.8 64,84.0 70,95.7 76,107.0 82,117.2 88,126.0 94,132.9 100,137.6 106,140.1 112,140.5 118,139.0 124,135.8 130,131.4 136,126.1 142,120.4 148,114.7 154,109.2 160,104.4 166,100.4 172,97.5 178,95.6 184,94.8 190,95.0 196,96.2 202,98.0 208,100.5 214,103.2 220,106.1 226,108.9 232,111.5 238,113.7 244,115.5 250,116.7 256,117.4 262,117.6 268,117.2 274,116.5 280,115.5 286,114.2 292,112.8 298,111.3 304,110.0 310,108.8 316,107.7 322,107.0 328,106.5 334,106.3 340,106.3 346,106.5 352,107.0 358,107.6 364,108.2 370,108.9 376,109.6 382,110.3 388,110.8 394,111.3 400,111.6 406,111.8 412,111.9 418,111.8 424,111.6 430,111.4 436,111.1 442,110.7 448,110.4 454,110.0 460,109.7 466,109.5 472,109.3 478,109.1 484,109.1 490,109.1 496,109.1 502,109.2 508,109.4 514,109.5" stroke="#2E7D32" stroke-width="1.8"></polyline>
+<polyline fill="none" points="40,102.0 64,120.0 88,97.5 112,125.6 136,90.5 160,134.4 184,79.5 208,148.1 232,62.3" stroke="#C62828" stroke-width="1.8"></polyline>
+<text fill="#2E7D32" font-size="8" font-weight="700" text-anchor="start" x="330" y="60">petit pas, amorti : oscille puis se pose</text>
+<text fill="#C62828" font-size="8" font-weight="700" text-anchor="middle" x="260" y="186">grand pas : chaque correction dépasse davantage</text>
+<circle cx="500" cy="98" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="500" y="101.2">1</text>
+<circle cx="244" cy="172" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="244" y="175.2">2</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · le symptôme et le réglage</span>points qui s'envolent     réduire dt, ou baisser la raideur k
+oscillation sans fin      augmenter l'amortissement
+convergence très lente    trop d'amortissement, ou dt trop petit
+forme qui dépend du dt    pas encore à l'équilibre : continuer</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Raideur et pas</h3>
+<p>Plus un ressort est raide, plus il demande un petit pas. Mêler des ressorts très raides et très mous rend la simulation lente.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Un meilleur pas</h3>
+<p>Une méthode du point milieu, qui évalue la direction au milieu du pas, suit mieux les trajectoires courbes à pas égal.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Augmenter le pas de temps pour aller plus vite, jusqu'à ce que « ça marche ». La forme obtenue tient à l'instabilité numérique autant qu'aux forces.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 171 · Simuler par la physique</div>
+</section>
+<!-- ============ PAGE 4 · LES OBJECTIFS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 171</b></div>
+<p class="rubrique">Schéma 3 · Les objectifs</p>
+<h2>Kangaroo : concilier des objectifs</h2>
+<p style="max-width:165mm">Kangaroo, livré avec Grasshopper, ne pense pas en forces mais en objectifs : une longueur à respecter, un point à ancrer, une charge, un sol. Chaque objectif propose où mettre ses points ; le solveur fait la moyenne pondérée et recommence jusqu'à l'équilibre.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Les objectifs : chacun dit où il voudrait mettre les points, le solveur arbitre</text>
+<circle cx="300" cy="110" fill="#2B2F33" r="5"></circle>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="300" y="132">point actuel</text>
+<circle cx="220" cy="60" fill="none" r="4" stroke="#1565C0" stroke-width="1.6"></circle>
+<line stroke="#1565C0" stroke-dasharray="3 2" x1="300" x2="220" y1="110" y2="60"></line>
+<text fill="#1565C0" font-size="7.8" font-weight="700" text-anchor="middle" x="220" y="51">longueur</text>
+<circle cx="390" cy="70" fill="none" r="4" stroke="#2E7D32" stroke-width="1.6"></circle>
+<line stroke="#2E7D32" stroke-dasharray="3 2" x1="300" x2="390" y1="110" y2="70"></line>
+<text fill="#2E7D32" font-size="7.8" font-weight="700" text-anchor="middle" x="390" y="61">appui</text>
+<circle cx="300" cy="172" fill="none" r="4" stroke="#E65100" stroke-width="1.6"></circle>
+<line stroke="#E65100" stroke-dasharray="3 2" x1="300" x2="300" y1="110" y2="172"></line>
+<text fill="#E65100" font-size="7.8" font-weight="700" text-anchor="middle" x="300" y="163">poids</text>
+<circle cx="303" cy="100" fill="#7B1FA2" r="5"></circle>
+<text fill="#7B1FA2" font-size="7.8" font-weight="700" text-anchor="start" x="352" y="118">moyenne pondérée</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="440" y="120">Chaque objectif a un poids :</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="440" y="134">un appui fort ne bouge pas,</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="440" y="148">un ressort faible cède.</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="20" y="120">On répète jusqu'à ce que</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="20" y="134">les points ne bougent</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="start" x="20" y="148">presque plus.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · une chaînette dans Grasshopper</span>Line → Divide Curve → Polyline → Explode   segments de la chaîne
+Length (Line)    chaque segment garde sa longueur
+Anchor           les deux extrémités, poids fort
+Load             un vecteur vers le bas sur chaque point
+Entwine → Solver  bouton Reset, puis laisser converger</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Le poids de chaque objectif</h3>
+<p>Un ancrage de poids fort ne bouge pas ; une longueur de poids faible s'étire. Les poids règlent les compromis entre objectifs contradictoires.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Forme, pas dimensionnement</h3>
+<p>La recherche de forme donne une géométrie en équilibre pour les charges choisies. Vérifier qu'elle tient reste le rôle d'un calcul de structure.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Donner à tous les objectifs le même poids maximal. Le solveur ne peut satisfaire des contraintes incompatibles : il oscille ou converge vers un compromis sans signification.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 171 · Simuler par la physique</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 171</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Une chaînette, puis une arche</h2>
+<p style="max-width:165mm; font-size:9pt">Tu simules une chaîne suspendue entre deux points avec Kangaroo, puis tu la retournes pour obtenir une arche funiculaire.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Dans Grasshopper, une <span class="cmd">Line</span> de 20 m entre (0,0,0) et (20,0,0), divisée en 20 par <span class="cmd">Divide Curve</span>.</li>
+<li>Relie les points en <span class="cmd">Polyline</span>, puis <span class="cmd">Explode</span> pour obtenir les segments.</li>
+<li>Branche les segments sur <span class="cmd">Length (Line)</span>, longueur au repos 1,2 fois l'originale (Multiplication).</li>
+<li>Ancre les deux extrémités (<span class="cmd">End Points</span> → <span class="cmd">Anchor</span>) ; mets <span class="cmd">Load</span> (0,0,-1) sur tous les points.</li>
+<li>Rassemble les objectifs avec <span class="cmd">Entwine</span>, branche-les sur le <span class="cmd">Solver</span>, bascule Reset sur faux.</li>
+<li>Récupère la polyligne résultat et retourne-la avec <span class="cmd">Mirror</span> par le plan XY.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        La chaîne <b>pend</b> entre les deux appuis, oscille un peu, puis se <b>stabilise</b> en chaînette. Retournée par Mirror, elle donne une <b>arche</b> plus haute au centre, qui ne travaille qu'en compression sous son propre poids.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Transforme la chaîne en filet : une grille de points reliée dans les deux directions, ancrée aux quatre coins. Que donne la forme retournée ?
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Le composant Flow de Cuttlefish trace des lignes de courant pas à pas, avec la même boucle qu'une simulation et un pas du point milieu.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">cuttlefish/Flow.cs</span></div>
+<div class="l k1"><span class="n">91</span>for (int i = 0; i &lt; count; i++)<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">93</span>    // Pas du point milieu (Runge-Kutta d'ordre 2).<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">94</span>    Vector3d v1 = field(p);<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">96</span>    Vector3d v2 = field(p + v1 * (step / 2));<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">98</span>    p += v2 * step;<span class="rep r3">3</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>La boucle</b>Un pas, puis le suivant.</li>
+<li><span class="rep r2">2</span><b>Le point milieu</b>La direction à mi-pas.</li>
+<li><span class="rep r3">3</span><b>Avancer</b>Position mise à jour.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ Les deux extrémités ne bougent pas.</li>
+<li style="margin-bottom:1.6mm">☐ La flèche augmente avec la longueur au repos.</li>
+<li style="margin-bottom:1.6mm">☐ Le solveur s'arrête : plus aucun mouvement visible.</li>
+<li style="margin-bottom:1.6mm">☐ L'arche retournée a la même portée que la chaîne.</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 171 · Simuler par la physique</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 5B</b> · Chercher la meilleure forme</span><b>Cours 171</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Une simulation avance par pas de temps : forces, vitesses, positions, amortissement, jusqu'à ce que plus rien ne bouge. Un pas trop grand ou des ressorts trop raides la font exploser ; l'amortissement la pose. Kangaroo concilie des objectifs pondérés (longueur, ancrage, charge). La recherche de forme donne une géométrie en équilibre, comme la chaînette retournée en arche, mais pas un dimensionnement.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Square (grille de points) ou Mesh Plane, puis les segments des deux directions (Face Boundaries puis Explode, ou Mesh Edges) dans Length (Line) ; Anchor sur les quatre coins, Load sur tous les points. Retournée, la forme donne une coque funiculaire, une voûte en compression posée sur quatre appuis.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">dt  amortissement</td><td>taille du pas, perte d'énergie</td><td>stabilité</td></tr>
+<tr><td class="c">Hooke : F = k (L − L0)</td><td>force d'un ressort</td><td>longueurs à respecter</td></tr>
+<tr><td class="c">Anchor  Load</td><td>fixer un point, appliquer une charge</td><td>appuis et poids</td></tr>
+<tr><td class="c">Length (Line)</td><td>objectif de longueur</td><td>câbles, chaînes, filets</td></tr>
+<tr><td class="c">Entwine → Solver</td><td>rassembler, résoudre</td><td>toute simulation Kangaroo</td></tr>
+<tr><td class="c">Mirror</td><td>retourner une chaînette</td><td>arche funiculaire</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Pas de temps</dt><dd>L'intervalle entre deux états calculés de la simulation.</dd>
+<dt>Amortissement</dt><dd>La perte de vitesse qui laisse le système se poser.</dd>
+<dt>Funiculaire</dt><dd>Une forme qui ne travaille qu'en tension, ou retournée, qu'en compression.</dd>
+<dt>Objectif (goal)</dt><dd>Une contrainte qui propose une position pour ses points.</dd>
+<dt>Convergence</dt><dd>L'état où les points ne bougent presque plus.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · cours 172, « Croissance et systèmes de règles ». Le forum Kangaroo de McNeel (Daniel Piker) et ses exemples livrés avec Grasshopper.</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : fiche récap de la partie 5</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 171 · Simuler par la physique</div>
+</section>
+</body>
+</html>

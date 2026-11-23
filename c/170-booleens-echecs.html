@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>170 · Les booléens et leurs échecs</title>
+<link href="trame.css" rel="stylesheet"/>
+</head>
+<body class="partie-4">
+<!-- ============ PAGE 1 · LE CONCEPT ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 170</b></div>
+<p class="rubrique">Le concept</p>
+<h1>Les booléens et leurs échecs</h1>
+<p class="chapeau">Percer, assembler, garder la partie commune : les booléens sont les gestes les plus naturels du volume. Ils sont aussi la commande qui échoue le plus souvent, avec un message laconique. Presque toujours pour quatre raisons, qu'on apprend à voir avant de recommencer.</p>
+<div class="meta">
+<span class="pastille"><b>50 min</b> de lecture et de pratique</span>
+<span class="pastille">Niveau · <b>intermédiaire</b></span>
+<span class="pastille">Prérequis · <b>160</b>, <b>169</b></span>
+<span class="pastille">Exemples · <b>Rhino, Grasshopper, RhinoCommon, GDI+</b></span>
+</div>
+<div class="panneau" style="padding:5mm 6mm 3mm; margin-bottom:5mm;">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Trois opérations, une même étape cachée : calculer où les deux solides se coupent</text>
+<rect fill="#fff" height="146" rx="6" stroke="#2E7D32" stroke-width="1.2" width="170" x="30" y="40"></rect>
+<rect fill="#2E7D32" fill-opacity=".25" height="60" stroke="#2E7D32" width="60" x="50" y="72"></rect>
+<circle cx="120" cy="102" fill="#2E7D32" fill-opacity=".25" r="30" stroke="#2E7D32"></circle>
+<text fill="#2E7D32" font-size="9" font-weight="700" text-anchor="middle" x="115" y="158">Union</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="115" y="174">A ∪ B</text>
+<rect fill="#fff" height="146" rx="6" stroke="#E65100" stroke-width="1.2" width="170" x="220" y="40"></rect>
+<defs><clippath id="cd"><rect height="60" width="60" x="240" y="72"></rect></clippath></defs>
+<rect fill="#E65100" fill-opacity=".3" height="60" stroke="#E65100" width="60" x="240" y="72"></rect>
+<circle clip-path="url(#cd)" cx="310" cy="102" fill="#fff" r="30" stroke="#E65100" stroke-dasharray="3 2"></circle>
+<circle cx="310" cy="102" fill="none" r="30" stroke="#6B7378" stroke-dasharray="3 2"></circle>
+<text fill="#E65100" font-size="9" font-weight="700" text-anchor="middle" x="305" y="158">Différence</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="305" y="174">A − B</text>
+<rect fill="#fff" height="146" rx="6" stroke="#1565C0" stroke-width="1.2" width="170" x="410" y="40"></rect>
+<defs><clippath id="ci"><rect height="60" width="60" x="430" y="72"></rect></clippath></defs>
+<rect fill="none" height="60" stroke="#6B7378" stroke-dasharray="3 2" width="60" x="430" y="72"></rect>
+<circle cx="500" cy="102" fill="none" r="30" stroke="#6B7378" stroke-dasharray="3 2"></circle>
+<circle clip-path="url(#ci)" cx="500" cy="102" fill="#1565C0" fill-opacity=".35" r="30" stroke="#1565C0"></circle>
+<text fill="#1565C0" font-size="9" font-weight="700" text-anchor="middle" x="495" y="158">Intersection</text>
+<text class="mono" fill="#2B2F33" font-size="8.6" style="font-size:8.6px" text-anchor="middle" x="495" y="174">A ∩ B</text>
+</svg>
+</div>
+<div class="deuxcol">
+<div>
+<h3>L'idée en une phrase</h3>
+<p>Un booléen calcule d'abord les courbes où les deux solides se coupent, puis garde les bons morceaux selon ce qui est dedans ou dehors. Il échoue quand cette étape est impossible : objet ouvert, normales inversées, objet invalide, faces confondues ou simple contact.</p>
+<h3 style="margin-top:4mm">La situation</h3>
+<p class="situation">Tu perces une plaque avec un cylindre posé exactement sur sa face supérieure. BooleanDifference refuse. Rien n'est faux à l'œil : le dessus du cylindre et celui de la plaque sont confondus. Allonger le cylindre pour qu'il dépasse des deux côtés, et le trou apparaît.</p>
+</div>
+<div>
+<h3>À la fin, tu sais</h3>
+<ol class="objectifs">
+<li>décrire ce qu'un booléen calcule ;</li>
+<li>énumérer ce qu'il suppose des objets ;</li>
+<li>reconnaître les configurations qui échouent ;</li>
+<li>diagnostiquer un échec avec les bons outils.</li>
+</ol>
+</div>
+</div>
+<div class="encadre" style="margin-top:4mm">
+<span class="titre">À retenir</span>
+    Fermés, valides, bien orientés, et franchement sécants : un booléen réussit à ces quatre conditions. S'il échoue, on vérifie chacune (What, Check, Dir, Intersect) avant de recommencer, et on fait dépasser l'outil plutôt que de l'aligner.
+  </div>
+<div class="folio">1</div>
+<div class="pied">Cours 170 · Les booléens et leurs échecs</div>
+</section>
+<!-- ============ PAGE 2 · CE QU'IL SUPPOSE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 170</b></div>
+<p class="rubrique">Schéma 1 · Ce qu'il suppose</p>
+<h2>Fermé, orienté, valide</h2>
+<p style="max-width:165mm">Pour garder « ce qui est dedans » ou « ce qui est dehors », un booléen doit savoir où est le dedans. Il suppose donc des solides fermés, aux normales tournées vers l'extérieur, sans face abîmée. Une surface ouverte n'a pas de dedans.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Ce qu'un booléen suppose avant de commencer</text>
+<rect fill="#fff" height="31" rx="4" stroke="#2E7D32" stroke-width="1.2" width="540" x="30" y="40"></rect>
+<circle cx="46" cy="55.5" fill="#2E7D32" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="46" y="58.7">1</text>
+<text fill="#2E7D32" font-size="8.8" font-weight="700" text-anchor="start" x="62" y="60">Solides fermés</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="250" y="60">aucune arête nue : un dedans et un dehors</text>
+<rect fill="#fff" height="31" rx="4" stroke="#1565C0" stroke-width="1.2" width="540" x="30" y="77"></rect>
+<circle cx="46" cy="92.5" fill="#1565C0" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="46" y="95.7">2</text>
+<text fill="#1565C0" font-size="8.8" font-weight="700" text-anchor="start" x="62" y="97">Normales vers l'extérieur</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="250" y="97">sinon le dedans est pris pour le dehors</text>
+<rect fill="#fff" height="31" rx="4" stroke="#7B1FA2" stroke-width="1.2" width="540" x="30" y="114"></rect>
+<circle cx="46" cy="129.5" fill="#7B1FA2" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="46" y="132.7">3</text>
+<text fill="#7B1FA2" font-size="8.8" font-weight="700" text-anchor="start" x="62" y="134">Objets valides</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="250" y="134">pas de face abîmée, pas d'auto-intersection</text>
+<rect fill="#fff" height="31" rx="4" stroke="#E65100" stroke-width="1.2" width="540" x="30" y="151"></rect>
+<circle cx="46" cy="166.5" fill="#E65100" r="7"></circle><text fill="#fff" font-size="8" font-weight="700" text-anchor="middle" x="46" y="169.7">4</text>
+<text fill="#E65100" font-size="8.8" font-weight="700" text-anchor="start" x="62" y="171">Intersections franches</text>
+<text fill="#2B2F33" font-size="8" text-anchor="start" x="250" y="171">ni faces confondues, ni simple contact</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Exemple autonome · C#, une différence qui peut échouer</span>double tol = doc.ModelAbsoluteTolerance;
+if (!plaque.IsSolid || !outil.IsSolid) return;      // fermés ?
+Brep[] res = Brep.CreateBooleanDifference(plaque, outil, tol);
+if (res == null || res.Length == 0)
+    RhinoApp.WriteLine("Échec : vérifier contact, faces confondues");
+else foreach (var b in res) doc.Objects.AddBrep(b);</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Un résultat ou rien</h3>
+<p>En cas d'échec, la méthode ne rend rien. Le code le teste, comme la commande affiche un message, au lieu de supposer un résultat.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>La tolérance du modèle</h3>
+<p>Les intersections se calculent à la tolérance absolue du document. Trop grossière, elle confond des faces ; trop fine, elle trouve des arêtes minuscules.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Lancer une différence avec une polysurface ouverte. La commande peut produire un résultat partiel ou rien ; il faut d'abord la fermer (Cap, Join) et vérifier avec What.
+  </div>
+<div class="folio">2</div>
+<div class="pied">Cours 170 · Les booléens et leurs échecs</div>
+</section>
+<!-- ============ PAGE 3 · LES ÉCHECS ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 170</b></div>
+<p class="rubrique">Schéma 2 · Les échecs</p>
+<h2>Confondu, tangent, minuscule</h2>
+<p style="max-width:165mm">Même avec des solides parfaits, certaines positions rendent l'intersection ambiguë. Deux faces exactement superposées, deux solides qui se touchent sans se couper, ou un décalage plus petit que la tolérance : l'opération ne sait plus quelles courbes tracer.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Les configurations qui font échouer un booléen</text>
+<rect fill="#fff" height="146" rx="6" stroke="#C62828" stroke-width="1.2" width="170" x="30" y="40"></rect>
+<rect fill="#F4F1EA" height="60" stroke="#2B2F33" width="70" x="60" y="80"></rect><rect fill="none" height="40" stroke="#C62828" stroke-width="1.6" width="60" x="105" y="80"></rect>
+<line stroke="#C62828" stroke-width="3" x1="105" x2="130" y1="80" y2="80"></line>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="115" y="160">le dessus coïncide :</text>
+<text fill="#C62828" font-size="7.6" font-weight="700" text-anchor="middle" x="115" y="174">dépasser franchement</text>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="middle" x="115" y="62">Faces confondues</text>
+<rect fill="#fff" height="146" rx="6" stroke="#E65100" stroke-width="1.2" width="170" x="220" y="40"></rect>
+<rect fill="#F4F1EA" height="50" stroke="#2B2F33" width="60" x="245" y="90"></rect><circle cx="330" cy="115" fill="none" r="25" stroke="#E65100" stroke-width="1.6"></circle>
+<circle cx="305" cy="115" fill="#E65100" r="3"></circle>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="305" y="160">ils se touchent sans</text>
+<text fill="#E65100" font-size="7.6" font-weight="700" text-anchor="middle" x="305" y="174">se couper : pas de courbe</text>
+<text fill="#E65100" font-size="9" font-weight="700" text-anchor="middle" x="305" y="62">Contact tangent</text>
+<rect fill="#fff" height="146" rx="6" stroke="#7B1FA2" stroke-width="1.2" width="170" x="410" y="40"></rect>
+<rect fill="#F4F1EA" height="60" stroke="#2B2F33" width="70" x="440" y="80"></rect><rect fill="none" height="30" stroke="#7B1FA2" stroke-width="1.6" width="60" x="439.4" y="100"></rect>
+<line stroke="#7B1FA2" stroke-dasharray="2 1" stroke-width="1" x1="439" x2="439" y1="96" y2="134"></line>
+<text fill="#2B2F33" font-size="7.6" text-anchor="middle" x="495" y="160">un décalage sous la</text>
+<text fill="#7B1FA2" font-size="7.6" font-weight="700" text-anchor="middle" x="495" y="174">tolérance : arête dégénérée</text>
+<text fill="#7B1FA2" font-size="9" font-weight="700" text-anchor="middle" x="495" y="62">Arête minuscule</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · la position et sa correction</span>faces confondues     faire dépasser l'outil d'une valeur franche
+contact tangent      enfoncer l'outil, ou unir autrement (Join)
+décalage &lt; tolérance aligner exactement, ou décaler bien au-delà
+outil trop juste     le prolonger des deux côtés de la pièce</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Dépasser, toujours</h3>
+<p>Un outil de perçage dépasse la pièce des deux côtés. Rien ne coûte moins, et c'est la première cause d'échec évitée.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Les booléens 2D</h3>
+<p>Les régions planes suivent la même logique : CurveBoolean et Region Union demandent des courbes fermées et coplanaires.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Aligner l'outil sur la face « pour que ce soit propre ». C'est le cas le plus difficile pour le calcul ; un dépassement franc donne le même résultat sans ambiguïté.
+  </div>
+<div class="folio">3</div>
+<div class="pied">Cours 170 · Les booléens et leurs échecs</div>
+</section>
+<!-- ============ PAGE 4 · LE DIAGNOSTIC ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 170</b></div>
+<p class="rubrique">Schéma 3 · Le diagnostic</p>
+<h2>Comprendre avant de recommencer</h2>
+<p style="max-width:165mm">Un échec se diagnostique dans l'ordre : chaque objet est-il fermé, valide, bien orienté ? Les courbes d'intersection existent-elles, et sont-elles fermées ? Chaque réponse désigne une correction précise.</p>
+<div class="panneau" style="padding:4mm 5mm 3mm; margin-top:3mm">
+<svg viewbox="0 0 600 196" width="100%">
+<rect fill="#EFE9E1" height="196" width="600" x="0" y="0"></rect>
+<text fill="#1F5F7A" font-size="10" font-weight="700" text-anchor="start" x="16" y="22">Quand un booléen échoue : diagnostiquer avant de recommencer</text>
+<rect fill="#fff" height="56" rx="5" stroke="#2E7D32" stroke-width="1.4" width="104" x="16" y="60"></rect>
+<text fill="#2E7D32" font-size="9" font-weight="700" text-anchor="middle" x="68" y="82">Fermé ?</text>
+<text class="mono" fill="#2B2F33" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="68" y="100">What, ShowEdges</text>
+<line stroke="#6B7378" stroke-width="1" x1="120" x2="132" y1="88" y2="88"></line><polygon fill="#6B7378" points="132,88 125.6,90.7 125.6,85.3"></polygon>
+<rect fill="#fff" height="56" rx="5" stroke="#7B1FA2" stroke-width="1.4" width="104" x="132" y="60"></rect>
+<text fill="#7B1FA2" font-size="9" font-weight="700" text-anchor="middle" x="184" y="82">Valide ?</text>
+<text class="mono" fill="#2B2F33" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="184" y="100">Check, SelBadObjects</text>
+<line stroke="#6B7378" stroke-width="1" x1="236" x2="248" y1="88" y2="88"></line><polygon fill="#6B7378" points="248,88 241.6,90.7 241.6,85.3"></polygon>
+<rect fill="#fff" height="56" rx="5" stroke="#1565C0" stroke-width="1.4" width="104" x="248" y="60"></rect>
+<text fill="#1565C0" font-size="9" font-weight="700" text-anchor="middle" x="300" y="82">Normales ?</text>
+<text class="mono" fill="#2B2F33" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="300" y="100">Dir</text>
+<line stroke="#6B7378" stroke-width="1" x1="352" x2="364" y1="88" y2="88"></line><polygon fill="#6B7378" points="364,88 357.6,90.7 357.6,85.3"></polygon>
+<rect fill="#fff" height="56" rx="5" stroke="#E65100" stroke-width="1.4" width="104" x="364" y="60"></rect>
+<text fill="#E65100" font-size="9" font-weight="700" text-anchor="middle" x="416" y="82">Se coupent ?</text>
+<text class="mono" fill="#2B2F33" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="416" y="100">Intersect</text>
+<line stroke="#6B7378" stroke-width="1" x1="468" x2="480" y1="88" y2="88"></line><polygon fill="#6B7378" points="480,88 473.6,90.7 473.6,85.3"></polygon>
+<rect fill="#fff" height="56" rx="5" stroke="#C62828" stroke-width="1.4" width="104" x="480" y="60"></rect>
+<text fill="#C62828" font-size="9" font-weight="700" text-anchor="middle" x="532" y="82">Ajuster</text>
+<text class="mono" fill="#2B2F33" font-size="7.4" style="font-size:7.4px" text-anchor="middle" x="532" y="100">dépasser, tolérance</text>
+<text fill="#E65100" font-size="7.8" font-weight="700" text-anchor="middle" x="300" y="146">Intersect montre les courbes que le booléen utiliserait : ouvertes ou absentes, il échouera.</text>
+<text fill="#2B2F33" font-size="7.8" text-anchor="middle" x="300" y="170">En dernier recours : séparer en étapes, ou passer par des maillages.</text>
+</svg>
+</div>
+<div class="boite apres" style="margin-top:4mm"><span class="etiq">Repère · les commandes du diagnostic</span>What  ShowEdges       fermé ? arêtes nues ?
+Check  SelBadObjects  objets invalides
+Dir  Flip            normales vers l'extérieur
+Intersect            les courbes que le booléen utiliserait
+BooleanSplit         voir les morceaux sans rien jeter</div>
+<div class="deuxcol" style="margin-top:4mm">
+<div style="font-size:8.6pt">
+<h3>Par étapes</h3>
+<p>Une union de vingt pièces qui échoue : on unit deux par deux pour trouver la pièce fautive, au lieu de chercher dans le tas.</p>
+</div>
+<div style="font-size:8.6pt">
+<h3>Le recours maillé</h3>
+<p>MeshBooleanUnion travaille sur des maillages : il passe souvent là où le booléen NURBS échoue, mais le résultat est facetté.</p>
+</div>
+</div>
+<div class="encadre piege" style="position:absolute; left:16mm; right:16mm; bottom:20mm;">
+<span class="titre">Piège courant</span>
+    Relancer la même commande en espérant un autre résultat, ou augmenter la tolérance jusqu'à ce que ça passe. Le modèle devient imprécis et le prochain booléen échouera aussi.
+  </div>
+<div class="folio">4</div>
+<div class="pied">Cours 170 · Les booléens et leurs échecs</div>
+</section>
+<!-- ============ PAGE 5 · MISE EN PRATIQUE ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 170</b></div>
+<p class="rubrique">Mise en pratique</p>
+<h2>Percer une plaque</h2>
+<p style="max-width:165mm; font-size:9pt">Tu provoques un échec typique, tu le diagnostiques, puis tu le corriges, et tu compares avec un objet ouvert.</p>
+<div class="deuxcol" style="grid-template-columns: 1.25fr 1fr; margin-top:3mm">
+<div>
+<h3>Exercice guidé</h3>
+<ol class="etapes">
+<li>Dessine une <span class="cmd">Box</span> de 100 × 60 × 10, posée sur le plan XY.</li>
+<li>Dessine un <span class="cmd">Cylinder</span> de rayon 10 qui part de Z = 0 et s'arrête exactement à Z = 10.</li>
+<li>Lance <span class="cmd">BooleanDifference</span> (la plaque, puis le cylindre) et note le résultat ou le message.</li>
+<li>Annule. Lance <span class="cmd">Intersect</span> sur les deux objets et observe les courbes.</li>
+<li>Avec <span class="cmd">Gumball</span> ou <span class="cmd">Move</span>, prolonge le cylindre de -5 à 15 en Z, puis relance la différence.</li>
+<li>Supprime la face du dessus d'une autre boîte (<span class="cmd">ExtractSrf</span>) et tente la même différence.</li>
+</ol>
+</div>
+<div>
+<div class="encadre resultat">
+<span class="titre">Résultat attendu</span>
+        Avec le cylindre aligné, le résultat est <b>incertain</b> : échec, ou trou à refaire selon la tolérance. Prolongé, il donne un <b>trou net</b> traversant. Avec la boîte ouverte, <b>What</b> annonce une polysurface ouverte et la différence ne donne pas de solide.
+      </div>
+<div class="encadre defi" style="margin-top:4mm">
+<span class="titre">Défi</span>
+        Perce la plaque de 12 trous en une seule opération, puis explique quoi faire si un seul des 12 fait échouer l'ensemble.
+      </div>
+</div>
+</div>
+<p class="rubrique" style="margin-top:5mm">Dans tes projets</p>
+<p style="font-size:8.8pt; margin-bottom:2mm">Dans SnapSet, la jauge peint son texte partout sauf sur la barre : une différence booléenne en 2D, faite sur la zone de découpe de GDI+.</p>
+<div class="code-zone">
+<div class="code">
+<div class="l"><span class="cm">SnapSet/src/SnapSet.Constituants/PeintreFeuilles.cs</span></div>
+<div class="l k1"><span class="n">594</span>var horsBarre = g.Save();<span class="rep r1">1</span></div>
+<div class="l k2"><span class="n">595</span>using (var zoneBarre = new Region(barre))<span class="rep r2">2</span></div>
+<div class="l k2"><span class="n">597</span>    g.ExcludeClip(zoneBarre);<span class="rep r2">2</span></div>
+<div class="l k3"><span class="n">602</span>    g.DrawString(texte, police, pinceau, zoneTexte, format);<span class="rep r3">3</span></div>
+<div class="l k1"><span class="n">605</span>g.Restore(horsBarre);<span class="rep r1">1</span></div>
+</div>
+<ul class="notes">
+<li><span class="rep r1">1</span><b>Sauver, rendre</b>La découpe d'avant.</li>
+<li><span class="rep r2">2</span><b>Retirer</b>La barre de la zone.</li>
+<li><span class="rep r3">3</span><b>Peindre</b>Hors de la barre.</li>
+</ul>
+</div>
+<p class="rubrique" style="margin-top:6mm">Vérifie ton travail</p>
+<ul style="list-style:none; padding:0; margin:0; font-size:8.8pt; line-height:1.45">
+<li style="margin-bottom:1.6mm">☐ La plaque percée est une polysurface fermée (What).</li>
+<li style="margin-bottom:1.6mm">☐ Le trou traverse de part en part.</li>
+<li style="margin-bottom:1.6mm">☐ Intersect montre deux cercles fermés une fois le cylindre prolongé.</li>
+<li style="margin-bottom:1.6mm">☐ La boîte ouverte a des arêtes nues (ShowEdges).</li>
+</ul>
+<div class="folio">5</div>
+<div class="pied">Cours 170 · Les booléens et leurs échecs</div>
+</section>
+
+
+<!-- ============ PAGE 6 · REPÈRES ============ -->
+<section class="page">
+<div class="entete"><span>Bibliothèque de cours · <b>Chapitre 4B</b> · La géométrie algorithmique</span><b>Cours 170</b></div><p class="rubrique">Repères</p><h2>Aide-mémoire et glossaire</h2>
+
+
+
+
+<p class="rubrique" style="">En résumé</p>
+<div class="encadre" style="font-size:8.6pt">Un booléen calcule les courbes d'intersection de deux solides, puis garde les morceaux selon le dedans et le dehors. Il suppose des solides fermés, valides et orientés vers l'extérieur, et une intersection franche : faces confondues, contact tangent et décalage sous la tolérance le font échouer. On diagnostique avec What, Check, Dir et Intersect, on fait dépasser l'outil, et on procède par étapes.</div>
+<p class="rubrique" style="margin-top:4mm">Le défi, une solution</p>
+<p style="font-size:8.4pt; line-height:1.45">Copie le cylindre prolongé (ArrayLinear ou Array), puis BooleanDifference avec la plaque d'abord et les 12 cylindres ensuite. Si l'opération échoue, enlève les cylindres par moitiés pour trouver le fautif (souvent un cylindre tangent à un bord ou confondu avec un autre), corrige-le, puis relance. Dans Grasshopper, Solid Difference prend la liste des outils et rend rien en cas d'échec : le même tri s'applique.</p>
+<p class="rubrique" style="margin-top:4mm">Aide-mémoire</p>
+<table class="aide">
+<thead><tr><th>Commande</th><th>Ce qu'elle fait</th><th>Quand</th></tr></thead>
+<tbody>
+<tr><td class="c">BooleanUnion  Difference  Intersection</td><td>unir, retirer, garder le commun</td><td>solides fermés</td></tr>
+<tr><td class="c">BooleanSplit</td><td>découper sans rien jeter</td><td>voir les morceaux</td></tr>
+<tr><td class="c">What  ShowEdges</td><td>fermé ? arêtes nues ?</td><td>avant tout booléen</td></tr>
+<tr><td class="c">Check  SelBadObjects  Dir</td><td>valide ? orienté ?</td><td>après un échec</td></tr>
+<tr><td class="c">Intersect</td><td>afficher les courbes d'intersection</td><td>comprendre l'échec</td></tr>
+<tr><td class="c">Solid Difference  Region Union</td><td>les mêmes, dans Grasshopper</td><td>3D et 2D</td></tr>
+</tbody>
+</table>
+<p class="rubrique" style="margin-top:4mm">Glossaire</p>
+<dl class="glossaire">
+<dt>Booléen</dt><dd>Une opération d'ensemble sur des volumes : union, différence, intersection.</dd>
+<dt>Solide</dt><dd>Une polysurface fermée, sans arête nue.</dd>
+<dt>Courbe d'intersection</dt><dd>La courbe où les surfaces de deux objets se coupent.</dd>
+<dt>Contact tangent</dt><dd>Deux objets qui se touchent sans se couper.</dd>
+<dt>Tolérance absolue</dt><dd>La distance sous laquelle deux points sont confondus dans le modèle.</dd>
+</dl>
+<p class="plusloin" style="margin-top:3mm"><b>Pour aller plus loin</b> · la fiche récap de la partie 4. Dans l'aide de Rhino, « BooleanDifference » et « Check ».</p>
+<div style="position:absolute; left:16mm; right:16mm; bottom:20mm; border-top:.3mm solid var(--line); padding-top:3mm; display:flex; justify-content:space-between; font-size:8.6pt;">
+<span>Cours terminé le ____ / ____ / ________</span><span>Suite : fiche récap de la partie 4</span>
+</div>
+<div class="folio">6</div>
+<div class="pied">Cours 170 · Les booléens et leurs échecs</div>
+</section>
+</body>
+</html>
